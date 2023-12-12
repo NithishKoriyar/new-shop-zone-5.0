@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "461002269867",
+    "project_id": "shop-zone-notifications",
+    "storage_bucket": "shop-zone-notifications.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:461002269867:android:aaa76d0bebd42458ed83ee",
+        "android_client_info": {
+          "package_name": "com.atozas.shop_zone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgi5g8YIR0UQKcIr6e51DTyRzAjfDpoko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

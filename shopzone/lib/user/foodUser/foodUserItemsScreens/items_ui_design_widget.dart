@@ -1,0 +1,86 @@
+import 'package:flutter/material.dart';
+import 'package:shopzone/api_key.dart';
+import 'package:shopzone/user/foodUser/foodUserItemsScreens/items_details_screen.dart';
+import 'package:shopzone/user/models/items.dart';
+
+
+
+
+// ignore: must_be_immutable
+class ItemsUiDesignWidget extends StatefulWidget
+{
+  Items? model;
+
+  ItemsUiDesignWidget({this.model,});
+
+  @override
+  State<ItemsUiDesignWidget> createState() => _ItemsUiDesignWidgetState();
+}
+
+
+
+
+class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget>
+{
+  @override
+  Widget build(BuildContext context)
+  {
+    return GestureDetector(
+      onTap: ()
+      {
+        Navigator.push(context, MaterialPageRoute(builder: (c)=> ItemsDetailsScreen(
+          model: widget.model,
+        )));
+      },
+      child: Card(
+        color: Colors.white,
+        elevation: 10,
+        shadowColor: Colors.black,
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: SizedBox(
+            height: 270,
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              children: [
+
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(40),
+                  child: Image.network(
+                    API.foodSellerMenuItemsInFoodUser + (widget.model!.thumbnailUrl ?? ''),
+                    //widget.model!.thumbnailUrl.toString(),
+                    height: 220,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+                const SizedBox(height: 1,),
+
+                Text(
+                  widget.model!.itemTitle.toString(),
+                  style: const TextStyle(
+                    color: Colors.deepPurple,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    letterSpacing: 3,
+                  ),
+                ),
+
+                const SizedBox(height: 1,),
+
+                Text(
+                  widget.model!.itemInfo.toString(),
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontSize: 14,
+                  ),
+                ),
+
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
