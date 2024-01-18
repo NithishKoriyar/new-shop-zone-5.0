@@ -174,22 +174,22 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
 
                 //Shifted Parcels
-                ListTile(
-                  leading: const Icon(
-                    Icons.picture_in_picture_alt_rounded,
-                    color: Colors.white,
-                  ),
-                  title: const Text(
-                    "Shifted Parcels",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (c) => ShiftedParcelsScreen()));
-                  },
-                ),
+                // ListTile(
+                //   leading: const Icon(
+                //     Icons.picture_in_picture_alt_rounded,
+                //     color: Colors.white,
+                //   ),
+                //   title: const Text(
+                //     "Shifted Parcels",
+                //     style: TextStyle(color: Colors.white),
+                //   ),
+                //   onTap: () {
+                //     Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //             builder: (c) => ShiftedParcelsScreen()));
+                //   },
+                // ),
                 const Divider(
                   height: 10,
                   color: Colors.white,

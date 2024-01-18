@@ -1,0 +1,14 @@
+
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+SharedPreferences? sharedPreferences;
+
+Position? position;
+List<Placemark>? placeMarks;
+String completeAddress="";
+
+String perParcelDeliveryAmount="";
+String previousEarnings = ""; // it is seller old total earnings
+String previousRiderEarnings = ""; // it is rider old total earnings

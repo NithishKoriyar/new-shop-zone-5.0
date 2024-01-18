@@ -44,7 +44,7 @@ class _OrderCardState extends State<OrderCard> {
               children: [
                 //image
                 Image.network(
-                  API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+                  API.foodSellerGetItemsImage + (widget.model!.thumbnailUrl ?? ''),
                   width: 140,
                   height: 120,
                 ),

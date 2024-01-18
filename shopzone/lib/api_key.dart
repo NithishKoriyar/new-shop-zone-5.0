@@ -194,4 +194,16 @@ class API {
       "$hostConnectFoodSeller/updateSellerLocation.php"; //update Seller Location
   static const fetchSellerLocation =
       "$hostConnectFoodSeller/fetchSellerLocation.php"; // fetch  Seller Location
+
+  //!--------------------Rider API------------------------------------------
+  static const hostRider = "$hostConnect/riders";
+
+  static const validate = "$hostRider/validate_email.php";
+  static const riderSignUp = "$hostRider/sign_up.php";
+  static const riderLogin = "$hostRider/log_In.php";
+  static const upProfileImage = "$hostRider/uploadProfileImage.php";
+  static const riderEarnings = "$hostRider/rider_earnings.php";//rider Earnings
+   static const deliveryAmount = "$hostRider/get_per_parcel_delivery_amount.php";//get_per_parcel_delivery_amount
+
+  
 }

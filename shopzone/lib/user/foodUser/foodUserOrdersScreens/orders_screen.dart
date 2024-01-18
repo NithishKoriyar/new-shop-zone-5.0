@@ -92,8 +92,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Orders"),
-        backgroundColor: Colors.black,
         centerTitle: true,
+        elevation: 20,
       ),
       body: StreamBuilder<List<dynamic>>(
         stream: fetchOrders(),

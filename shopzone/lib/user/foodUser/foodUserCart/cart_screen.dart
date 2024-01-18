@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopzone/api_key.dart';
@@ -76,7 +75,7 @@ class _CartScreenUserState extends State<CartScreenUser> {
     return Scaffold(
       drawer: MyDrawer(),
       appBar: AppBar(
-        title: Text("Cart"),
+        title: const Text("Cart"),
         backgroundColor: Colors.black,
         centerTitle: true,
       ),
@@ -84,10 +83,10 @@ class _CartScreenUserState extends State<CartScreenUser> {
         stream: fetchCartItems(),
         builder: (context, dataSnapshot) {
           if (dataSnapshot.connectionState == ConnectionState.waiting) {
-            return Center(
+            return const Center(
                 child: CircularProgressIndicator()); // Show loading indicator
           } else if (!dataSnapshot.hasData || dataSnapshot.data!.isEmpty) {
-            return Center(child: Text('No items exist in the cart'));
+            return const Center(child: Text('No items exist in the cart'));
           } else {
             List<dynamic> cartItems = dataSnapshot.data!;
             return ListView.builder(

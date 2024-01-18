@@ -31,7 +31,6 @@ class LoadingDialogWidget extends StatelessWidget
           Text(
             message.toString() + ", Please wait...",
           ),
-
         ],
       ),
     );

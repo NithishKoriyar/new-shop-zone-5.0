@@ -231,8 +231,8 @@ Future<void> notificationFormat(userDeviceToken, orderID, sellerName) async {
               decoration: const BoxDecoration(
                   gradient: LinearGradient(
                 colors: [
-                  Colors.pinkAccent,
-                  Colors.purpleAccent,
+                  Colors.black,
+                    Colors.black,
                 ],
                 begin: FractionalOffset(0.0, 0.0),
                 end: FractionalOffset(1.0, 0.0),

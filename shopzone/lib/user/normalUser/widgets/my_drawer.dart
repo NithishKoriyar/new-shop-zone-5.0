@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/foodSeller/splashScreen/food_seller_my_splash_screen.dart';
+import 'package:shopzone/rider/riders_splashScreen/riders_splash_screen.dart';
 import 'package:shopzone/seller/splashScreen/seller_my_splash_screen.dart';
 import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/normalUser/history/history_screen.dart';
@@ -27,7 +28,6 @@ class _MyDrawerState extends State<MyDrawer> {
   late String userImg;
 
   bool dataLoaded = false;
-
 
   @override
   void initState() {
@@ -59,10 +59,10 @@ class _MyDrawerState extends State<MyDrawer> {
   Widget build(BuildContext context) {
     // Check if sellerImg is null before accessing it.
 // Placeholder if sellerImg is empty.
-  if (!dataLoaded) {
-    // Return a loading widget or an empty drawer until data is loaded
-    return Drawer(child: Center(child: CircularProgressIndicator()));
-  }
+    if (!dataLoaded) {
+      // Return a loading widget or an empty drawer until data is loaded
+      return Drawer(child: Center(child: CircularProgressIndicator()));
+    }
 
     return Drawer(
       backgroundColor: Colors.black54,
@@ -292,7 +292,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   color: Colors.grey,
                   thickness: 2,
                 ),
-                                ListTile(
+                ListTile(
                   leading: const Icon(
                     Icons.supervisor_account_sharp,
                     color: Colors.white,
@@ -312,6 +312,22 @@ class _MyDrawerState extends State<MyDrawer> {
                   height: 10,
                   color: Colors.grey,
                   thickness: 2,
+                ),
+                                ListTile(
+                  leading: const Icon(
+                    Icons.supervisor_account_sharp,
+                    color: Colors.white,
+                  ),
+                  title: const Text(
+                    "Rider",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (c) => const RidersSplashScreen()));
+                  },
                 ),
               ],
             ),

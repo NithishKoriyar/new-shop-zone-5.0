@@ -130,6 +130,7 @@ class _CartItemDesignWidgetState extends State<CartItemDesignWidget> {
                 ),
               ],
             ),
+            
           ),
         ),
       ),
