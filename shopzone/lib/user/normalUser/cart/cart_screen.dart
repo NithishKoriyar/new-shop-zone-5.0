@@ -76,7 +76,7 @@ class _CartScreenUserState extends State<CartScreenUser> {
       drawer: MyDrawer(),
       appBar: AppBar(
         title: Text("Cart"),
-        backgroundColor: Colors.black,
+        elevation: 20,
         centerTitle: true,
       ),
       body: StreamBuilder<List<dynamic>>(

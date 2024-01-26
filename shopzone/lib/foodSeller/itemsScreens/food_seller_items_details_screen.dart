@@ -17,15 +17,13 @@ class ItemsDetailsScreen extends StatefulWidget {
     this.model,
   });
 
-
   @override
   State<ItemsDetailsScreen> createState() => _ItemsDetailsScreenState();
-
 }
 
 class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
-
-  Future<void> deleteItem(String brandUniqueID,String itemID, String thumbnailUrl) async {
+  Future<void> deleteItem(
+      String brandUniqueID, String itemID, String thumbnailUrl) async {
     //Uri.parse("${API.currentSellerBrandView}?sellerID=$sellerID")
     var url = Uri.parse(
         "${API.foodSellerDeleteItems}?brandUniqueID=$brandUniqueID&itemID=$itemID&uid=$sellerID&thumbnailUrl=$thumbnailUrl");
@@ -37,7 +35,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
       var jsonResponse = json.decode(response.body);
       if (jsonResponse["status"] == "success") {
         Fluttertoast.showToast(msg: jsonResponse["message"]);
-        Navigator.push(context, MaterialPageRoute(builder: (c) => FoodSellerSplashScreen()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (c) => FoodSellerSplashScreen()));
       } else {
         Fluttertoast.showToast(msg: jsonResponse["message"]);
       }
@@ -45,16 +44,17 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
       Fluttertoast.showToast(msg: "Network error.");
     }
   }
-      //!seller information
-  final CurrentFoodSeller currentSellerController = Get.put(CurrentFoodSeller());
+
+  //!seller information
+  final CurrentFoodSeller currentSellerController =
+      Get.put(CurrentFoodSeller());
 
   late String sellerName;
   late String sellerEmail;
   late String sellerID;
 
-
   @override
-    void initState() {
+  void initState() {
     super.initState();
     currentSellerController.getSellerInfo().then((_) {
       setSellerInfo();
@@ -79,35 +79,22 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-            colors: [
-              Colors.black,
-              Colors.black,
-            ],
-            begin: FractionalOffset(0.0, 0.0),
-            end: FractionalOffset(1.0, 0.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp,
-          )),
-        ),
+        elevation: 20,
         title: Text(
           widget.model!.itemTitle.toString(),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          deleteItem(widget.model!.brandID.toString(),
+          deleteItem(
+              widget.model!.brandID.toString(),
               widget.model!.itemID.toString(),
               widget.model!.thumbnailUrl.toString());
         },
         label: const Text("Delete this Item"),
         icon: const Icon(
           Icons.delete_sweep_outlined,
-          color: Colors.white,
         ),
-        backgroundColor: Colors.black,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

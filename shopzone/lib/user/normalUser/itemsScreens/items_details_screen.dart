@@ -72,9 +72,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         label: const Text("Add to Cart"),
         icon: const Icon(
           Icons.add_shopping_cart_rounded,
-          color: Colors.white,
         ),
-        backgroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         child: Column(

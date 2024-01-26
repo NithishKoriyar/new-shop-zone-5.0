@@ -28,7 +28,8 @@ class ItemsScreen extends StatefulWidget {
 
 class _ItemsScreenState extends State<ItemsScreen> {
   //!seller information
-  final CurrentFoodSeller currentSellerController = Get.put(CurrentFoodSeller());
+  final CurrentFoodSeller currentSellerController =
+      Get.put(CurrentFoodSeller());
 
   late String sellerName;
   late String sellerEmail;
@@ -61,19 +62,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-            colors: [
-              Colors.black,
-              Colors.black,
-            ],
-            begin: FractionalOffset(0.0, 0.0),
-            end: FractionalOffset(1.0, 0.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp,
-          )),
-        ),
+        elevation: 20,
         title: const Text(
           "Shop Zone Foods",
           style: TextStyle(
@@ -179,6 +168,5 @@ class _ItemsScreenState extends State<ItemsScreen> {
       print("Error: ");
     }
   }
-
 }
 // final url = "${API.getItems}?uid=$uid&brandID=$brandID";

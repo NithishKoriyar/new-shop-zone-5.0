@@ -117,19 +117,7 @@ Future<void> validateUploadForm() async {
             ),
           ),
         ],
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-            colors: [
-              Colors.black,
-              Colors.black,
-            ],
-            begin: FractionalOffset(0.0, 0.0),
-            end: FractionalOffset(1.0, 0.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp,
-          )),
-        ),
+elevation: 20,
         title: const Text("Upload New Item"),
         centerTitle: true,
       ),
@@ -298,19 +286,7 @@ Future<void> validateUploadForm() async {
   defaultScreen() {
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-            colors: [
-              Colors.black,
-              Colors.black,
-            ],
-            begin: FractionalOffset(0.0, 0.0),
-            end: FractionalOffset(1.0, 0.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp,
-          )),
-        ),
+elevation: 20,
         title: const Text("Add New Item"),
         centerTitle: true,
       ),

@@ -79,19 +79,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-            colors: [
-              Colors.black,
-              Colors.black,
-            ],
-            begin: FractionalOffset(0.0, 0.0),
-            end: FractionalOffset(1.0, 0.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp,
-          )),
-        ),
+elevation: 20,
         title: Text(
           widget.model!.itemTitle.toString(),
         ),
@@ -105,9 +93,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         label: const Text("Delete this Item"),
         icon: const Icon(
           Icons.delete_sweep_outlined,
-          color: Colors.white,
         ),
-        backgroundColor: Colors.black,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

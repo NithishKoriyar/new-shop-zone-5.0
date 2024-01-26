@@ -38,14 +38,12 @@ class _AuthScreenState extends State<AuthScreen>
                 text: "Login",
                 icon: Icon(
                   Icons.lock,
-                  color: Colors.white,
                 ),
               ),
               Tab(
                 text: "Registration",
                 icon: Icon(
                   Icons.person,
-                  color: Colors.white,
                 ),
               ),
             ],

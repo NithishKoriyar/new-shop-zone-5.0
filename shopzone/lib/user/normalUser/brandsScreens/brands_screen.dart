@@ -46,17 +46,7 @@ Stream<List<Brands>> _getBrands(String uid) async* {
       backgroundColor: Colors.white,
       drawer: MyDrawer(),
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.black, Colors.black],
-              begin: FractionalOffset(0.0, 0.0),
-              end: FractionalOffset(1.0, 0.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp,
-            ),
-          ),
-        ),
+         elevation: 20,
         title: const Text(
           "Shop Zone",
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

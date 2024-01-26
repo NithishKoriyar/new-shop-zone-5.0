@@ -19,7 +19,7 @@ class _AuthScreenState extends State<AuthScreen>
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.black,
+          elevation: 20,
           title: const Text(
             "Shop Zone",
             style: TextStyle(

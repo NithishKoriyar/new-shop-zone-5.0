@@ -204,6 +204,7 @@ class API {
   static const upProfileImage = "$hostRider/uploadProfileImage.php";
   static const riderEarnings = "$hostRider/rider_earnings.php";//rider Earnings
    static const deliveryAmount = "$hostRider/get_per_parcel_delivery_amount.php";//get_per_parcel_delivery_amount
+   static const normalOrdersRDR = "$hostRider/riderOrderScreen.php";
 
   
 }

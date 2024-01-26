@@ -27,21 +27,7 @@ class _AppBarWithCartBadgeState extends State<AppBarWithCartBadge>
   Widget build(BuildContext context)
   {
     return AppBar(
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors:
-              [
-                Colors.black,
-                Colors.black,
-              ],
-              begin: FractionalOffset(0.0, 0.0),
-              end: FractionalOffset(1.0, 0.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp,
-            )
-        ),
-      ),
+       elevation: 20,
       automaticallyImplyLeading: true,
       title: const Text(
         "Food Zone",

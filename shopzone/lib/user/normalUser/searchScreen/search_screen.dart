@@ -33,19 +33,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-            colors: [
-              Colors.black,
-              Colors.black,
-            ],
-            begin: FractionalOffset(0.0, 0.0),
-            end: FractionalOffset(1.0, 0.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp,
-          )),
-        ),
+elevation: 20,
         automaticallyImplyLeading: true,
         title: TextField(
           onChanged: (textEntered) {

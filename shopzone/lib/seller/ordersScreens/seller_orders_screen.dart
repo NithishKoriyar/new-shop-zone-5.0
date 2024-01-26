@@ -84,8 +84,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Orders"),
-        backgroundColor: Colors.black,
+        title: const Text("Orders"), elevation: 20,
         centerTitle: true,
       ),
       body: StreamBuilder<List<dynamic>>(

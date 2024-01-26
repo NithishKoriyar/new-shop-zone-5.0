@@ -95,7 +95,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Parcels History"),
-        backgroundColor: Colors.black,
+        elevation: 20,
         centerTitle: true,
       ),
       body: StreamBuilder<List<dynamic>>(

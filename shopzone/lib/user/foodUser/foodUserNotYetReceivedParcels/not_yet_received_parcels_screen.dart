@@ -96,7 +96,7 @@ class _NotYetReceivedParcelsScreenState extends State<NotYetReceivedParcelsScree
     return Scaffold(
       appBar: AppBar(
         title: const Text("Not Yet Received Parcels"),
-        backgroundColor: Colors.black,
+         elevation: 20,
         centerTitle: true,
       ),
       body: StreamBuilder<List<dynamic>>(

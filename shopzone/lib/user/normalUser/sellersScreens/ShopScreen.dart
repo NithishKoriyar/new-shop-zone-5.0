@@ -58,19 +58,7 @@ class _ShopScreenState extends State<ShopScreen> {
       backgroundColor: Colors.white,
       drawer: MyDrawer(),
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 0, 0, 0),
-              Color.fromARGB(255, 0, 0, 0),
-            ],
-            begin: FractionalOffset(0.0, 0.0),
-            end: FractionalOffset(1.0, 0.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp,
-          )),
-        ),
+elevation: 20,
         title: const Text(
           "Shop Zone",
           style: TextStyle(

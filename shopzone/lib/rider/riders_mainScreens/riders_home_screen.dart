@@ -27,34 +27,13 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
       elevation: 2,
       margin: const EdgeInsets.all(8),
       child: Container(
-        decoration: index == 0 || index == 3 || index == 4
-            ? const BoxDecoration(
-                gradient: LinearGradient(
-                colors: [
-                  Colors.black,
-                    Colors.black,
-                ],
-                begin: FractionalOffset(0.0, 0.0),
-                end: FractionalOffset(1.0, 0.0),
-                stops: [0.0, 1.0],
-                tileMode: TileMode.clamp,
-              ))
-            : const BoxDecoration(
-                gradient: LinearGradient(
-                colors: [
-                   Colors.black,
-                    Colors.black,
-                ],
-                begin: FractionalOffset(0.0, 0.0),
-                end: FractionalOffset(1.0, 0.0),
-                stops: [0.0, 1.0],
-                tileMode: TileMode.clamp,
-              )),
+        
+
         child: InkWell(
           onTap: () {
             if (index == 0) {
               //New Available Orders
-              //Navigator.push(context,MaterialPageRoute(builder: (c) => NewOrdersScreen()));
+              Navigator.push(context,MaterialPageRoute(builder: (c) => NewOrdersScreen()));
             }
             if (index == 1) {
               //Parcels in Progress
@@ -89,7 +68,7 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
                 child: Icon(
                   iconData,
                   size: 40,
-                  color: Colors.black,
+                  color: Color.fromARGB(255, 255, 153, 0),
                 ),
               ),
               const SizedBox(height: 10.0),
@@ -98,7 +77,7 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
                   title,
                   style: const TextStyle(
                     fontSize: 16,
-                    color: Colors.black,
+                    color: Color.fromARGB(255, 255, 153, 0),
                   ),
                 ),
               ),
@@ -200,21 +179,9 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-            colors: [
-               Colors.black,
-                    Colors.black,
-            ],
-            begin: FractionalOffset(0.0, 0.0),
-            end: FractionalOffset(1.0, 0.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp,
-          )),
-        ),
+        elevation: 20,
         title: Text(
-          "Welcome ${riderName}" ,
+          "Welcome ${riderName}",
           style: const TextStyle(
             fontSize: 25.0,
             color: Colors.black,

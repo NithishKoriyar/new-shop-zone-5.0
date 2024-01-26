@@ -103,7 +103,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
               "Remove",
               style: TextStyle(fontSize: 16),
             ),
-            backgroundColor: Colors.black,
           ),
           //!Buy now option
           FloatingActionButton.extended(
@@ -122,7 +121,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
               "Buy Now",
               style: TextStyle(fontSize: 16),
             ),
-            backgroundColor: Colors.black,
           ),
         ],
       ),

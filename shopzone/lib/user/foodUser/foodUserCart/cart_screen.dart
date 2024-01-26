@@ -48,11 +48,10 @@ class _CartScreenUserState extends State<CartScreenUser> {
     print('user image: $userImg');
   }
 
-  List<dynamic> items = [];
+  List<dynamic> cartItems = []; // Class-level variable to store cart items
   bool isLoading = true;
 
   Stream<List<dynamic>> fetchCartItems() async* {
-    // Assuming your API endpoint is something like this
     print("Loading");
     const String apiUrl = API.foodUserCartView;
     print(API.foodUserCartView);
@@ -61,6 +60,7 @@ class _CartScreenUserState extends State<CartScreenUser> {
 
     if (response.statusCode == 200) {
       final List<dynamic> fetchedItems = json.decode(response.body);
+      cartItems = fetchedItems; // Update the class-level cartItems variable
       yield fetchedItems;
       print("fetchedItems");
       print(fetchedItems);
@@ -70,13 +70,22 @@ class _CartScreenUserState extends State<CartScreenUser> {
     }
   }
 
+  void _orderAll() {
+    // Loop through all cart items and print them
+    print("--------------------------------");
+    for (var item in cartItems) {
+      
+      print(item.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MyDrawer(),
       appBar: AppBar(
         title: const Text("Cart"),
-        backgroundColor: Colors.black,
+        elevation: 20,
         centerTitle: true,
       ),
       body: StreamBuilder<List<dynamic>>(
@@ -86,7 +95,9 @@ class _CartScreenUserState extends State<CartScreenUser> {
             return const Center(
                 child: CircularProgressIndicator()); // Show loading indicator
           } else if (!dataSnapshot.hasData || dataSnapshot.data!.isEmpty) {
-            return const Center(child: Text('No items exist in the cart'));
+            return const Center(
+              child: Text('No items exist in the cart'),
+            );
           } else {
             List<dynamic> cartItems = dataSnapshot.data!;
             return ListView.builder(
@@ -105,6 +116,13 @@ class _CartScreenUserState extends State<CartScreenUser> {
             );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          _orderAll();
+        },
+        icon: const Icon(Icons.check_circle),
+        label: const Text("Order All"),
       ),
     );
   }
