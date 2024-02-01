@@ -10,7 +10,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Initialize Firebase
+    // Initialize Firebase  ``
     await Firebase.initializeApp();
     runApp(const MyApp());
   } catch (e) {

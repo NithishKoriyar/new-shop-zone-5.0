@@ -1,53 +1,145 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shopzone/api_key.dart';
+import 'package:shopzone/rider/riders_mainScreens/rider_order_details_screen.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:shopzone/rider/riders_model/rider_items.dart';
 
-class OrderCard extends StatelessWidget {
-  final int? itemCount;
-  final List<DocumentSnapshot>? data;
-  final String? orderID;
-  final List<String>? seperateQuantitiesList;
-  final Orders model;
+class OrderCard extends StatefulWidget {
+  Orders? model;
+  int? quantityNumber;
 
   OrderCard({
-    this.itemCount,
-    this.data,
-    this.orderID,
-    this.seperateQuantitiesList, 
-    required this.model,
+    this.model,
+    this.quantityNumber,
   });
-
+ 
   @override
-  Widget build(BuildContext context) {
-    if (itemCount == null || data == null || seperateQuantitiesList == null) {
-      return Center(child: Text("Data is not available"));
-    }
+  State<OrderCard> createState() => _OrderCardState();
+}
 
+class _OrderCardState extends State<OrderCard> {
+  
+  @override
+  
+  Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Navigator.push(context, MaterialPageRoute(builder: (c) => OrderDetailsScreen(orderID: orderID)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (c) => OrderDetailsScreen(
+              model: widget.model,
+            ),
+          ),
+        );
       },
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.all(10),
-        height: itemCount * 125,
-        child: ListView.builder(
-          itemCount: itemCount,
-          physics: NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            Map<String, dynamic>? itemData = data[index].data() as Map<String, dynamic>?;
-            if (itemData == null) {
-              return Text("Item data not available");
-            }
-            Items itemModel = Items.fromJson(itemData);
-            return placedOrderDesignWidget(itemModel, context,);
-          },
+      child: Card(
+        color: Colors.white,
+        shadowColor: Colors.white54,
+        elevation: 10,
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: SizedBox(
+            height: 100,
+            width: MediaQuery.of(context).size.width,
+            child: Row(
+              children: [
+                //image
+                Image.network(
+                  API.foodSellerGetItemsImage + (widget.model!.thumbnailUrl ?? ''),
+                  width: 140,
+                  height: 120,
+                ),
+
+                const SizedBox(
+                  width: 6,
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.only(left: 14.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      //title
+                      Text(
+                        widget.model!.itemTitle.toString(),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 2,
+                      ),
+
+                      //Price: ₹ 12
+                      Row(
+                        children: [
+                          const Text(
+                            "Price: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const Text(
+                            "₹ ",
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontSize: 18,
+                            ),
+                          ),
+                          Text(
+                            widget.model!.price.toString(),
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(
+                        height: 4,
+                      ),
+
+                      //Quantity: 4
+                      Row(
+                        children: [
+                          const Text(
+                            "Quantity: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                            ),
+                          ),
+                          Text(
+                           widget.model!.itemQuantity.toString(),
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 }
+
 
 Widget placedOrderDesignWidget(Items model, BuildContext context, String quantity) {
   return Container(

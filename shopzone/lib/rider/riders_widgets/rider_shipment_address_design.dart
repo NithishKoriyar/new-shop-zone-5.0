@@ -1,53 +1,97 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopzone/api_key.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/riders_assistantMethods/get_current_location.dart';
 import 'package:shopzone/rider/riders_global/global.dart';
+import 'package:shopzone/rider/riders_mainScreens/rider_new_orders_screen.dart';
+import 'package:shopzone/rider/riders_mainScreens/rider_parcel_picking_screen.dart';
+import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:shopzone/rider/riders_model/rider_address.dart';
-import 'package:shopzone/rider/riders_splashScreen/riders_splash_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
 
-class ShipmentAddressDesign extends StatelessWidget {
-  final Address? model;
-  final String? orderStatus;
-  final String? orderId;
-  final String? sellerId;
-  final String? orderByUser;
-  final CurrentRider currentRiderController;
+class ShipmentAddressDesign extends StatefulWidget {
+  Orders? model;
 
-  ShipmentAddressDesign(
-      {this.model,
-      this.orderStatus,
-      this.orderId,
-      this.sellerId,
-      this.orderByUser})
-      : currentRiderController = Get.put(CurrentRider());
+  ShipmentAddressDesign({
+    this.model,
+  });
 
-  // Function to handle parcel shipment confirmation
-  void confirmedParcelShipment(BuildContext context, String getOrderID,
-      String sellerId, String purchaserId) {
-    FirebaseFirestore.instance.collection("orders").doc(getOrderID).update({
-      "riderUID": sharedPreferences!.getString("uid"),
-      "riderName": sharedPreferences!.getString("name"),
-      "status": "picking",
-      "lat": position!.latitude,
-      "lng": position!.longitude,
-      "address": completeAddress,
-    });
+  @override
+  State<ShipmentAddressDesign> createState() => _ShipmentAddressDesignState();
+}
 
-    // Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //         builder: (context) => ParcelPickingScreen(
-    //               purchaserId: purchaserId,
-    //               purchaserAddress: model!.fullAddress,
-    //               purchaserLat: model!.lat,
-    //               purchaserLng: model!.lng,
-    //               sellerId: sellerId,
-    //               getOrderID: getOrderID,
-    //             )));
+class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
+    final CurrentRider currentRiderController = Get.put(CurrentRider());
+  late String riderName;
+  late String riderEmail;
+  String? riderID;
+  late String riderImg;
+
+  @override
+  void initState() {
+    super.initState();
+    currentRiderController.getUserInfo().then(
+      (_) {
+        setRiderInfo();
+        // printSellerInfo();
+        setState(() {});
+
+        // restrictBlockedRidersFromUsingApp();
+      },
+    );
   }
 
+  void setRiderInfo() {
+    riderName = currentRiderController.rider.riders_name;
+    riderEmail = currentRiderController.rider.riders_email;
+    riderID = currentRiderController.rider.riders_id.toString();
+    riderImg = currentRiderController.rider.riders_image;
+  }
+
+  // void printSellerInfo() {
+  //   print('Seller Name: $riderName');
+  //   print('Seller Email: $riderEmail');
+  //   print('Seller ID: $riderID'); // Corrected variable name
+  //   print('Seller image: $riderImg');
+  // }
+
+  // Function to handle parcel shipment confirmation
+  void confirmedParcelShipment(
+      BuildContext context, getOrderID, sellerId, purchaserId) async {
+    print(API.updateOrderStatusRDR);
+    var url =
+        Uri.parse(API.updateOrderStatusRDR); // Change to your PHP script URL
+    var response = await http.post(url, body: {
+      'getOrderID': getOrderID,
+      'riderUID': riderID, // Replace with actual value
+      'riderName': riderName, // Replace with actual value
+      'status': 'picking',
+      'lat': position!.latitude.toString(), // Replace with actual value
+      'lng': position!.longitude.toString(), // Replace with actual value
+      'address': completeAddress, // Replace with actual value
+    });
+
+    if (response.statusCode == 200) {
+      // Handle the response from the PHP script
+      print('Server response: ${response.body}');
+      //send rider to shipmentScreen
+      // ignore: use_build_context_synchronously
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ParcelPickingScreen(
+          purchaserId: purchaserId,
+          purchaserAddress: widget.model?.completeAddress,
+          purchaserLat: widget.model!.lat,
+          purchaserLng: widget.model!.lng,
+          sellerId: sellerId,
+          getOrderID: getOrderID,
+      )));
+    } else {
+      // Handle the error
+      print('Server error: ${response.body}');
+    }
+  }
+
+  // void confirmedParcelShipment(BuildContext context,  getOrderID,
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -73,7 +117,7 @@ class ShipmentAddressDesign extends StatelessWidget {
                     "Name",
                     style: TextStyle(color: Colors.black),
                   ),
-                  Text(model!.name!),
+                  Text(widget.model!.name!),
                 ],
               ),
               TableRow(
@@ -82,7 +126,7 @@ class ShipmentAddressDesign extends StatelessWidget {
                     "Phone Number",
                     style: TextStyle(color: Colors.black),
                   ),
-                  Text(model!.phoneNumber!),
+                  Text(widget.model!.phoneNumber!),
                 ],
               ),
             ],
@@ -94,11 +138,11 @@ class ShipmentAddressDesign extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            model!.fullAddress!,
+            widget.model!.completeAddress!,
             textAlign: TextAlign.justify,
           ),
         ),
-        orderStatus == "ended"
+        widget.model?.orderStatus == "ended"
             ? Container()
             : Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -108,15 +152,17 @@ class ShipmentAddressDesign extends StatelessWidget {
                       UserLocation uLocation = UserLocation();
                       uLocation.getCurrentLocation();
 
-                      confirmedParcelShipment(
-                          context, orderId!, sellerId!, orderByUser!);
+                      // confirmedParcelShipment(
+                      //     context, orderId!, sellerId!, orderByUser!);
+                      confirmedParcelShipment(context, widget.model!.orderId,
+                          widget.model!.sellerUID, widget.model!.orderBy);
                     },
                     child: Container(
                       decoration: const BoxDecoration(
                           gradient: LinearGradient(
                         colors: [
-               Colors.black,
-                    Colors.black,
+                          Colors.black,
+                          Colors.black,
                         ],
                         begin: FractionalOffset(0.0, 0.0),
                         end: FractionalOffset(1.0, 0.0),
@@ -140,10 +186,7 @@ class ShipmentAddressDesign extends StatelessWidget {
           child: Center(
             child: InkWell(
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const RidersSplashScreen()));
+                Navigator.pop(context);
               },
               child: Container(
                 decoration: const BoxDecoration(

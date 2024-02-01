@@ -11,14 +11,22 @@ class Orders {
   Timestamp? publishedDate;
   String? sellerName;
   String? sellerUID;
+  double? sellerLat;
+  double? sellerLng;
   String? orderStatus;
   String? thumbnailUrl;
   String? orderId;
+  String? orderBy;
   String? orderTime;
   int? itemQuantity;
   String? name;
   String? phoneNumber;
   String? completeAddress;
+  String? riderUID;
+  String? riderName;
+  double? lat;
+  double? lng;
+  String? address;
 
   Orders({
     this.brandID,
@@ -31,14 +39,22 @@ class Orders {
     this.publishedDate,
     this.sellerName,
     this.sellerUID,
+    this.sellerLat,
+    this.sellerLng,
     this.orderStatus,
     this.thumbnailUrl,
     this.orderId,
+    this.orderBy,
     this.orderTime,
     this.itemQuantity,
     this.name,
     this.phoneNumber,
     this.completeAddress,
+    this.riderUID,
+    this.riderName,
+    this.lat,
+    this.lng,
+    this.address,
   });
 
   Orders.fromJson(Map<String, dynamic> json) {
@@ -52,7 +68,7 @@ class Orders {
     } else {
       price = json["price"];
     }
-        if (json["totalAmount"] is int) {
+    if (json["totalAmount"] is int) {
       totalAmount = json["totalAmount"].toString();
     } else {
       totalAmount = json["totalAmount"];
@@ -62,9 +78,16 @@ class Orders {
     }
     sellerName = json["sellerName"];
     sellerUID = json["sellerUID"];
+    sellerLat = json['sellerLat'] != null
+        ? double.tryParse(json['sellerLat'].toString())
+        : null;
+    sellerLng = json['sellerLng'] != null
+        ? double.tryParse(json['sellerLng'].toString())
+        : null;
     orderStatus = json["orderStatus"];
     thumbnailUrl = json["thumbnailUrl"];
     orderId = json["orderId"];
+    orderBy = json["orderBy"];
 
     orderTime = json["orderTime"];
 
@@ -77,5 +100,10 @@ class Orders {
     name = json["name"];
     phoneNumber = json["phoneNumber"];
     completeAddress = json["completeAddress"];
+    riderUID = json["riderUID"];
+    riderName = json["riderName"];
+    lat = json['lat'] != null ? double.tryParse(json['lat'].toString()) : null;
+    lng = json['lng'] != null ? double.tryParse(json['lng'].toString()) : null;
+    address = json["address"];
   }
 }
