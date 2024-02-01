@@ -91,12 +91,7 @@ void confirmParcelHasBeenPicked(String getOrderId, String sellerId, String purch
   if (response.statusCode == 200) {
     var data = json.decode(response.body);
     print(data['message']); // Handle the response as needed
-  } else {
-    print('Failed to update the order');
-  }
-}
-
-      // Navigator.push(context, MaterialPageRoute(builder: (c)=> ParcelDeliveringScreen(
+    //         Navigator.push(context, MaterialPageRoute(builder: (c)=> ParcelDeliveringScreen(
     //   purchaserId: purchaserId,
     //   purchaserAddress: purchaserAddress,
     //   purchaserLat: purchaserLat,
@@ -104,6 +99,13 @@ void confirmParcelHasBeenPicked(String getOrderId, String sellerId, String purch
     //   sellerId: sellerId,
     //   getOrderId: getOrderId,
     // )));
+  } else {
+    print('Failed to update the order');
+  }
+
+}
+
+
   
   // confirmParcelHasBeenPicked(getOrderId, sellerId, purchaserId,
   //     purchaserAddress, purchaserLat, purchaserLng) {

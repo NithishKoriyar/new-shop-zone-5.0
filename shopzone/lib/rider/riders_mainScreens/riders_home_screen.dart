@@ -38,7 +38,7 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
             }
             if (index == 1) {
               //Parcels in Progress
-              //Navigator.push(context,MaterialPageRoute(builder: (c) => ParcelInProgressScreen()));
+              Navigator.push(context,MaterialPageRoute(builder: (c) => ParcelInProgressScreen()));
             }
             if (index == 2) {
               //Not Yet Delivered
