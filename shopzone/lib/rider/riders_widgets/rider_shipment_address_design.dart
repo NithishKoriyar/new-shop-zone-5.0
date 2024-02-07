@@ -22,7 +22,7 @@ class ShipmentAddressDesign extends StatefulWidget {
 }
 
 class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
-    final CurrentRider currentRiderController = Get.put(CurrentRider());
+  final CurrentRider currentRiderController = Get.put(CurrentRider());
   late String riderName;
   late String riderEmail;
   String? riderID;
@@ -77,14 +77,19 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
       print('Server response: ${response.body}');
       //send rider to shipmentScreen
       // ignore: use_build_context_synchronously
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ParcelPickingScreen(
-          purchaserId: purchaserId,
-          purchaserAddress: widget.model?.completeAddress,
-          purchaserLat: widget.model!.lat,
-          purchaserLng: widget.model!.lng,
-          sellerId: sellerId,
-          getOrderID: getOrderID,
-      )));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ParcelPickingScreen(
+                      purchaserId: purchaserId,
+                      purchaserAddress: widget.model?.completeAddress,
+                      purchaserLat: widget.model!.lat,
+                      purchaserLng: widget.model!.lng,
+                      sellerId: sellerId,
+                      getOrderID: getOrderID,
+                    )));
+      });
     } else {
       // Handle the error
       print('Server error: ${response.body}');

@@ -42,11 +42,11 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
             }
             if (index == 2) {
               //Not Yet Delivered
-              //Navigator.push(context,MaterialPageRoute(builder: (c) => NotYetDeliveredScreen()));
+              Navigator.push(context,MaterialPageRoute(builder: (c) => NotYetDeliveredScreen()));
             }
             if (index == 3) {
               //History
-              //Navigator.push(context, MaterialPageRoute(builder: (c) => HistoryScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (c) => HistoryScreen()));
             }
             if (index == 4) {
               //Total Earnings
@@ -89,11 +89,7 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
     );
   }
 
-  final CurrentRider currentRiderController = Get.put(CurrentRider());
-  late String riderName;
-  late String riderEmail;
-  String? riderID;
-  late String riderImg;
+
 
   // restrictBlockedRidersFromUsingApp() async
   // {
@@ -118,6 +114,12 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
   //   });
   // }
 
+  final CurrentRider currentRiderController = Get.put(CurrentRider());
+  late String riderName;
+  late String riderEmail;
+  String? riderID;
+  late String riderImg;
+  
   @override
   void initState() {
     super.initState();

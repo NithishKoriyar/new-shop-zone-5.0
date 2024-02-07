@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shopzone/api_key.dart';
+import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:shopzone/rider/riders_widgets/rider_order_card.dart';
 import 'package:shopzone/rider/riders_widgets/rider_simple_app_bar.dart';
@@ -18,15 +20,38 @@ class ParcelInProgressScreen extends StatefulWidget
 
 class _ParcelInProgressScreenState extends State<ParcelInProgressScreen>
 {
+    final CurrentRider currentRiderController = Get.put(CurrentRider());
+  late String riderName;
+  late String riderEmail;
+  String? riderID;
+  late String riderImg;
+  
+  @override
+  void initState() {
+    super.initState();
+    currentRiderController.getUserInfo().then((_) {
+      setRiderInfo();
+      setState(() {});
+
+      // restrictBlockedRidersFromUsingApp();
+    });
+  }
+
+  void setRiderInfo() {
+    riderName = currentRiderController.rider.riders_name;
+    riderEmail = currentRiderController.rider.riders_email;
+    riderID = currentRiderController.rider.riders_id.toString();
+    riderImg = currentRiderController.rider.riders_image;
+  }
 
 
   Stream<List<dynamic>> fetchOrders() async* {
     // Assuming your API endpoint is something like this
-    const String apiUrl = API.foodSellerSellerOrdersView;
+    const String apiUrl = API.parcelInProgressScreenRDR;
 
     try {
       final response =
-          await http.post(Uri.parse(apiUrl),body: {'sellerID': sellerID});
+          await http.post(Uri.parse(apiUrl),body: {'riderID': riderID});
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);

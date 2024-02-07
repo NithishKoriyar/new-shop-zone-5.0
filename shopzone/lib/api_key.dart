@@ -1,3 +1,5 @@
+import 'package:shopzone/rider/riders_mainScreens/rider_parcel_in_progress_screen.dart';
+
 class API {
   //! web server
   static const hostConnect =
@@ -208,5 +210,11 @@ class API {
   static const normalOrdersRDR = "$hostRider/riderOrderScreen.php";
   static const updateOrderStatusRDR = "$hostRider/updateOrderStatus.php";
   static const getLatLngOfSellerInRDR = "$hostRider/getLatLngOfSellerInRDR.php";
-    static const updateOrderPicking = "$hostRider/updateOrderPicking.php";
+  static const updateOrderPicking = "$hostRider/updateOrderPicking.php";
+  static const parcelInProgressScreenRDR =
+      "$hostRider/parcelInProgressScreenRDR.php";
+        static const parcelNotYetDeliverScreenRDR =
+      "$hostRider/parcelNotYetDeliverScreenRDR.php";
+      static const parcelHistoryScreenRDR =
+      "$hostRider/parcelHistoryScreenRDR.php";
 }

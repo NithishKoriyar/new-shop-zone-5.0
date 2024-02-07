@@ -1,9 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/rider/riders_assistantMethods/get_current_location.dart';
 import 'package:shopzone/rider/riders_global/global.dart';
-import 'package:shopzone/rider/riders_mainScreens/rider_parcel_delivering_screen.dart';
 import '../maps/map_utils.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -106,25 +104,6 @@ void confirmParcelHasBeenPicked(String getOrderId, String sellerId, String purch
 }
 
 
-  
-  // confirmParcelHasBeenPicked(getOrderId, sellerId, purchaserId,
-  //     purchaserAddress, purchaserLat, purchaserLng) {
-  //   FirebaseFirestore.instance.collection("orders").doc(getOrderId).update({
-  //     "status": "delivering",
-  //     "address": completeAddress,
-  //     "lat": position!.latitude,
-  //     "lng": position!.longitude,
-  //   });
-
-  //   // Navigator.push(context, MaterialPageRoute(builder: (c)=> ParcelDeliveringScreen(
-  //   //   purchaserId: purchaserId,
-  //   //   purchaserAddress: purchaserAddress,
-  //   //   purchaserLat: purchaserLat,
-  //   //   purchaserLng: purchaserLng,
-  //   //   sellerId: sellerId,
-  //   //   getOrderId: getOrderId,
-  //   // )));
-  // }
 
   @override
   Widget build(BuildContext context) {
