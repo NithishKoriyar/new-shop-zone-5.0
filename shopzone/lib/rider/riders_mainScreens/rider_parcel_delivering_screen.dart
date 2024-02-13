@@ -1,9 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shopzone/api_key.dart';
 import 'package:shopzone/rider/riders_assistantMethods/get_current_location.dart';
 import 'package:shopzone/rider/riders_global/global.dart';
 import 'package:shopzone/rider/riders_splashScreen/riders_splash_screen.dart';
 import '../maps/map_utils.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import '../ridersPreferences/riders_current_user.dart';
 
 class ParcelDeliveringScreen extends StatefulWidget {
   String? purchaserId;
@@ -29,82 +34,171 @@ class ParcelDeliveringScreen extends StatefulWidget {
 class _ParcelDeliveringScreenState extends State<ParcelDeliveringScreen> {
   String orderTotalAmount = "";
 
+  final CurrentRider currentRiderController = Get.put(CurrentRider());
+  late String riderName;
+  late String riderEmail;
+  String? riderID;
+  late String riderImg;
+
+  @override
+  void initState() {
+    super.initState();
+    currentRiderController.getUserInfo().then((_) {
+      setRiderInfo();
+      setState(() {});
+      UserLocation uLocation = UserLocation();
+      uLocation.getCurrentLocation();
+
+      getOrderTotalAmount();
+    });
+  }
+
+  void setRiderInfo() {
+    riderName = currentRiderController.rider.riders_name;
+    riderEmail = currentRiderController.rider.riders_email;
+    riderID = currentRiderController.rider.riders_id.toString();
+    riderImg = currentRiderController.rider.riders_image;
+  }
+
+  void printSellerInfo() {
+    print('Seller Name: $riderName');
+    print('Seller Email: $riderEmail');
+    print('Seller ID: $riderID'); // Corrected variable name
+    print('Seller image: $riderImg');
+  }
+
   confirmParcelHasBeenDelivered(getOrderId, sellerId, purchaserId,
-      purchaserAddress, purchaserLat, purchaserLng) {
+      purchaserAddress, purchaserLat, purchaserLng) async {
     String riderNewTotalEarningAmount = ((double.parse(previousRiderEarnings)) +
             (double.parse(perParcelDeliveryAmount)))
         .toString();
 
-    FirebaseFirestore.instance.collection("orders").doc(getOrderId).update({
-      "status": "ended",
-      "address": completeAddress,
-      "lat": position!.latitude,
-      "lng": position!.longitude,
-      "earnings": perParcelDeliveryAmount, //pay per parcel delivery amount
-    }).then((value) {
-      FirebaseFirestore.instance
-          .collection("riders")
-          .doc(sharedPreferences!.getString("uid"))
-          .update({
-        "earnings": riderNewTotalEarningAmount, //total earnings amount of rider
-      });
-    }).then((value) {
-      FirebaseFirestore.instance
-          .collection("sellers")
-          .doc(widget.sellerId)
-          .update({
-        "earnings":
-            (double.parse(orderTotalAmount) + (double.parse(previousEarnings)))
-                .toString(), //total earnings amount of seller
-      });
-    }).then((value) {
-      FirebaseFirestore.instance
-          .collection("users")
-          .doc(purchaserId)
-          .collection("orders")
-          .doc(getOrderId)
-          .update({
-        "status": "ended",
-        "riderUID": sharedPreferences!.getString("uid"),
-      });
-    });
+    updateStatusEnded(getOrderId);
+    updateEarnings(riderID, riderNewTotalEarningAmount);
+    updateSellerEarnings(sellerId);
+    updateOrderStatus(purchaserId, getOrderId , riderID);
 
     Navigator.push(
         context, MaterialPageRoute(builder: (c) => const RidersSplashScreen()));
   }
 
-  getOrderTotalAmount() {
-    FirebaseFirestore.instance
-        .collection("orders")
-        .doc(widget.getOrderId)
-        .get()
-        .then((snap) {
-      orderTotalAmount = snap.data()!["totalAmount"].toString();
-      widget.sellerId = snap.data()!["sellerUID"].toString();
-    }).then((value) {
+//!........................................................
+  Future<void> updateStatusEnded(getOrderId) async {
+    try {
+      final response = await http.post(
+        Uri.parse(API.updateStatusToEndedRDR),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          'orderId': getOrderId,
+          'status': "ended",
+          'address': completeAddress,
+          'lat': position!.latitude,
+          'lng': position!.longitude,
+          'earnings': perParcelDeliveryAmount,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Order updated successfully: ${response.body}");
+      } else {
+        print("Failed to update order: ${response.body}");
+      }
+    } catch (e) {
+      print("Exception caught: $e");
+    }
+  }
+
+  Future<void> updateEarnings(riderID, riderNewTotalEarningAmount) async {
+    try {
+      final response = await http.post(
+        Uri.parse(API.updateEarningsRDR),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          'riderID': riderID,
+          'earnings': riderNewTotalEarningAmount,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Order updated successfully: ${response.body}");
+      } else {
+        print("Failed to update order: ${response.body}");
+      }
+    } catch (e) {
+      print("Exception caught: $e");
+    }
+  }
+
+//!------------------------------------------------------------------------------------------------
+
+  Future<void> updateSellerEarnings(sellerId) async {
+    try {
+      final response = await http.post(
+        Uri.parse(API.updateSellerEarningsRDR),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          'sellerId': sellerId,
+          'earnings': (double.parse(orderTotalAmount) +
+                  (double.parse(previousEarnings)))
+              .toString(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Order updated successfully: ${response.body}");
+      } else {
+        print("Failed to update order: ${response.body}");
+      }
+    } catch (e) {
+      print("Exception caught: $e");
+    }
+  }
+  //......................................................................
+
+ Future<void> updateOrderStatus( purchaserId,  getOrderId,  riderID) async {
+  final url = Uri.parse(API.updateOrderStatusEndingRDR); // Use your actual server URL
+  final response = await http.post(url, body: {
+    'purchaserId': purchaserId,
+    'getOrderId': getOrderId,
+    'riderUID': riderID,
+  });
+
+  if (response.statusCode == 200) {
+    print('Order updated successfully');
+  } else {
+    print('Failed to update order');
+  }
+}
+
+  void getOrderTotalAmount() async {
+    final orderId = widget.getOrderId;
+    final response =
+        await http.get(Uri.parse('${API.getOrderDetailsRDR}?orderId=$orderId'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        orderTotalAmount = data['totalAmount'].toString();
+        widget.sellerId = data['sellerUID'].toString();
+      });
       getSellerData();
-    });
+    } else {
+      print("Enable to get order total amount");
+    }
   }
 
-  getSellerData() {
-    FirebaseFirestore.instance
-        .collection("sellers")
-        .doc(widget.sellerId)
-        .get()
-        .then((snap) {
-      previousEarnings = snap.data()!["earnings"].toString();
-    });
-  }
+  void getSellerData() async {
+    final response = await http
+        .get(Uri.parse('${API.getSellerDataRDR}?sellerId=${widget.sellerId}'));
 
-  @override
-  void initState() {
-    super.initState();
-
-    //rider location update
-    UserLocation uLocation = UserLocation();
-    uLocation.getCurrentLocation();
-
-    getOrderTotalAmount();
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        previousEarnings = data['earnings'].toString();
+      });
+    } else {
+      print("Enable to get Seller Data");
+    }
   }
 
   @override
