@@ -10,6 +10,7 @@ import 'package:shopzone/foodSeller/foodSellerPreferences/food_current_seller.da
 import 'package:shopzone/foodSeller/itemsScreens/food_seller_items_ui_design_widget.dart';
 import 'package:shopzone/foodSeller/itemsScreens/food_seller_upload_items_screen.dart';
 import 'package:shopzone/foodSeller/models/food_seller_items.dart';
+import 'package:shopzone/noConnectionPage.dart';
 
 import '../models/food_seller_brands.dart';
 import '../widgets/food_seller_text_delegate_header_widget.dart';
@@ -117,9 +118,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 );
               } else if (snapshot.hasError) {
                 return SliverToBoxAdapter(
-                  child: Center(
-                    child: Text(snapshot.error.toString()),
-                  ),
+                  child: Center(child: NoConnectionPage()),
                 );
               } else {
                 return const SliverToBoxAdapter(

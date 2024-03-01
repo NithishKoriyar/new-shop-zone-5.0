@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shopzone/api_key.dart';
+import 'package:shopzone/noConnectionPage.dart';
 import 'package:shopzone/seller/itemsScreens/seller_items_ui_design_widget.dart';
 import 'package:shopzone/seller/itemsScreens/seller_upload_items_screen.dart';
 import 'package:shopzone/seller/models/seller_items.dart';
@@ -117,9 +118,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 );
               } else if (snapshot.hasError) {
                 return SliverToBoxAdapter(
-                  child: Center(
-                    child: Text(snapshot.error.toString()),
-                  ),
+                  child: Center(child: NoConnectionPage()),
                 );
               } else {
                 return const SliverToBoxAdapter(

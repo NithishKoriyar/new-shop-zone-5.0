@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shopzone/api_key.dart';
+import 'package:shopzone/noConnectionPage.dart';
 import 'package:shopzone/user/models/sellers.dart';
 import 'package:shopzone/user/normalUser/sellersScreens/sellers_ui_design_widget.dart';
 import 'package:http/http.dart' as http;
@@ -75,7 +76,7 @@ elevation: 20,
             );
           } else if (snapshot.hasError) {
             return Center(
-              child: Text("Error: ${snapshot.error}"),
+              child: Center(child: NoConnectionPage()),
             );
           } else {
             return const Center(

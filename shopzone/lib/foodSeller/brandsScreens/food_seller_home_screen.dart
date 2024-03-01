@@ -11,6 +11,7 @@ import 'package:shopzone/foodSeller/brandsScreens/food_seller_upload_brands_scre
 import 'package:shopzone/foodSeller/models/food_seller_brands.dart';
 import 'package:shopzone/foodSeller/push_notifications/food_seller_push_notifications_system.dart';
 import 'package:shopzone/foodSeller/widgets/food_seller_text_delegate_header_widget.dart';
+import 'package:shopzone/noConnectionPage.dart';
 import 'package:shopzone/notification_service.dart';
 import '../../api_key.dart';
 import '../foodSellerPreferences/food_current_seller.dart';
@@ -147,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 } else if (snapshot.hasError) {
                   return SliverFillRemaining(
-                    child: Center(child: Text('Error: ${snapshot.error}')),
+                     child: Center(child: NoConnectionPage()),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const SliverFillRemaining(
