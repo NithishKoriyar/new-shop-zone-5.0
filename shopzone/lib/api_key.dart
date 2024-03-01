@@ -1,4 +1,3 @@
-import 'package:shopzone/rider/riders_mainScreens/rider_parcel_in_progress_screen.dart';
 
 class API {
   //! web server

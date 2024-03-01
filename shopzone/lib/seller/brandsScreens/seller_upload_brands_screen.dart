@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -58,17 +59,17 @@ class _UploadBrandsScreenState extends State<UploadBrandsScreen> {
         });
 
         // Step 1: Upload the image
-final bytes = await imgXFile!.readAsBytes();
-final imgBase64 = base64Encode(bytes);
+        final bytes = await imgXFile!.readAsBytes();
+        final imgBase64 = base64Encode(bytes);
 
-final response = await http.post(
-  Uri.parse(API.saveBrandImage),
-  body: {
-    'thumbnailUrl': imgBase64,
-  },
-);
+        final response = await http.post(
+          Uri.parse(API.saveBrandImage),
+          body: {
+            'thumbnailUrl': imgBase64,
+          },
+        );
 
-final imgResponseBody = response.body;
+        final imgResponseBody = response.body;
 
         if (response.statusCode == 200) {
           try {
@@ -104,7 +105,7 @@ final imgResponseBody = response.body;
                     });
                     Navigator.push(context,
                         MaterialPageRoute(builder: (c) => HomeScreen()));
-                        Fluttertoast.showToast(msg: 'Brand Added Successfully');
+                    Fluttertoast.showToast(msg: 'Brand Added Successfully');
                   } else {
                     Fluttertoast.showToast(msg: dataJsonResponse['message']);
                   }
@@ -126,8 +127,7 @@ final imgResponseBody = response.body;
           }
         } else {
           Fluttertoast.showToast(
-              msg:
-                  'Image server responded with code: ${response.statusCode}');
+              msg: 'Image server responded with code: ${response.statusCode}');
         }
       } else {
         Fluttertoast.showToast(msg: "Please write brand info and brand title.");
@@ -145,7 +145,7 @@ final imgResponseBody = response.body;
   Widget defaultScreen() {
     return Scaffold(
       appBar: AppBar(
-elevation: 20,
+        elevation: 20,
         title: const Text("Add New Brand"),
         centerTitle: true,
       ),
@@ -215,7 +215,7 @@ elevation: 20,
             ),
           ),
         ],
-elevation: 20,
+        elevation: 20,
         title: const Text("Upload New Brand"),
         centerTitle: true,
       ),
@@ -353,15 +353,37 @@ elevation: 20,
         });
   }
 
+Future<XFile?> compressImage(XFile? file) async {
+  if (file == null) return null;
+
+  final filePath = file.path;
+  final fileName = filePath.split('/').last;
+  final targetPath = Directory.systemTemp.path + "/$fileName";
+
+  var result = await FlutterImageCompress.compressAndGetFile(
+    filePath,
+    targetPath,
+    quality: 88, // Adjust the quality as needed
+    minWidth: 800, // Adjust the width as needed
+    minHeight: 600, // Adjust the height as needed
+  );
+
+  return result != null ? XFile(result.path) : null;
+}
+
+
   getImageFromGallery() async {
     Navigator.pop(context);
-    imgXFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    var originalImage =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+    imgXFile = await compressImage(originalImage);
     setState(() {});
   }
 
   captureImagewithPhoneCamera() async {
     Navigator.pop(context);
-    imgXFile = await imagePicker.pickImage(source: ImageSource.camera);
+    var originalImage = await imagePicker.pickImage(source: ImageSource.camera);
+    imgXFile = await compressImage(originalImage);
     setState(() {});
   }
 }

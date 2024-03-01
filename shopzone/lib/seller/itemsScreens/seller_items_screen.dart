@@ -61,7 +61,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-elevation: 20,
+        elevation: 20,
         title: const Text(
           "Shop Zone",
           style: TextStyle(
@@ -74,15 +74,17 @@ elevation: 20,
           IconButton(
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (c) => UploadItemsScreen(
-                            model: widget.model,
-                          )));
+                context,
+                MaterialPageRoute(
+                  builder: (c) => UploadItemsScreen(
+                    model: widget.model,
+                  ),
+                ),
+              );
             },
             icon: const Icon(
               Icons.add_box_rounded,
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
         ],
@@ -92,8 +94,7 @@ elevation: 20,
           SliverPersistentHeader(
             pinned: true,
             delegate: TextDelegateHeaderWidget(
-                title:
-                    "My " + widget.model!.brandTitle.toString() + "'s Items"),
+                title: widget.model!.brandTitle.toString()),
           ),
 
           //1. query
@@ -159,7 +160,7 @@ elevation: 20,
         yield items;
       } else {
         print("status is not success");
-        throw Exception(jsonData['message']);
+        throw jsonData['message'];
       }
     } catch (e) {
       // Handle any other exceptions that may arise and propagate them as errors in the stream.
@@ -167,6 +168,5 @@ elevation: 20,
       print("Error: ");
     }
   }
-
 }
 // final url = "${API.getItems}?uid=$uid&brandID=$brandID";

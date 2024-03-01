@@ -33,6 +33,8 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
   File? imagepath;
 
   final ImagePicker _picker = ImagePicker();
+  bool _isRegistering = false; // Add this at the beginning of your _RegistrationTabPageState class
+
 
   String usersImageUrl = "";
 
@@ -80,7 +82,10 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
   //this function is get current location
   //the form validation
   Future<void> formValidation() async {
-    if (imageXFile == null) {
+  if (_isRegistering) return; // Prevent further execution if already registering
+
+  // The rest of your existing code...
+      if (imageXFile == null) {
       Fluttertoast.showToast(msg: "Please select an image.");
     } else {
       if (passwordTextEditingController.text ==
@@ -99,12 +104,20 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
         Fluttertoast.showToast(msg: "Password do not match.");
       }
     }
-  }
+  
+  // Set the flag to true just before starting the registration process
+  setState(() {
+    _isRegistering = true;
+  });
+
+  // Remember to set _isRegistering to false on registration completion or failure
+}
+
 
   //this function send the sellers email to the php code and check is it all ready registered or not
   void authenticateSeller() async {
-    try {
-      var res = await http.post(
+  try {
+          var res = await http.post(
         Uri.parse(API.validateSellerEmail),
         body: {
           'seller_email': emailTextEditingController.text.trim(),
@@ -137,12 +150,19 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
       } else {
         print("failed to register");
       }
-    } catch (e) {
-      print("failed to register");
+  } catch (e) {
+          print("failed to register");
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());
-    }
+  } finally {
+    // Reset the flag regardless of the outcome
+    setState(() {
+      _isRegistering = false;
+    });
   }
+}
+
+
 
   //so this function will save the data in mysql
   registerAndSaveUserRecord() async {
@@ -236,7 +256,7 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
                   CustomTextField(
                     textEditingController: nameTextEditingController,
                     iconData: Icons.person,
-                    hintText: "Name",
+                    hintText: "Shop Name",
                     isObsecre: false,
                     enabled: true,
                     keyboardType: TextInputType.name,
@@ -246,7 +266,7 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
                   CustomTextField(
                     textEditingController: emailTextEditingController,
                     iconData: Icons.email,
-                    hintText: "Email",
+                    hintText: "Shop Email",
                     isObsecre: false,
                     enabled: true,
                     keyboardType: TextInputType.emailAddress,

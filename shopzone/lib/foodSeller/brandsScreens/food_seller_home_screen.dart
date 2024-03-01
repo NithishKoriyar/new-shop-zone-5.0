@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       drawer: MyDrawer(),
       appBar: AppBar(
-elevation: 20,
+        elevation: 20,
         title: const Text(
           "Shop Zone Foods",
           style: TextStyle(
@@ -150,7 +150,7 @@ elevation: 20,
                     child: Center(child: Text('Error: ${snapshot.error}')),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return SliverFillRemaining(
+                  return const SliverFillRemaining(
                     child: Center(child: Text('No brands exists')),
                   );
                 } else {
@@ -223,71 +223,70 @@ elevation: 20,
   }
   //updateLocation
 
-Future<void> updateLocation() async {
-  try {
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  Future<void> updateLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
 
-    // Get the address from the coordinates
-    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placemarks[0];
-    String fullAddress = '${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}';
+      // Get the address from the coordinates
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      Placemark place = placemarks[0];
+      String fullAddress =
+          '${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}';
 
-    // Update the backend with the location and address
-    var url = Uri.parse(API.updateSellerLocation);
-    var response = await http.post(url, body: {
-      'user_id': sellerID.toString(),
-      'latitude': position.latitude.toString(),
-      'longitude': position.longitude.toString(),
-      'address': fullAddress, // Send the full address
-    });
+      // Update the backend with the location and address
+      var url = Uri.parse(API.updateSellerLocation);
+      var response = await http.post(url, body: {
+        'user_id': sellerID.toString(),
+        'latitude': position.latitude.toString(),
+        'longitude': position.longitude.toString(),
+        'address': fullAddress, // Send the full address
+      });
 
-    // Handle the response
-    if (response.statusCode == 200) {
-      var responseData = json.decode(response.body);
-      if (responseData['status'] == 'success') {
-        Fluttertoast.showToast(
-            msg: "Location and address updated successfully",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0
-        );
+      // Handle the response
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        if (responseData['status'] == 'success') {
+          Fluttertoast.showToast(
+              msg: "Location and address updated successfully",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        } else {
+          Fluttertoast.showToast(
+              msg: "Failed to update location and address",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
       } else {
         Fluttertoast.showToast(
-            msg: "Failed to update location and address",
+            msg: "Error: ${response.statusCode}",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
             backgroundColor: Colors.red,
             textColor: Colors.white,
-            fontSize: 16.0
-        );
+            fontSize: 16.0);
       }
-    } else {
+    } catch (e) {
       Fluttertoast.showToast(
-          msg: "Error: ${response.statusCode}",
+          msg: "Failed to get location: $e",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.red,
           textColor: Colors.white,
-          fontSize: 16.0
-      );
+          fontSize: 16.0);
     }
-  } catch (e) {
-    Fluttertoast.showToast(
-        msg: "Failed to get location: $e",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
   }
-}
 
   void _showUpdateLocationDialog() {
     showDialog(

@@ -3,6 +3,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopzone/noConnectionPage.dart';
 import 'package:shopzone/notification_service.dart';
 import 'package:shopzone/seller/brandsScreens/seller_brands_ui_design_widget.dart';
 import 'package:shopzone/seller/brandsScreens/seller_upload_brands_screen.dart';
@@ -117,7 +118,7 @@ elevation: 20,
             },
             icon: const Icon(
               Icons.add,
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
         ],
@@ -142,7 +143,7 @@ elevation: 20,
                   );
                 } else if (snapshot.hasError) {
                   return SliverFillRemaining(
-                    child: Center(child: Text('Error: ${snapshot.error}')),
+                    child: Center(child: NoConnectionPage()),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return SliverFillRemaining(
@@ -173,7 +174,9 @@ elevation: 20,
 //   final String apiUrl = '${API.currentSellerBrandView}?uid=$sellerID';
 //http://192.168.0.113/amazon%20clone%20in%20backend%20php/shop_zone/shop_zone_api/seller/Brands.php
   Stream<List<dynamic>> fetchBrandsStream(String sellerID) async* {
-    final response = await http
+    final response = 
+    
+    await http
         .get(Uri.parse("${API.currentSellerBrandView}?sellerID=$sellerID"));
     print("${API.currentSellerBrandView}?sellerID=$sellerID");
 
@@ -182,10 +185,8 @@ elevation: 20,
 
       if (decodedResponse is List<dynamic>) {
         yield decodedResponse;
-        // print("++++++++++++++++++++++++++");
         print(decodedResponse);
       } else {
-        //throw Exception('Expected a list but got a different type');
         const Text('No brands exists');
       }
     } else {
