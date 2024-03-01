@@ -51,7 +51,7 @@ class _LoginTabPageState extends State<LoginTabPage> {
         },
       );
 
-      if(res.statusCode == 200) //from flutter app the connection with api to server - success
+      if(res.statusCode == 200) 
       {
         var resBodyOfLogin = jsonDecode(res.body);
         if(resBodyOfLogin['success'] == true)
