@@ -12,6 +12,7 @@ import 'package:shopzone/user/normalUser/widgets/custom_text_field.dart';
 import 'package:shopzone/user/normalUser/widgets/loading_dialog.dart';
 
 class LoginTabPage extends StatefulWidget {
+
   @override
   State<LoginTabPage> createState() => _LoginTabPageState();
 }
@@ -20,7 +21,7 @@ class _LoginTabPageState extends State<LoginTabPage> {
       var formKey = GlobalKey<FormState>();
   var emailTextEditingController = TextEditingController();
   var passwordTextEditingController = TextEditingController();
-  var isObsecure = true.obs;
+  var isObsecure = true.obs; 
 
   validateForm() {
     if (emailTextEditingController.text.isNotEmpty &&

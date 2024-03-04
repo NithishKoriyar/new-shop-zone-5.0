@@ -353,8 +353,12 @@ class _UploadBrandsScreenState extends State<UploadBrandsScreen> {
         });
   }
 
-Future<XFile?> compressImage(XFile? file) async {
+Future<XFile?> compressImage(XFile? file, {bool compress = true}) async {
   if (file == null) return null;
+
+  if (!compress) {
+    return file;
+  }
 
   final filePath = file.path;
   final fileName = filePath.split('/').last;
@@ -372,13 +376,15 @@ Future<XFile?> compressImage(XFile? file) async {
 }
 
 
-  getImageFromGallery() async {
-    Navigator.pop(context);
-    var originalImage =
-        await imagePicker.pickImage(source: ImageSource.gallery);
-    imgXFile = await compressImage(originalImage);
-    setState(() {});
-  }
+
+getImageFromGallery() async {
+  Navigator.pop(context);
+  var originalImage =
+      await imagePicker.pickImage(source: ImageSource.gallery);
+  imgXFile = await compressImage(originalImage, compress: false);
+  setState(() {});
+}
+
 
   captureImagewithPhoneCamera() async {
     Navigator.pop(context);
