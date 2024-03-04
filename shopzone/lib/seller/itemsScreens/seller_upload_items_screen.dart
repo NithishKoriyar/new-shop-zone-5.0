@@ -41,13 +41,12 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
   bool uploading = false;
   String itemUniqueId = DateTime.now().millisecondsSinceEpoch.toString();
 
-Future<void> validateUploadForm() async {
+  Future<void> validateUploadForm() async {
     if (imgXFile != null) {
       if (itemInfoTextEditingController.text.isNotEmpty &&
           itemTitleTextEditingController.text.isNotEmpty &&
           itemDescriptionTextEditingController.text.isNotEmpty &&
           itemPriceTextEditingController.text.isNotEmpty) {
-        
         var imageBytes = await imgXFile!.readAsBytes();
         var base64Image = base64Encode(imageBytes);
 
@@ -90,7 +89,7 @@ Future<void> validateUploadForm() async {
     } else {
       Fluttertoast.showToast(msg: "Please choose an image.");
     }
-}
+  }
 
   uploadFormScreen() {
     return Scaffold(
@@ -118,7 +117,7 @@ Future<void> validateUploadForm() async {
             ),
           ),
         ],
-elevation: 20,
+        elevation: 20,
         title: const Text("Upload New Item"),
         centerTitle: true,
       ),
@@ -152,6 +151,28 @@ elevation: 20,
             color: Colors.black,
             thickness: 1,
           ),
+          //brand title
+          ListTile(
+            leading: const Icon(
+              Icons.title,
+              color: Colors.black,
+            ),
+            title: SizedBox(
+              width: 250,
+              child: TextField(
+                controller: itemTitleTextEditingController,
+                decoration: const InputDecoration(
+                  hintText: "item title",
+                  hintStyle: TextStyle(color: Colors.black),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          const Divider(
+            color: Colors.black,
+            thickness: 1,
+          ),
 
           //brand info
           ListTile(
@@ -165,29 +186,6 @@ elevation: 20,
                 controller: itemInfoTextEditingController,
                 decoration: const InputDecoration(
                   hintText: "item info",
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ),
-          const Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
-
-          //brand title
-          ListTile(
-            leading: const Icon(
-              Icons.title,
-              color: Colors.black,
-            ),
-            title: SizedBox(
-              width: 250,
-              child: TextField(
-                controller: itemTitleTextEditingController,
-                decoration: const InputDecoration(
-                  hintText: "item title",
                   hintStyle: TextStyle(color: Colors.black),
                   border: InputBorder.none,
                 ),
@@ -287,7 +285,7 @@ elevation: 20,
   defaultScreen() {
     return Scaffold(
       appBar: AppBar(
-elevation: 20,
+        elevation: 20,
         title: const Text("Add New Item"),
         centerTitle: true,
       ),
@@ -392,28 +390,34 @@ elevation: 20,
         });
   }
 
-  Future<XFile?> compressImage(XFile? file) async {
-    final filePath = file?.path;
-    final fileName = filePath?.split('/').last;
+  Future<XFile?> compressImage(XFile? file, {bool compress = true}) async {
+    if (file == null) return null;
+
+    if (!compress) {
+      return file;
+    }
+
+    final filePath = file.path;
+    final fileName = filePath.split('/').last;
     final targetPath = Directory.systemTemp.path + "/$fileName";
 
     var result = await FlutterImageCompress.compressAndGetFile(
-      filePath!,
+      filePath,
       targetPath,
       quality: 88, // Adjust the quality as needed
       minWidth: 800, // Adjust the width as needed
       minHeight: 600, // Adjust the height as needed
     );
 
-    return XFile(result!.path);
+    return result != null ? XFile(result.path) : null;
   }
 
   getImageFromGallery() async {
     Navigator.pop(context);
-    imgXFile = await imagePicker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      imgXFile;
-    });
+    var originalImage =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+    imgXFile = await compressImage(originalImage, compress: false);
+    setState(() {});
   }
 
   captureImagewithPhoneCamera() async {

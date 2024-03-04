@@ -246,27 +246,7 @@ class _UploadBrandsScreenState extends State<UploadBrandsScreen> {
             color: Colors.black,
             thickness: 1,
           ),
-          ListTile(
-            leading: const Icon(
-              Icons.perm_device_information,
-              color: Colors.black,
-            ),
-            title: SizedBox(
-              width: 250,
-              child: TextField(
-                controller: brandInfoTextEditingController,
-                decoration: const InputDecoration(
-                  hintText: "brand info",
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ),
-          const Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
+
           ListTile(
             leading: const Icon(
               Icons.title,
@@ -285,7 +265,28 @@ class _UploadBrandsScreenState extends State<UploadBrandsScreen> {
             ),
           ),
           const Divider(
-            color: Colors.pinkAccent,
+            color: Color.fromARGB(255, 0, 0, 0),
+            thickness: 1,
+          ),
+                    ListTile(
+            leading: const Icon(
+              Icons.perm_device_information,
+              color: Colors.black,
+            ),
+            title: SizedBox(
+              width: 250,
+              child: TextField(
+                controller: brandInfoTextEditingController,
+                decoration: const InputDecoration(
+                  hintText: "brand info",
+                  hintStyle: TextStyle(color: Colors.black),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          const Divider(
+            color: Colors.black,
             thickness: 1,
           ),
         ],
