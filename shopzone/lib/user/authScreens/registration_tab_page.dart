@@ -13,7 +13,7 @@ import 'package:shopzone/user/userPreferences/user_preferences.dart';
 import 'package:shopzone/user/normalUser/widgets/custom_text_field.dart';
 import 'package:shopzone/user/normalUser/widgets/loading_dialog.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:path_provider/path_provider.dart';
+
 
 class RegistrationTabPage extends StatefulWidget {
   const RegistrationTabPage({Key? key}) : super(key: key);
@@ -317,3 +317,4 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
     );
   }
 }
+//...........addd comment
