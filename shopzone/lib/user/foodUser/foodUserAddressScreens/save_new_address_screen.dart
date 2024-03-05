@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/foodUser/foodUserAddressScreens/address_screen.dart';
 import 'package:shopzone/user/foodUser/foodUserAddressScreens/text_field_address_widget.dart';
+import 'package:shopzone/user/foodUser/foodUserCart/cart_screen.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 
 // ignore: must_be_immutable
@@ -109,7 +110,7 @@ elevation: 20,
                 formKey.currentState!.reset();
                 // ignore: use_build_context_synchronously
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (c) => AddressScreen()));
+                    MaterialPageRoute(builder: (c) => CartScreenUser()));
               } else {
                 Fluttertoast.showToast(msg: "Error saving address.");
               }
