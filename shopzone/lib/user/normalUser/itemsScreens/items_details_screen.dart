@@ -101,6 +101,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Center(
                 child: CartStepperInt(
+                  // ignore: deprecated_member_use
                   count: counterLimit,
                   size: 50,
                   // deActiveBackgroundColor: Colors.red,
@@ -124,7 +125,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0, top: 8.0),
               child: Text(
-                widget.model!.itemTitle.toString() + ":",
+                "${widget.model!.itemTitle}",
                 textAlign: TextAlign.justify,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
@@ -162,7 +163,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
-                "₹ " + widget.model!.price.toString(),
+                "₹ ${widget.model!.price}",
                 textAlign: TextAlign.justify,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,

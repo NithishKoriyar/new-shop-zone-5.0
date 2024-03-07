@@ -321,7 +321,7 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
 
             ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.white,
+                  backgroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
                 ),

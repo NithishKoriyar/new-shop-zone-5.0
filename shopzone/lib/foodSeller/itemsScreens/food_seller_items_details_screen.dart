@@ -99,14 +99,16 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(
-            API.foodSellerGetItemsImage + (widget.model!.thumbnailUrl ?? ''),
+          Center(
+            child: Image.network(
+              API.foodSellerGetItemsImage + (widget.model!.thumbnailUrl ?? ''),
+            ),
           ),
           Center(
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0, top: 8.0),
               child: Text(
-                widget.model!.itemTitle.toString() + ":",
+                "${widget.model!.itemTitle}",
                 textAlign: TextAlign.justify,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
@@ -133,7 +135,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
-                "₹ " + widget.model!.price.toString(),
+                "₹ ${widget.model!.price}",
                 textAlign: TextAlign.justify,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,

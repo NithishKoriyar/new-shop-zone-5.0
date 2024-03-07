@@ -175,7 +175,7 @@ class _UploadBrandsScreenState extends State<UploadBrandsScreen> {
                     obtainImageDialogBox();
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.black,
+                    backgroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),

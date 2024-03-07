@@ -153,7 +153,7 @@ class _RateSellerScreenState extends State<RateSellerScreen> {
                       MaterialPageRoute(builder: (c) => MySplashScreen()));
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.purpleAccent,
+                  backgroundColor: Colors.purpleAccent,
                   padding: const EdgeInsets.symmetric(horizontal: 74),
                 ),
                 child: const Text("Submit"),

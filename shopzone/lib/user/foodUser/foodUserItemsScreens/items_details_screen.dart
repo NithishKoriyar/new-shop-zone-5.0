@@ -78,8 +78,10 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(
-              API.foodSellerMenuItemsInFoodUser + (widget.model!.thumbnailUrl ?? ''),
+            Center(
+              child: Image.network(
+                API.foodSellerMenuItemsInFoodUser + (widget.model!.thumbnailUrl ?? ''),
+              ),
             ),
 
             //implement the item counter
