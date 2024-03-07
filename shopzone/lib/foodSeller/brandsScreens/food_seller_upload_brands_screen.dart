@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -357,15 +358,40 @@ elevation: 20,
         });
   }
 
+  Future<XFile?> compressImage(XFile? file, {bool compress = true}) async {
+    if (file == null) return null;
+
+    if (!compress) {
+      return file;
+    }
+
+    final filePath = file.path;
+    final fileName = filePath.split('/').last;
+    final targetPath = Directory.systemTemp.path + "/$fileName";
+
+    var result = await FlutterImageCompress.compressAndGetFile(
+      filePath,
+      targetPath,
+      quality: 88, // Adjust the quality as needed
+      minWidth: 800, // Adjust the width as needed
+      minHeight: 600, // Adjust the height as needed
+    );
+
+    return result != null ? XFile(result.path) : null;
+  }
+
   getImageFromGallery() async {
     Navigator.pop(context);
-    imgXFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    var originalImage =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+    imgXFile = await compressImage(originalImage, compress: false);
     setState(() {});
   }
 
   captureImagewithPhoneCamera() async {
     Navigator.pop(context);
-    imgXFile = await imagePicker.pickImage(source: ImageSource.camera);
+    var originalImage = await imagePicker.pickImage(source: ImageSource.camera);
+    imgXFile = await compressImage(originalImage);
     setState(() {});
   }
 }

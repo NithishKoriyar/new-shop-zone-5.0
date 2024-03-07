@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
               stream: fetchBrandsStream(sellerID!),
               builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return SliverFillRemaining(
+                  return const SliverFillRemaining(
                     child: Center(child: CircularProgressIndicator()),
                   );
                 } else if (snapshot.hasError) {
@@ -298,12 +298,6 @@ class _HomeScreenState extends State<HomeScreen> {
           content:
               Text('Your location is not set. Would you like to update it?'),
           actions: <Widget>[
-            ElevatedButton(
-              child: Text('Skip'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
             ElevatedButton(
               child: Text('Update Location'),
               onPressed: () {

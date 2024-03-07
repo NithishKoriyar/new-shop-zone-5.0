@@ -15,27 +15,21 @@ class AddressDesign extends StatelessWidget {
     this.model,
   });
 
-  sendNotificationToUser(userUID, orderID) async {
-    //!--------------------------------------------------------
-    if (userUID == null) {
-      //!print("userUID is null");
-      return;
-    }
-    //!print("userUID is ${userUID}");
+  sendNotificationToUser(String userUID, String orderID) async {
     String userDeviceToken = await getUserDeviceTokenFromAPI(userUID);
-    //!print("Retrieved seller device token-------------------------------------------------------------------------------------------: ${userDeviceToken}");
 
     if (userDeviceToken.isNotEmpty) {
-      print("-------------------------------------notificationFormat----------------------------------------------");
-
       notificationFormat(
         userDeviceToken,
         orderID,
-         model?.name,
+        model?.name,
       );
+      print("---------------------------------------------------------------------------------------------------------");
       print(userDeviceToken);
-      print(orderID);
-      print(model?.sellerName);
+      print(orderID,);
+      print(model?.name,);
+    } else {
+      print("user device token is empty");
     }
   }
 
@@ -43,59 +37,62 @@ class AddressDesign extends StatelessWidget {
     final response = await http.get(
       Uri.parse('${API.foodSellerGetUserDeviceTokenInSellerApp}?userUID=$userUID'),
     );
-    print("================================================================");
-    print('${API.foodSellerGetUserDeviceTokenInSellerApp}?userUID=$userUID');
-
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       if (data['userDeviceToken'] != null) {
-        // print("-----------------------------------------------------------------------------------");
-        // print('seller device token${data}');
         return data['userDeviceToken'].toString();
       }
-      //!print('seller device token${data}');
     } else {
       // Handle the error accordingly
-      //!print('Failed to load seller device token');
+      print('Failed to load user device token');
     }
 
     return "";
   }
 
-  notificationFormat(userDeviceToken, orderID, sellerName) {
-    //!print("-----------------------------------------notificationFormat sending------------------------------------------");
-    Map<String, String> headerNotification = {
-      'Content-Type': 'application/json',
-      'Authorization': fcmServerToken,
-    };
+Future<void> notificationFormat(userDeviceToken, orderID, sellerName) async {
+  final Map<String, String> headerNotification = {
+    'Content-Type': 'application/json',
+    'Authorization': fcmServerToken, // Assuming fcmServerToken is a variable holding your server key.
+  };
 
-    Map bodyNotification = {
-      'body':
-          "Dear user, your Parcel (# $orderID) has been shifted Successfully by seller $sellerName. \nPlease Check Now",
-      'title': "Parcel shifted",
-    };
+  final Map<String, dynamic> bodyNotification = {
+    'body':
+        "Dear user, your Parcel (# $orderID) has been shifted Successfully by seller $sellerName. \nPlease Check Now",
+    'title': "Parcel Shifted",
+  };
 
-    Map dataMap = {
-      "click_action": "FLUTTER_NOTIFICATION_CLICK",
-      "id": "1",
-      "status": "done",
-      "userOrderId": orderID,
-    };
+  final Map<String, dynamic> dataMap = {
+    "click_action": "FLUTTER_NOTIFICATION_CLICK",
+    "id": "1",
+    "status": "done",
+    "userOrderId": orderID,
+  };
 
-    Map officialNotificationFormat = {
-      'notification': bodyNotification,
-      'data': dataMap,
-      'priority': 'high',
-      'to': userDeviceToken,
-    };
+  final Map<String, dynamic> officialNotificationFormat = {
+    'notification': bodyNotification,
+    'data': dataMap,
+    'priority': 'high',
+    'to': userDeviceToken,
+  };
 
-    http.post(
-      Uri.parse("https://fcm.googleapis.com/fcm/send"),
-      headers: headerNotification,
-      body: jsonEncode(officialNotificationFormat),
-    );
+  final response = await http.post(
+    Uri.parse("https://fcm.googleapis.com/fcm/send"),
+    headers: headerNotification,
+    body: jsonEncode(officialNotificationFormat),
+  );
+
+  if (response.statusCode == 200) {
+    // Notification sent successfully. You can process the response data if needed.
+    print("Notification sent successfully");
+  } else {
+    // Handle the error. Inspect the response for details.
     
+    print("Error sending notification. Status code: ${response.statusCode}");
+    print("Response body: ${response.body}");
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -234,8 +231,8 @@ class AddressDesign extends StatelessWidget {
               decoration: const BoxDecoration(
                   gradient: LinearGradient(
                 colors: [
-                  Colors.pinkAccent,
-                  Colors.purpleAccent,
+                  Colors.green,
+                  Colors.green,
                 ],
                 begin: FractionalOffset(0.0, 0.0),
                 end: FractionalOffset(1.0, 0.0),

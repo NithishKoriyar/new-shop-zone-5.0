@@ -44,12 +44,15 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget>
               children: [
 
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(40),
-                  child: Image.network(
-                    API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-                    //widget.model!.thumbnailUrl.toString(),
-                    height: 220,
-                    fit: BoxFit.cover,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Hero(
+                    tag: API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+                    child: Image.network(
+                      API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+                      //widget.model!.thumbnailUrl.toString(),
+                      height: 220,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
 

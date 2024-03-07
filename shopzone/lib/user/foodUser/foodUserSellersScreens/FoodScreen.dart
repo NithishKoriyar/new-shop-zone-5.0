@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -85,7 +86,7 @@ class _FoodScreenState extends State<FoodScreen> {
       backgroundColor: Colors.white,
       drawer: MyDrawer(),
       appBar: AppBar(
-elevation: 20,
+        elevation: 20,
         title: const Text(
           "Food Zone",
           style: TextStyle(
@@ -161,13 +162,22 @@ elevation: 20,
           StreamBuilder<List<Sellers>>(
             stream: getSellersStream(),
             builder: (context, AsyncSnapshot<List<Sellers>> dataSnapshot) {
-              if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
+              // Check if the snapshot is still fetching data
+              if (dataSnapshot.connectionState == ConnectionState.waiting) {
+                // Show loading indicator while fetching data
+                return SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              } else if (dataSnapshot.hasData &&
+                  dataSnapshot.data!.isNotEmpty) {
+                // Data is fetched and not empty, show your content
                 return SliverStaggeredGrid.countBuilder(
                   crossAxisCount: 1,
                   staggeredTileBuilder: (c) => const StaggeredTile.fit(1),
                   itemBuilder: (context, index) {
                     Sellers model = dataSnapshot.data![index];
-
                     return SellersUIDesignWidget(
                       model: model,
                     );
@@ -175,6 +185,7 @@ elevation: 20,
                   itemCount: dataSnapshot.data!.length,
                 );
               } else {
+                // Data is fetched but empty, show a message
                 return const SliverToBoxAdapter(
                   child: Center(
                     child: Text(
@@ -190,38 +201,38 @@ elevation: 20,
     );
   }
 
-Stream<List<Sellers>> getSellersStream() async* {
-  try {
-    // Obtain the current location
-    Position position = await getCurrentLocation();
-    double latitude = position.latitude;
-    double longitude = position.longitude;
+  Stream<List<Sellers>> getSellersStream() async* {
+    try {
+      // Obtain the current location
+      Position position = await getCurrentLocation();
+      double latitude = position.latitude;
+      double longitude = position.longitude;
 
-    // Construct the URL with latitude and longitude in the path
-  String baseUrl = API.fetchSellerByFoodUser;
-var url = Uri.parse(baseUrl).replace(queryParameters: {
-  'latitude': latitude.toString(),
-  'longitude': longitude.toString(),
-});
-print(url);
+      // Construct the URL with latitude and longitude in the path
+      String baseUrl = API.fetchSellerByFoodUser;
+      var url = Uri.parse(baseUrl).replace(queryParameters: {
+        'latitude': latitude.toString(),
+        'longitude': longitude.toString(),
+      });
+      print(url);
 
-    final response = await http.get(url);
+      final response = await http.get(url);
 
-    // Check for a successful response
-    if (response.statusCode == 200) {
-      final sellersList = json.decode(response.body) as List;
-      final sellersObjects = sellersList.map((item) => Sellers.fromJson(item)).toList();
-      yield sellersObjects;
-    } else {
-      // Handle different types of errors
-      throw Exception('Failed to load sellers: ${response.statusCode}');
+      // Check for a successful response
+      if (response.statusCode == 200) {
+        final sellersList = json.decode(response.body) as List;
+        final sellersObjects =
+            sellersList.map((item) => Sellers.fromJson(item)).toList();
+        yield sellersObjects;
+      } else {
+        // Handle different types of errors
+        throw Exception('Failed to load sellers: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle exceptions
+      throw Exception('Error occurred: $e');
     }
-  } catch (e) {
-    // Handle exceptions
-    throw Exception('Error occurred: $e');
   }
-}
-
 
   //! get user current lat lang to fined nearby seller
 
@@ -232,7 +243,15 @@ print(url);
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
+      Fluttertoast.showToast(
+        msg: "Enable location",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.white,
+        textColor: const Color.fromARGB(255, 0, 0, 0),
+        fontSize: 16.0
+    );
     }
 
     permission = await Geolocator.checkPermission();

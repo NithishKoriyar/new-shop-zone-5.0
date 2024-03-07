@@ -310,7 +310,7 @@ void _showWelcomeDialog() {
                   CustomTextField(
                     textEditingController: nameTextEditingController,
                     iconData: Icons.person,
-                    hintText: "Name",
+                    hintText: "Restaurant Name",
                     isObsecre: false,
                     enabled: true,
                     keyboardType: TextInputType.name,
@@ -320,7 +320,7 @@ void _showWelcomeDialog() {
                   CustomTextField(
                     textEditingController: emailTextEditingController,
                     iconData: Icons.email,
-                    hintText: "Email",
+                    hintText: "Restaurant Email",
                     isObsecre: false,
                     enabled: true,
                     keyboardType: TextInputType.emailAddress,

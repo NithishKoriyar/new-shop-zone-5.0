@@ -105,7 +105,7 @@ class _LoginTabPageState extends State<LoginTabPage> {
                 CustomTextField(
                   textEditingController: emailTextEditingController,
                   iconData: Icons.email,
-                  hintText: "Email",
+                  hintText: "Restaurant Email",
                   isObsecre: false,
                   enabled: true,
                   keyboardType: TextInputType.emailAddress,
@@ -129,7 +129,7 @@ class _LoginTabPageState extends State<LoginTabPage> {
           ),
           ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.white,
+                backgroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
               ),

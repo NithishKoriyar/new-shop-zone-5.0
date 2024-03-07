@@ -234,8 +234,8 @@ class AddressDesign extends StatelessWidget {
               decoration: const BoxDecoration(
                   gradient: LinearGradient(
                 colors: [
-                  Colors.black,
-                    Colors.black,
+                  Colors.green,
+                    Colors.green,
                 ],
                 begin: FractionalOffset(0.0, 0.0),
                 end: FractionalOffset(1.0, 0.0),

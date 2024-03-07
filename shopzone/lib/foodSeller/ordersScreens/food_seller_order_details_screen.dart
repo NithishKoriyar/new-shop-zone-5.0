@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopzone/foodSeller/models/food_orders.dart';
-import 'package:shopzone/foodSeller/ordersScreens/food_seller_address_design_widget%20copy.dart';
+import 'package:shopzone/foodSeller/ordersScreens/food_seller_address_design_widget.dart';
 
 // ignore: must_be_immutable
 class OrderDetailsScreen extends StatefulWidget {

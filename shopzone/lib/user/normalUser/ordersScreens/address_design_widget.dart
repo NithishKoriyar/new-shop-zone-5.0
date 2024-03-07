@@ -39,7 +39,6 @@ class AddressDesign extends StatelessWidget {
 
     if (sellerDeviceToken.isNotEmpty) {
       //print("-------------------------------------notificationFormat----------------------------------------------");
-
       notificationFormat(
         sellerDeviceToken,
         userOrderID,
