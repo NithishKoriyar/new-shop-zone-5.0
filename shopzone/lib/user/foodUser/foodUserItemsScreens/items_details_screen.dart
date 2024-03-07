@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/foodUser/foodUserGlobal/global.dart';
 import 'package:shopzone/user/models/items.dart';
-import 'package:shopzone/user/foodUser/foodUserWidgets/appbar_cart_badge.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 
 // ignore: must_be_immutable
@@ -57,8 +56,17 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBarWithCartBadge(
-        sellerUID: widget.model!.sellerUID.toString(),
+            appBar: AppBar(
+    elevation: 20,
+        title: const Text(
+          "Food Zone",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: true,
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -118,6 +126,18 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                   color: Colors.black,
+                ),
+              ),
+            ),
+                        Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
+              child: Text(
+                widget.model!.itemInfo.toString(),
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  color: Colors.grey,
+                  fontSize: 15,
                 ),
               ),
             ),

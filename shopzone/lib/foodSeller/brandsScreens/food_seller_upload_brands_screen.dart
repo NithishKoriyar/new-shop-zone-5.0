@@ -247,7 +247,29 @@ elevation: 20,
               ),
             ),
           ),
+
           const Divider(
+            color: Colors.black,
+            thickness: 1,
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.title,
+              color: Colors.black,
+            ),
+            title: SizedBox(
+              width: 250,
+              child: TextField(
+                controller: brandTitleTextEditingController,
+                decoration: const InputDecoration(
+                  hintText: "Menu title",
+                  hintStyle: TextStyle(color: Colors.black),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+                    const Divider(
             color: Colors.black,
             thickness: 1,
           ),
@@ -270,27 +292,6 @@ elevation: 20,
           ),
           const Divider(
             color: Colors.black,
-            thickness: 1,
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.title,
-              color: Colors.black,
-            ),
-            title: SizedBox(
-              width: 250,
-              child: TextField(
-                controller: brandTitleTextEditingController,
-                decoration: const InputDecoration(
-                  hintText: "Menu title",
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ),
-          const Divider(
-            color: Colors.pinkAccent,
             thickness: 1,
           ),
         ],

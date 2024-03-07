@@ -96,43 +96,43 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
           Icons.delete_sweep_outlined,
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Image.network(
-              API.foodSellerGetItemsImage + (widget.model!.thumbnailUrl ?? ''),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Image.network(
+                API.foodSellerGetItemsImage + (widget.model!.thumbnailUrl ?? ''),
+              ),
             ),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8.0, top: 8.0),
-              child: Text(
-                "${widget.model!.itemTitle}",
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.green,
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                child: Text(
+                  "${widget.model!.itemTitle}",
+                  textAlign: TextAlign.justify,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.green,
+                  ),
                 ),
               ),
             ),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
-              child: Text(
-                widget.model!.longDescription.toString(),
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  fontSize: 15,
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
+                child: Text(
+                  widget.model!.longDescription.toString(),
+                  textAlign: TextAlign.justify,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ),
-          ),
-          Center(
-            child: Padding(
+            Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
                 "₹ ${widget.model!.price}",
@@ -144,16 +144,13 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 0, right: 0),
-            child: Divider(
-              height: 1,
-              thickness: 2,
-              color: Colors.black,
-            ),
-          ),
-        ],
+            SizedBox(
+              height: 20,
+            )
+        
+        
+          ],
+        ),
       ),
     );
   }

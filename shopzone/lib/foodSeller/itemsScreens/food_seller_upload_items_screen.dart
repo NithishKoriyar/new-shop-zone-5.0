@@ -41,12 +41,13 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
   bool uploading = false;
   String itemUniqueId = DateTime.now().millisecondsSinceEpoch.toString();
 
-Future<void> validateUploadForm() async {
+ Future<void> validateUploadForm() async {
     if (imgXFile != null) {
       if (itemInfoTextEditingController.text.isNotEmpty &&
           itemTitleTextEditingController.text.isNotEmpty &&
           itemDescriptionTextEditingController.text.isNotEmpty &&
           itemPriceTextEditingController.text.isNotEmpty) {
+            setState(() => uploading = true); 
         
         var imageBytes = await imgXFile!.readAsBytes();
         var base64Image = base64Encode(imageBytes);
@@ -80,7 +81,8 @@ Future<void> validateUploadForm() async {
                 context, MaterialPageRoute(builder: (c) => HomeScreen()));
           } else {
             Fluttertoast.showToast(msg: "Error: " + responseJson['message']);
-          }
+          } 
+          setState(() => uploading = false);
         } else {
           Fluttertoast.showToast(msg: "Network error: Unable to upload.");
         }
@@ -118,7 +120,7 @@ Future<void> validateUploadForm() async {
             ),
           ),
         ],
-elevation: 20,
+        elevation: 20,
         title: const Text("Upload New Item"),
         centerTitle: true,
       ),
@@ -154,27 +156,6 @@ elevation: 20,
           ),
 
           //brand info
-          ListTile(
-            leading: const Icon(
-              Icons.perm_device_information,
-              color: Colors.black,
-            ),
-            title: SizedBox(
-              width: 250,
-              child: TextField(
-                controller: itemInfoTextEditingController,
-                decoration: const InputDecoration(
-                  hintText: "item info",
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ),
-          const Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
 
           //brand title
           ListTile(
@@ -188,6 +169,27 @@ elevation: 20,
                 controller: itemTitleTextEditingController,
                 decoration: const InputDecoration(
                   hintText: "item title",
+                  hintStyle: TextStyle(color: Colors.black),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          const Divider(
+            color: Colors.black,
+            thickness: 1,
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.perm_device_information,
+              color: Colors.black,
+            ),
+            title: SizedBox(
+              width: 250,
+              child: TextField(
+                controller: itemInfoTextEditingController,
+                decoration: const InputDecoration(
+                  hintText: "item info",
                   hintStyle: TextStyle(color: Colors.black),
                   border: InputBorder.none,
                 ),
@@ -250,7 +252,8 @@ elevation: 20,
   }
 
   //!--------------------------------
-  final CurrentFoodSeller currentSellerController = Get.put(CurrentFoodSeller());
+  final CurrentFoodSeller currentSellerController =
+      Get.put(CurrentFoodSeller());
 
   late String sellerName;
   late String sellerEmail;
@@ -287,7 +290,7 @@ elevation: 20,
   defaultScreen() {
     return Scaffold(
       appBar: AppBar(
-elevation: 20,
+        elevation: 20,
         title: const Text("Add New Item"),
         centerTitle: true,
       ),

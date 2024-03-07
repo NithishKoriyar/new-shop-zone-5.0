@@ -6,7 +6,6 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/foodUser/foodUserAddressScreens/address_screen.dart';
 import 'package:shopzone/user/foodUser/foodUserCart/cart_screen.dart';
 import 'package:shopzone/user/models/cart.dart';
-import 'package:shopzone/user/foodUser/foodUserWidgets/appbar_cart_badge.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 import 'package:http/http.dart' as http;
 
@@ -76,8 +75,17 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBarWithCartBadge(
-        sellerUID: widget.model!.sellerUID.toString(),
+            appBar: AppBar(
+    elevation: 20,
+        title: const Text(
+          "Food Zone",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: true,
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
