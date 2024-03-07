@@ -6,7 +6,6 @@ import 'package:shopzone/foodSeller/foodSellerPreferences/food_current_seller.da
 import 'package:shopzone/foodSeller/foodSellerPreferences/food_seller_preferences.dart';
 import 'package:shopzone/foodSeller/historyScreen/food_seller_history_screen.dart';
 import 'package:shopzone/foodSeller/ordersScreens/food_seller_orders_screen.dart';
-import 'package:shopzone/foodSeller/shiftedParcelsScreen/food_seller_shifted_parcels_screen.dart';
 import 'package:shopzone/foodSeller/splashScreen/food_seller_my_splash_screen.dart';
 import 'package:shopzone/user/splashScreen/my_splash_screen.dart';
 import '../../api_key.dart';
@@ -190,11 +189,11 @@ class _MyDrawerState extends State<MyDrawer> {
                 //             builder: (c) => ShiftedParcelsScreen()));
                 //   },
                 // ),
-                const Divider(
-                  height: 10,
-                  color: Colors.white,
-                  thickness: 2,
-                ),
+                // const Divider(
+                //   height: 10,
+                //   color: Colors.white,
+                //   thickness: 2,
+                // ),
 
                 //history
                 ListTile(

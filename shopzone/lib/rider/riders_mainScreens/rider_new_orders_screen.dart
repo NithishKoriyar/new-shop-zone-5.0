@@ -1,12 +1,11 @@
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:shopzone/rider/riders_widgets/rider_order_card.dart';
-import 'package:shopzone/rider/riders_widgets/rider_simple_app_bar.dart';
-import 'package:shopzone/rider/riders_widgets/riders_progress_bar.dart';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
 
 class NewOrdersScreen extends StatefulWidget {
   @override
@@ -14,25 +13,68 @@ class NewOrdersScreen extends StatefulWidget {
 }
 
 class _NewOrdersScreenState extends State<NewOrdersScreen> {
-  
+
+
+
+ Future<Position> getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      Fluttertoast.showToast(
+        msg: "Enable location",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.white,
+        textColor: const Color.fromARGB(255, 0, 0, 0),
+        fontSize: 16.0
+    );
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can get the location
+    return await Geolocator.getCurrentPosition();
+  }
+
+
+
   Stream<List<dynamic>> fetchOrdersInRDR() async* {
+            Position position = await getCurrentLocation();
+      double latitude = position.latitude;
+      double longitude = position.longitude;
     // Assuming your API endpoint is something like this
-    const String apiUrl = API.normalOrdersRDR;
+     String apiUrl = '${API.normalOrdersRDR}?lat=$latitude&lng=$longitude';
 
     try {
-      final response = await http.post(Uri.parse(apiUrl));
-      // Removed the body part that was sending sellerID
-
-      print(API.sellerOrdersView);
-      print("Response Status Code: ${response.statusCode}");
+    final response = await http.get(
+      Uri.parse(apiUrl),
+      headers: {"Content-Type": "application/json"},
+    );
       print("Response Body: ${response.body}");
+      print('latitude ${latitude}');
+      print('longitude ${longitude}');
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
 
         if (responseData.containsKey('error')) {
           // If there's an error message in the response
-          print("Server Error: ${responseData['error']}");
+          print("Server Error : ${responseData['error']}");
           yield []; // yield an empty list or handle error differently
         } else {
           final List<dynamic> fetchedItems = responseData['orders'] ?? [];
@@ -45,10 +87,12 @@ class _NewOrdersScreenState extends State<NewOrdersScreen> {
         yield []; // yield an empty list or handle error differently
       }
     } catch (e) {
-      print("Exception while fetching orders: $e");
+      // Handle exceptio
+      print("--------------------------------------------------------------");
       yield [];
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +112,6 @@ class _NewOrdersScreenState extends State<NewOrdersScreen> {
               return const Center(
                   child: Text('No Orders')); // Show loading indicator
             } else {
-              
               List<dynamic> orderItems = dataSnapshot.data!;
               return ListView.builder(
                 itemCount: orderItems.length,

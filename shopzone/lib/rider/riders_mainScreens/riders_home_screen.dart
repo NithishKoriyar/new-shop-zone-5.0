@@ -184,7 +184,7 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
       appBar: AppBar(
         elevation: 20,
         title: Text(
-          "Welcome ${riderName}",
+          "Welcome",
           style: const TextStyle(
             fontSize: 25.0,
             color: Colors.black,
