@@ -34,6 +34,7 @@ class _SellerSplashScreenState extends State<SellerSplashScreen>
         BindingsBuilder(() {
           Get.put(CurrentSeller()); // Initialize the CurrentSeller instance
         });
+        Navigator.pop(context);
         Navigator.push(context, MaterialPageRoute(builder: (c)=> HomeScreen()));
       }
       //if seller is not loogedin already

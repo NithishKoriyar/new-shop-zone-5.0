@@ -22,6 +22,7 @@ class _CartItemDesignWidgetState extends State<CartItemDesignWidget> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(

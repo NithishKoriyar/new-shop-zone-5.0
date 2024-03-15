@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shopzone/api_key.dart';
+import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/normalUser/global/global.dart';
 import 'package:shopzone/user/models/items.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
@@ -56,8 +57,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-            appBar: AppBar(
-         elevation: 20,
+      appBar: AppBar(
+        elevation: 20,
         title: const Text(
           "Shop Zone",
           style: TextStyle(
@@ -65,22 +66,56 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (c) => CartScreenUser()));
+              },
+              icon: Icon(Icons.shopping_cart))
+        ],
         centerTitle: true,
         automaticallyImplyLeading: true,
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          int itemCounter = counterLimit;
-          cartMethods.addItemToCart(
-            widget.model!.itemID.toString(),
-            itemCounter,
-            userID,
-          );
-        },
-        label: const Text("Add to Cart"),
-        icon: const Icon(
-          Icons.add_shopping_cart_rounded,
-        ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          SizedBox(
+            width: 10,
+          ),
+          FloatingActionButton.extended(
+            
+            onPressed: () {
+              int itemCounter = counterLimit;
+              cartMethods.addItemToCart(
+                widget.model!.itemID.toString(),
+                itemCounter,
+                userID,
+              );
+            },
+            label: const Text("Add to Cart"),
+            icon: const Icon(
+              Icons.add_shopping_cart_rounded,
+            ),
+          ),
+          FloatingActionButton.extended(
+            backgroundColor: Colors.green,
+            onPressed: () {
+              int itemCounter = counterLimit;
+              cartMethods.addItemToCart(
+                widget.model!.itemID.toString(),
+                itemCounter,
+                userID,
+              );
+                              Navigator.push(context,
+                    MaterialPageRoute(builder: (c) => CartScreenUser()));
+            },
+            label: const Text("Buy Now"),
+            icon: const Icon(
+              Icons.credit_score_rounded,
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -183,7 +218,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             ),
 
             const SizedBox(
-              height: 30,
+              height: 80,
             ),
           ],
         ),

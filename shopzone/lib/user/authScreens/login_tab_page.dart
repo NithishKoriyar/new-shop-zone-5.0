@@ -66,6 +66,7 @@ class _LoginTabPageState extends State<LoginTabPage> {
 
           Future.delayed(Duration(milliseconds: 2000), ()
           {
+            Navigator.pop(context);
              Navigator.push(context, MaterialPageRoute(builder: (c)=>  HomeScreen()));
           });
         }
