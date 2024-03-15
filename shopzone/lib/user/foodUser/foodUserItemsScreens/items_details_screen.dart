@@ -20,7 +20,7 @@ class ItemsDetailsScreen extends StatefulWidget {
 }
 
 class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
-    final CurrentUser currentUserController = Get.put(CurrentUser());
+  final CurrentUser currentUserController = Get.put(CurrentUser());
 
   late String userName;
   late String userEmail;
@@ -29,7 +29,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   int counterLimit = 1;
 
   @override
-    void initState() {
+  void initState() {
     super.initState();
     currentUserController.getUserInfo().then((_) {
       setUserInfo();
@@ -56,8 +56,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-            appBar: AppBar(
-    elevation: 20,
+      appBar: AppBar(
+        elevation: 20,
         title: const Text(
           "Food Zone",
           style: TextStyle(
@@ -88,7 +88,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
           children: [
             Center(
               child: Image.network(
-                API.foodSellerMenuItemsInFoodUser + (widget.model!.thumbnailUrl ?? ''),
+                API.foodSellerMenuItemsInFoodUser +
+                    (widget.model!.thumbnailUrl ?? ''),
               ),
             ),
 
@@ -129,7 +130,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
-                        Padding(
+            Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
               child: Text(
                 widget.model!.itemInfo.toString(),
@@ -174,6 +175,17 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 height: 1,
                 thickness: 2,
                 color: Colors.green,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                "Total Price: ₹ ${counterLimit * (double.tryParse(widget.model?.price ?? '0') ?? 0)}",
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
             ),
 

@@ -244,14 +244,13 @@ class _FoodScreenState extends State<FoodScreen> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       Fluttertoast.showToast(
-        msg: "Enable location",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.white,
-        textColor: const Color.fromARGB(255, 0, 0, 0),
-        fontSize: 16.0
-    );
+          msg: "Enable location",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.white,
+          textColor: const Color.fromARGB(255, 0, 0, 0),
+          fontSize: 16.0);
     }
 
     permission = await Geolocator.checkPermission();
