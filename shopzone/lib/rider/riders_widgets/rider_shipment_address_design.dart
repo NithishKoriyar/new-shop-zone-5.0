@@ -84,6 +84,7 @@ void confirmedParcelShipment(BuildContext context, getOrderID, sellerId, purchas
           fontSize: 16.0
       );
     } else {
+      Navigator.pop(context);
       Navigator.push(context,MaterialPageRoute(builder: (c) => NewOrdersScreen()));
       //send rider to shipmentScreen
       // ignore: use_build_context_synchronously
