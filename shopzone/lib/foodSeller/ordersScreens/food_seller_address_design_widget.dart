@@ -24,10 +24,15 @@ class AddressDesign extends StatelessWidget {
         orderID,
         model?.name,
       );
-      print("---------------------------------------------------------------------------------------------------------");
+      print(
+          "---------------------------------------------------------------------------------------------------------");
       print(userDeviceToken);
-      print(orderID,);
-      print(model?.name,);
+      print(
+        orderID,
+      );
+      print(
+        model?.name,
+      );
     } else {
       print("user device token is empty");
     }
@@ -35,7 +40,8 @@ class AddressDesign extends StatelessWidget {
 
   Future<String> getUserDeviceTokenFromAPI(String userUID) async {
     final response = await http.get(
-      Uri.parse('${API.foodSellerGetUserDeviceTokenInSellerApp}?userUID=$userUID'),
+      Uri.parse(
+          '${API.foodSellerGetUserDeviceTokenInSellerApp}?userUID=$userUID'),
     );
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -50,49 +56,49 @@ class AddressDesign extends StatelessWidget {
     return "";
   }
 
-Future<void> notificationFormat(userDeviceToken, orderID, sellerName) async {
-  final Map<String, String> headerNotification = {
-    'Content-Type': 'application/json',
-    'Authorization': fcmServerToken, // Assuming fcmServerToken is a variable holding your server key.
-  };
+  Future<void> notificationFormat(userDeviceToken, orderID, sellerName) async {
+    final Map<String, String> headerNotification = {
+      'Content-Type': 'application/json',
+      'Authorization':
+          fcmServerToken, // Assuming fcmServerToken is a variable holding your server key.
+    };
 
-  final Map<String, dynamic> bodyNotification = {
-    'body':
-        "Dear user, your Parcel (# $orderID) has been shifted Successfully by seller $sellerName. \nPlease Check Now",
-    'title': "Parcel Shifted",
-  };
+    final Map<String, dynamic> bodyNotification = {
+      'body':
+          "Dear user, your Parcel (# $orderID) has been shifted Successfully by seller $sellerName. \nPlease Check Now",
+      'title': "Parcel Shifted",
+    };
 
-  final Map<String, dynamic> dataMap = {
-    "click_action": "FLUTTER_NOTIFICATION_CLICK",
-    "id": "1",
-    "status": "done",
-    "userOrderId": orderID,
-  };
+    final Map<String, dynamic> dataMap = {
+      "click_action": "FLUTTER_NOTIFICATION_CLICK",
+      "id": "1",
+      "status": "done",
+      "userOrderId": orderID,
+    };
 
-  final Map<String, dynamic> officialNotificationFormat = {
-    'notification': bodyNotification,
-    'data': dataMap,
-    'priority': 'high',
-    'to': userDeviceToken,
-  };
+    final Map<String, dynamic> officialNotificationFormat = {
+      'notification': bodyNotification,
+      'data': dataMap,
+      'priority': 'high',
+      'to': userDeviceToken,
+    };
 
-  final response = await http.post(
-    Uri.parse("https://fcm.googleapis.com/fcm/send"),
-    headers: headerNotification,
-    body: jsonEncode(officialNotificationFormat),
-  );
+    final response = await http.post(
+      Uri.parse("https://fcm.googleapis.com/fcm/send"),
+      headers: headerNotification,
+      body: jsonEncode(officialNotificationFormat),
+    );
 
-  if (response.statusCode == 200) {
-    // Notification sent successfully. You can process the response data if needed.
-    print("Notification sent successfully");
-  } else {
-    // Handle the error. Inspect the response for details.
-    
-    print("Error sending notification. Status code: ${response.statusCode}");
-    print("Response body: ${response.body}");
+    if (response.statusCode == 200) {
+      // Notification sent successfully. You can process the response data if needed.
+      print("Notification sent successfully");
+    } else {
+      // Handle the error. Inspect the response for details.
+
+      print("Error sending notification. Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -207,10 +213,13 @@ Future<void> notificationFormat(userDeviceToken, orderID, sellerName) async {
                   Fluttertoast.showToast(
                       msg:
                           responseBody["message"] ?? "Confirmed Successfully.");
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FoodSellerSplashScreen()));
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FoodSellerSplashScreen()),
+                    (Route<dynamic> route) =>
+                        false, // This condition prevents any route from being retained, effectively clearing the stack.
+                  );
                 } else {
                   Fluttertoast.showToast(
                       msg: responseBody["message"] ?? "Error updating data.");
@@ -219,10 +228,13 @@ Future<void> notificationFormat(userDeviceToken, orderID, sellerName) async {
                 Fluttertoast.showToast(msg: "Server error. Please try again.");
               }
             } else {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const FoodSellerSplashScreen()));
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => FoodSellerSplashScreen()),
+                (Route<dynamic> route) =>
+                    false, // This condition prevents any route from being retained, effectively clearing the stack.
+              );
             }
           },
           child: Padding(
@@ -250,7 +262,7 @@ Future<void> notificationFormat(userDeviceToken, orderID, sellerName) async {
                       : model?.orderStatus == "shifted"
                           ? "Go Back"
                           : model?.orderStatus == "normal"
-                              ? "Parcel Packed & \nShifted to Nearest PickUp Point. \nClick to Confirm"
+                              ? "Parcel is Ready to PickPoint. \nClick to Confirm"
                               : "",
                   textAlign: TextAlign.center,
                   style: const TextStyle(

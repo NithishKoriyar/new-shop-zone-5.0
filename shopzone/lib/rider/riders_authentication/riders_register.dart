@@ -301,7 +301,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   CustomTextField(
                     data: Icons.my_location,
                     controller: locationController,
-                    hintText: "Cafe/Restaurant Address",
+                    hintText: "Current Location",
                     isObsecre: false,
                     enabled: false,
                   ),

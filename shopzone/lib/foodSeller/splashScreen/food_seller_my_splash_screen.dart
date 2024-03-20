@@ -9,8 +9,6 @@ import 'package:shopzone/foodSeller/foodSellerPreferences/food_seller_preference
 
 import '../foodSellerPreferences/food_current_seller.dart';
 
-
-
 class FoodSellerSplashScreen extends StatefulWidget {
   const FoodSellerSplashScreen({Key? key}) : super(key: key);
 
@@ -18,27 +16,27 @@ class FoodSellerSplashScreen extends StatefulWidget {
   State<FoodSellerSplashScreen> createState() => _FoodSellerSplashScreenState();
 }
 
-class _FoodSellerSplashScreenState extends State<FoodSellerSplashScreen>
-{
+class _FoodSellerSplashScreenState extends State<FoodSellerSplashScreen> {
 //the splash screen is there for 3 sec
-  startTimer() async
-  {
+  startTimer() async {
     // Read user info from preferences
     final sellerInfo = await RememberFoodSellerPrefs.readSellerInfo();
 
     Timer(const Duration(seconds: 1), () async
-    // if seller is already logged in send theme to homepage or to AuthScreen
+        // if seller is already logged in send theme to homepage or to AuthScreen
         {
-      if(sellerInfo !=null)
-      {
+      if (sellerInfo != null) {
         BindingsBuilder(() {
           Get.put(CurrentFoodSeller()); // Initialize the CurrentSeller instance
         });
-        Navigator.push(context, MaterialPageRoute(builder: (c)=> HomeScreen()));
+        Navigator.pop(context);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (c) => HomeScreen()));
       }
       //if seller is not loogedin already
-      else{
-        Navigator.push(context, MaterialPageRoute(builder: (c)=> AuthScreen()));
+      else {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (c) => AuthScreen()));
       }
     });
   }

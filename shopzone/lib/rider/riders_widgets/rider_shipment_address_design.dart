@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/riders_assistantMethods/get_current_location.dart';
 import 'package:shopzone/rider/riders_global/global.dart';
-import 'package:shopzone/rider/riders_mainScreens/rider_new_orders_screen.dart';
 import 'package:shopzone/rider/riders_mainScreens/rider_parcel_picking_screen.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
-import 'package:shopzone/rider/riders_model/rider_address.dart';
 import 'package:http/http.dart' as http;
 
 class ShipmentAddressDesign extends StatefulWidget {
@@ -57,24 +56,33 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
   // }
 
   // Function to handle parcel shipment confirmation
-  void confirmedParcelShipment(
-      BuildContext context, getOrderID, sellerId, purchaserId) async {
-    print(API.updateOrderStatusRDR);
-    var url =
-        Uri.parse(API.updateOrderStatusRDR); // Change to your PHP script URL
-    var response = await http.post(url, body: {
-      'getOrderID': getOrderID,
-      'riderUID': riderID, // Replace with actual value
-      'riderName': riderName, // Replace with actual value
-      'status': 'picking',
-      'lat': position!.latitude.toString(), // Replace with actual value
-      'lng': position!.longitude.toString(), // Replace with actual value
-      'address': completeAddress, // Replace with actual value
-    });
+void confirmedParcelShipment(BuildContext context, getOrderID, sellerId, purchaserId) async {
+  print(API.updateOrderStatusRDR);
+  var url = Uri.parse(API.updateOrderStatusRDR); // Change to your PHP script URL
+  var response = await http.post(url, body: {
+    'getOrderID': getOrderID,
+    'riderUID': riderID, // Replace with actual value
+    'riderName': riderName, // Replace with actual value
+    'status': 'picking',
+    'lat': position!.latitude.toString(), // Replace with actual value
+    'lng': position!.longitude.toString(), // Replace with actual value
+    'address': completeAddress, // Replace with actual value
+  });
 
-    if (response.statusCode == 200) {
-      // Handle the response from the PHP script
-      print('Server response: ${response.body}');
+  if (response.statusCode == 200) {
+    print('Server response: ${response.body}');
+    if (response.body.contains("Order already picked")) {
+      // Display Flutter toast
+      Fluttertoast.showToast(
+          msg: "Order already picked",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+    } else {
       //send rider to shipmentScreen
       // ignore: use_build_context_synchronously
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -90,11 +98,13 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
                       getOrderID: getOrderID,
                     )));
       });
-    } else {
-      // Handle the error
-      print('Server error: ${response.body}');
     }
+  } else {
+    // Handle the error
+    print('Server error: ${response.body}');
   }
+}
+
 
   // void confirmedParcelShipment(BuildContext context,  getOrderID,
   @override
