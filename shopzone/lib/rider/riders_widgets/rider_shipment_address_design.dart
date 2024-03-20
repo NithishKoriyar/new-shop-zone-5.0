@@ -5,6 +5,7 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/riders_assistantMethods/get_current_location.dart';
 import 'package:shopzone/rider/riders_global/global.dart';
+import 'package:shopzone/rider/riders_mainScreens/rider_new_orders_screen.dart';
 import 'package:shopzone/rider/riders_mainScreens/rider_parcel_picking_screen.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:http/http.dart' as http;
@@ -83,21 +84,22 @@ void confirmedParcelShipment(BuildContext context, getOrderID, sellerId, purchas
           fontSize: 16.0
       );
     } else {
+      Navigator.push(context,MaterialPageRoute(builder: (c) => NewOrdersScreen()));
       //send rider to shipmentScreen
       // ignore: use_build_context_synchronously
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ParcelPickingScreen(
-                      purchaserId: purchaserId,
-                      purchaserAddress: widget.model?.completeAddress,
-                      purchaserLat: widget.model!.lat,
-                      purchaserLng: widget.model!.lng,
-                      sellerId: sellerId,
-                      getOrderID: getOrderID,
-                    )));
-      });
+      // WidgetsBinding.instance.addPostFrameCallback((_) {
+      //   Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //           builder: (context) => ParcelPickingScreen(
+      //                 purchaserId: purchaserId,
+      //                 purchaserAddress: widget.model?.completeAddress,
+      //                 purchaserLat: widget.model!.lat,
+      //                 purchaserLng: widget.model!.lng,
+      //                 sellerId: sellerId,
+      //                 getOrderID: getOrderID,
+      //               )));
+      // });
     }
   } else {
     // Handle the error

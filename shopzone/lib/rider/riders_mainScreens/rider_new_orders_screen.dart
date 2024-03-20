@@ -53,46 +53,52 @@ class _NewOrdersScreenState extends State<NewOrdersScreen> {
 
 
 
-  Stream<List<dynamic>> fetchOrdersInRDR() async* {
-            Position position = await getCurrentLocation();
-      double latitude = position.latitude;
-      double longitude = position.longitude;
-    // Assuming your API endpoint is something like this
-     String apiUrl = '${API.normalOrdersRDR}?lat=$latitude&lng=$longitude';
+ Stream<List<dynamic>> fetchOrdersInRDR() async* {
+  while (true) {
+    Position position = await getCurrentLocation();
+    double latitude = position.latitude;
+    double longitude = position.longitude;
+    String apiUrl = '${API.normalOrdersRDR}?lat=$latitude&lng=$longitude';
 
     try {
-    final response = await http.get(
-      Uri.parse(apiUrl),
-      headers: {"Content-Type": "application/json"},
-    );
-      print("Response Body: ${response.body}");
-      print('latitude ${latitude}');
-      print('longitude ${longitude}');
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+      );
+      
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
 
         if (responseData.containsKey('error')) {
-          // If there's an error message in the response
-          print("Server Error : ${responseData['error']}");
+         
           yield []; // yield an empty list or handle error differently
         } else {
           final List<dynamic> fetchedItems = responseData['orders'] ?? [];
-          // Assuming the fetched items are under the 'orders' key. Use a null check just in case.
           yield fetchedItems;
-          print(fetchedItems);
+        
         }
       } else {
-        print("Error fetching cart items");
+       Fluttertoast.showToast(
+        msg: "Network error",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
         yield []; // yield an empty list or handle error differently
       }
     } catch (e) {
-      // Handle exceptio
-      print("--------------------------------------------------------------");
+      
       yield [];
     }
-  }
 
+    // Wait for some time before fetching again (e.g., 5 seconds)
+    await Future.delayed(const Duration(seconds: 1));
+  }
+}
 
   @override
   Widget build(BuildContext context) {
