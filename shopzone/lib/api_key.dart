@@ -225,4 +225,5 @@ class API {
    static const updateSellerEarningsRDR = "$hostRider/updateSellerEarningsRDR.php";
    
    static const updateOrderStatusEndingRDR = "$hostRider/updateOrderStatusRDR.php";
+      static const getSellerAddressRDR = "$hostRider/get_seller_address.php";
 }

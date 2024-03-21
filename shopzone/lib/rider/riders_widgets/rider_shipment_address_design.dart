@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -36,6 +38,7 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
         setRiderInfo();
         // printSellerInfo();
         setState(() {});
+        getSellerAddress();
 
         // restrictBlockedRidersFromUsingApp();
       },
@@ -56,58 +59,88 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
   //   print('Seller image: $riderImg');
   // }
 
-  // Function to handle parcel shipment confirmation
-void confirmedParcelShipment(BuildContext context, getOrderID, sellerId, purchaserId) async {
-  print(API.updateOrderStatusRDR);
-  var url = Uri.parse(API.updateOrderStatusRDR); // Change to your PHP script URL
-  var response = await http.post(url, body: {
-    'getOrderID': getOrderID,
-    'riderUID': riderID, // Replace with actual value
-    'riderName': riderName, // Replace with actual value
-    'status': 'picking',
-    'lat': position!.latitude.toString(), // Replace with actual value
-    'lng': position!.longitude.toString(), // Replace with actual value
-    'address': completeAddress, // Replace with actual value
-  });
+  String sellerAddress = "";
+  String sellerPhone = "";
 
-  if (response.statusCode == 200) {
-    print('Server response: ${response.body}');
-    if (response.body.contains("Order already picked")) {
-      // Display Flutter toast
-      Fluttertoast.showToast(
-          msg: "Order already picked",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0
+  Future<void> getSellerAddress() async {
+     print(API.getSellerAddressRDR);
+    String? sellerUID = widget.model?.sellerUID;
+    if (sellerUID != null) {
+      var response = await http.post(
+        Uri.parse(API.getSellerAddressRDR),
+        body: {'sellerUID': sellerUID},
       );
-    } else {
-      Navigator.pop(context);
-      Navigator.push(context,MaterialPageRoute(builder: (c) => NewOrdersScreen()));
-      //send rider to shipmentScreen
-      // ignore: use_build_context_synchronously
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
-      //   Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //           builder: (context) => ParcelPickingScreen(
-      //                 purchaserId: purchaserId,
-      //                 purchaserAddress: widget.model?.completeAddress,
-      //                 purchaserLat: widget.model!.lat,
-      //                 purchaserLng: widget.model!.lng,
-      //                 sellerId: sellerId,
-      //                 getOrderID: getOrderID,
-      //               )));
-      // });
-    }
-  } else {
-    // Handle the error
-    print('Server error: ${response.body}');
-  }
-}
+     
 
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        // Set the seller address and phone variables
+        setState(() {
+          sellerAddress = data['seller_address'];
+          sellerPhone = data[
+              'seller_phone']; // Assuming 'seller_phone' is the key in the response
+        });
+      } else {
+        print('Failed to fetch seller details');
+      }
+    } else {
+      print('Seller UID is null');
+    }
+  }
+
+  // Function to handle parcel shipment confirmation
+  void confirmedParcelShipment(
+      BuildContext context, getOrderID, sellerId, purchaserId) async {
+    print(API.updateOrderStatusRDR);
+    var url =
+        Uri.parse(API.updateOrderStatusRDR); // Change to your PHP script URL
+    var response = await http.post(url, body: {
+      'getOrderID': getOrderID,
+      'riderUID': riderID, // Replace with actual value
+      'riderName': riderName, // Replace with actual value
+      'status': 'picking',
+      'lat': position!.latitude.toString(), // Replace with actual value
+      'lng': position!.longitude.toString(), // Replace with actual value
+      'address': completeAddress, // Replace with actual value
+    });
+
+    if (response.statusCode == 200) {
+      print('Server response: ${response.body}');
+      if (response.body.contains("Order already picked")) {
+        // Display Flutter toast
+        Fluttertoast.showToast(
+            msg: "Order already picked",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        Navigator.pop(context);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (c) => NewOrdersScreen()));
+        //send rider to shipmentScreen
+        // ignore: use_build_context_synchronously
+        // WidgetsBinding.instance.addPostFrameCallback((_) {
+        //   Navigator.push(
+        //       context,
+        //       MaterialPageRoute(
+        //           builder: (context) => ParcelPickingScreen(
+        //                 purchaserId: purchaserId,
+        //                 purchaserAddress: widget.model?.completeAddress,
+        //                 purchaserLat: widget.model!.lat,
+        //                 purchaserLng: widget.model!.lng,
+        //                 sellerId: sellerId,
+        //                 getOrderID: getOrderID,
+        //               )));
+        // });
+      }
+    } else {
+      // Handle the error
+      print('Server error: ${response.body}');
+    }
+  }
 
   // void confirmedParcelShipment(BuildContext context,  getOrderID,
   @override
@@ -116,16 +149,13 @@ void confirmedParcelShipment(BuildContext context, getOrderID, sellerId, purchas
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.all(5.0),
           child: Text('Shipping Details:',
               style:
                   TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         ),
-        const SizedBox(
-          height: 6.0,
-        ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 1),
           width: MediaQuery.of(context).size.width,
           child: Table(
             children: [
@@ -144,34 +174,50 @@ void confirmedParcelShipment(BuildContext context, getOrderID, sellerId, purchas
                     "Phone Number",
                     style: TextStyle(color: Colors.black),
                   ),
-                  Text(widget.model!.phoneNumber!),
+                  Text(": " + widget.model!.phoneNumber!),
                 ],
               ),
             ],
           ),
         ),
-        const SizedBox(
-          height: 20,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Text(
-            widget.model!.completeAddress!,
-            textAlign: TextAlign.justify,
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Text(
+              widget.model!.completeAddress!,
+              textAlign: TextAlign.justify,
+            ),
           ),
         ),
-        widget.model?.orderStatus == "ended"
-            ? Container()
-            : Padding(
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Text(
+              "Restaurant Address :$sellerAddress",
+              textAlign: TextAlign.justify,
+            ),
+          ),
+        ),
+                Center(
+          child: Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: Text(
+              "Phone :$sellerPhone",
+              textAlign: TextAlign.justify,
+            ),
+          ),
+        ),
+        Builder(
+          builder: (context) {
+            // Using if-else to decide which widget to display
+            if (widget.model?.orderStatus == "ready") {
+              return Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Center(
                   child: InkWell(
                     onTap: () {
                       UserLocation uLocation = UserLocation();
                       uLocation.getCurrentLocation();
-
-                      // confirmedParcelShipment(
-                      //     context, orderId!, sellerId!, orderByUser!);
                       confirmedParcelShipment(context, widget.model!.orderId,
                           widget.model!.sellerUID, widget.model!.orderBy);
                     },
@@ -191,14 +237,55 @@ void confirmedParcelShipment(BuildContext context, getOrderID, sellerId, purchas
                       height: 50,
                       child: const Center(
                         child: Text(
-                          "Confirm - To Deliver this Parcel",
+                          "Accept the Parcel",
                           style: TextStyle(color: Colors.white, fontSize: 15.0),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              );
+            } else if (widget.model?.orderStatus == "picking") {
+              return Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Center(
+                  child: InkWell(
+                    onTap: () {
+                      UserLocation uLocation = UserLocation();
+                      uLocation.getCurrentLocation();
+                      confirmedParcelShipment(context, widget.model!.orderId,
+                          widget.model!.sellerUID, widget.model!.orderBy);
+                    },
+                    child: Container(
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                        colors: [
+                          Colors.black,
+                          Colors.black,
+                        ],
+                        begin: FractionalOffset(0.0, 0.0),
+                        end: FractionalOffset(1.0, 0.0),
+                        stops: [0.0, 1.0],
+                        tileMode: TileMode.clamp,
+                      )),
+                      width: MediaQuery.of(context).size.width - 40,
+                      height: 50,
+                      child: const Center(
+                        child: Text(
+                          "Pick the Parcel",
+                          style: TextStyle(color: Colors.white, fontSize: 15.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              // For any other status, show the confirmation button.
+              return Container(); // If the order status is "ended", show an empty container.
+            }
+          },
+        ),
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Center(
