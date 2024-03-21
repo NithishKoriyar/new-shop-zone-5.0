@@ -63,14 +63,12 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
   String sellerPhone = "";
 
   Future<void> getSellerAddress() async {
-     print(API.getSellerAddressRDR);
     String? sellerUID = widget.model?.sellerUID;
     if (sellerUID != null) {
       var response = await http.post(
         Uri.parse(API.getSellerAddressRDR),
         body: {'sellerUID': sellerUID},
       );
-     
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
@@ -174,7 +172,7 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
                     "Phone Number",
                     style: TextStyle(color: Colors.black),
                   ),
-                  Text(": " + widget.model!.phoneNumber!),
+                  Text(": ${widget.model!.phoneNumber!}"),
                 ],
               ),
             ],
@@ -198,7 +196,7 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
             ),
           ),
         ),
-                Center(
+        Center(
           child: Padding(
             padding: const EdgeInsets.all(0.0),
             child: Text(
@@ -211,73 +209,93 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
           builder: (context) {
             // Using if-else to decide which widget to display
             if (widget.model?.orderStatus == "ready") {
-              return Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Center(
-                  child: InkWell(
-                    onTap: () {
-                      UserLocation uLocation = UserLocation();
-                      uLocation.getCurrentLocation();
-                      confirmedParcelShipment(context, widget.model!.orderId,
-                          widget.model!.sellerUID, widget.model!.orderBy);
-                    },
-                    child: Container(
-                      decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                        colors: [
-                          Colors.black,
-                          Colors.black,
-                        ],
-                        begin: FractionalOffset(0.0, 0.0),
-                        end: FractionalOffset(1.0, 0.0),
-                        stops: [0.0, 1.0],
-                        tileMode: TileMode.clamp,
-                      )),
-                      width: MediaQuery.of(context).size.width - 40,
-                      height: 50,
-                      child: const Center(
-                        child: Text(
-                          "Accept the Parcel",
-                          style: TextStyle(color: Colors.white, fontSize: 15.0),
-                        ),
-                      ),
+              return Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    UserLocation uLocation = UserLocation();
+                    uLocation.getCurrentLocation();
+                    confirmedParcelShipment(context, widget.model!.orderId,
+                        widget.model!.sellerUID, widget.model!.orderBy);
+                  },
+                  child: const Text(
+                    "Accept the Parcel",
+                    style: TextStyle(
+                      color: Colors.white, // Set text color here
                     ),
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                        Colors.green), // Set background color here
                   ),
                 ),
               );
             } else if (widget.model?.orderStatus == "picking") {
-              return Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Center(
-                  child: InkWell(
-                    onTap: () {
-                      UserLocation uLocation = UserLocation();
-                      uLocation.getCurrentLocation();
-                      confirmedParcelShipment(context, widget.model!.orderId,
-                          widget.model!.sellerUID, widget.model!.orderBy);
-                    },
-                    child: Container(
-                      decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                        colors: [
-                          Colors.black,
-                          Colors.black,
-                        ],
-                        begin: FractionalOffset(0.0, 0.0),
-                        end: FractionalOffset(1.0, 0.0),
-                        stops: [0.0, 1.0],
-                        tileMode: TileMode.clamp,
-                      )),
-                      width: MediaQuery.of(context).size.width - 40,
-                      height: 50,
-                      child: const Center(
-                        child: Text(
-                          "Pick the Parcel",
-                          style: TextStyle(color: Colors.white, fontSize: 15.0),
-                        ),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment
+                      .center, // Centers the buttons horizontally
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: const Text('Open Restaurant Location'),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            const Color.fromARGB(
+                                255, 0, 255, 8)), // Set background color here
                       ),
                     ),
-                  ),
+                    const SizedBox(
+                        width:
+                            20), // Provides some space between the two buttons
+                    ElevatedButton(
+                      onPressed: () {
+                        // Show confirmation dialog
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            // Return the actual dialog widget
+                            return AlertDialog(
+                              title: Text('Confirmation'),
+                              content: Text('Do you want to pick the parcel?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    // If user cancels, just close the dialog
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    // Pop the dialog first
+                                    Navigator.of(context).pop();
+                                    // Then proceed with the original button actions
+                                    UserLocation uLocation = UserLocation();
+                                    uLocation.getCurrentLocation();
+                                    confirmedParcelShipment(
+                                        context,
+                                        widget.model!.orderId,
+                                        widget.model!.sellerUID,
+                                        widget.model!.orderBy);
+                                  },
+                                  child: Text('Confirm'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: const Text(
+                        'Pick the Parcel',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            Color.fromARGB(
+                                255, 255, 0, 0)), // Red background color
+                      ),
+                    ),
+                  ],
                 ),
               );
             } else {
@@ -289,31 +307,11 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Center(
-            child: InkWell(
-              onTap: () {
+            child: ElevatedButton(
+              onPressed: () {
                 Navigator.pop(context);
               },
-              child: Container(
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                  colors: [
-                    Colors.black,
-                    Colors.black,
-                  ],
-                  begin: FractionalOffset(0.0, 0.0),
-                  end: FractionalOffset(1.0, 0.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp,
-                )),
-                width: MediaQuery.of(context).size.width - 40,
-                height: 50,
-                child: const Center(
-                  child: Text(
-                    "Go Back",
-                    style: TextStyle(color: Colors.white, fontSize: 15.0),
-                  ),
-                ),
-              ),
+              child: const Text('Go Back'),
             ),
           ),
         ),
