@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shopzone/api_key.dart';
+import 'package:shopzone/rider/maps/map_utils.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/riders_assistantMethods/get_current_location.dart';
 import 'package:shopzone/rider/riders_global/global.dart';
@@ -61,7 +62,7 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
 
   String sellerAddress = "";
   String sellerPhone = "";
-
+  double? sellerLat, sellerLng;
   Future<void> getSellerAddress() async {
     String? sellerUID = widget.model?.sellerUID;
     if (sellerUID != null) {
@@ -72,11 +73,15 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        // Set the seller address and phone variables
         setState(() {
           sellerAddress = data['seller_address'];
-          sellerPhone = data[
-              'seller_phone']; // Assuming 'seller_phone' is the key in the response
+          sellerPhone = data['seller_phone'];
+
+          // Check if latitude and longitude are not null and are strings, then convert to double
+          if (data["latitude"] != null && data["longitude"] != null) {
+            sellerLat = double.tryParse(data["latitude"]);
+            sellerLng = double.tryParse(data["longitude"]);
+          }
         });
       } else {
         print('Failed to fetch seller details');
@@ -236,8 +241,14 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
                       .center, // Centers the buttons horizontally
                   children: <Widget>[
                     ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('Open Restaurant Location'),
+                      onPressed: () {
+                        MapUtils.lauchMapFromSourceToDestination(
+                            "12.715912861333345",
+                            "75.50503162387126",
+                            sellerLat,
+                            sellerLng);
+                      },
+                      child: Text('Open Restaurant Location'),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
                             const Color.fromARGB(
