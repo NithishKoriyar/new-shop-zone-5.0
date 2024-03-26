@@ -1,14 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:intl/intl.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
-import 'package:shopzone/rider/riders_model/rider_address.dart';
 import 'package:shopzone/rider/riders_widgets/rider_shipment_address_design.dart';
-import 'package:shopzone/rider/riders_widgets/rider_status_banner.dart';
-import 'package:shopzone/rider/riders_widgets/riders_progress_bar.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
   Orders? model;

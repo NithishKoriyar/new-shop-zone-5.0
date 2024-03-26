@@ -5,27 +5,20 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:shopzone/rider/riders_widgets/rider_order_card.dart';
-import 'package:shopzone/rider/riders_widgets/rider_simple_app_bar.dart';
 import 'package:http/http.dart' as http;
 
-
-
-class ParcelInProgressScreen extends StatefulWidget
-{
+class ParcelInProgressScreen extends StatefulWidget {
   @override
   _ParcelInProgressScreenState createState() => _ParcelInProgressScreenState();
 }
 
-
-
-class _ParcelInProgressScreenState extends State<ParcelInProgressScreen>
-{
-    final CurrentRider currentRiderController = Get.put(CurrentRider());
+class _ParcelInProgressScreenState extends State<ParcelInProgressScreen> {
+  final CurrentRider currentRiderController = Get.put(CurrentRider());
   late String riderName;
   late String riderEmail;
   String? riderID;
   late String riderImg;
-  
+
   @override
   void initState() {
     super.initState();
@@ -44,44 +37,44 @@ class _ParcelInProgressScreenState extends State<ParcelInProgressScreen>
     riderImg = currentRiderController.rider.riders_image;
   }
 
-
   Stream<List<dynamic>> fetchOrders() async* {
-    // Assuming your API endpoint is something like this
-    const String apiUrl = API.parcelInProgressScreenRDR;
+    while (true) {
+      // Assuming your API endpoint is something like this
+      const String apiUrl = API.parcelInProgressScreenRDR;
 
-    try {
-      final response =
-          await http.post(Uri.parse(apiUrl),body: {'riderID': riderID});
+      try {
+        final response =
+            await http.post(Uri.parse(apiUrl), body: {'riderID': riderID});
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
 
-        if (responseData.containsKey('error')) {
-          // If there's an error message in the response
-          print("Server Error: ${responseData['error']}");
-          yield []; // yield an empty list or handle error differently
+          if (responseData.containsKey('error')) {
+            // If there's an error message in the response
+            print("Server Error: ${responseData['error']}");
+            yield []; // yield an empty list or handle error differently
+          } else {
+            final List<dynamic> fetchedItems = responseData['orders'] ?? [];
+            // Assuming the fetched items are under the 'orders' key. Use a null check just in case.
+            yield fetchedItems;
+          }
         } else {
-          final List<dynamic> fetchedItems = responseData['orders'] ?? [];
-          // Assuming the fetched items are under the 'orders' key. Use a null check just in case.
-          yield fetchedItems;
+          print("Error fetching cart items");
+          yield []; // yield an empty list or handle error differently
         }
-      } else {
-        print("Error fetching cart items");
-        yield []; // yield an empty list or handle error differently
+      } catch (e) {
+        print("Exception while fetching orders: $e");
+        yield [];
       }
-    } catch (e) {
-      print("Exception while fetching orders: $e");
-      yield [];
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Parcel In Progress"),
-         elevation: 20,
+        elevation: 20,
         centerTitle: true,
       ),
       body: StreamBuilder<List<dynamic>>(
@@ -114,4 +107,3 @@ class _ParcelInProgressScreenState extends State<ParcelInProgressScreen>
     );
   }
 }
-

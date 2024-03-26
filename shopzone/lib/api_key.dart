@@ -207,6 +207,7 @@ class API {
   static const deliveryAmount ="$hostRider/get_per_parcel_delivery_amount.php"; //get_per_parcel_delivery_amount
   static const normalOrdersRDR = "$hostRider/riderOrderScreen.php";
   static const updateOrderStatusRDR = "$hostRider/updateOrderStatus.php";
+  static const updateDeliveryAndEndedOrderStatusRDR = "$hostRider/updateDeliveryAndEndedOrderStatusRDR.php";
   static const getLatLngOfSellerInRDR = "$hostRider/getLatLngOfSellerInRDR.php";
   static const updateOrderPicking = "$hostRider/updateOrderPicking.php";
   static const parcelInProgressScreenRDR =

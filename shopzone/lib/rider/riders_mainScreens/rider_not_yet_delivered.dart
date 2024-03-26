@@ -6,7 +6,6 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:shopzone/rider/riders_widgets/rider_order_card.dart';
-import 'package:shopzone/rider/riders_widgets/rider_simple_app_bar.dart';
 import 'package:http/http.dart' as http;
 
 

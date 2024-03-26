@@ -79,26 +79,26 @@ Future<void> getSellerData() async {
 void confirmParcelHasBeenPicked(String getOrderId, String sellerId, String purchaserId, String purchaserAddress, double purchaserLat, double purchaserLng) async {
   var url = Uri.parse(API.updateOrderPicking); // Replace with your actual API endpoint URL
   var response = await http.post(url, body: json.encode({
-    "orderId": getOrderId,
-    "status": "delivering",
-    "address": purchaserAddress,
-    "lat": purchaserLat,
-    "lng": purchaserLng
+  "orderId": getOrderId,
+  "status": "delivering",
+  "address": purchaserAddress,
+  "lat": purchaserLat,
+  "lng": purchaserLng
   }));
 
   if (response.statusCode == 200) {
-    var data = json.decode(response.body);
-    print(data['message']); // Handle the response as needed
-    //         Navigator.push(context, MaterialPageRoute(builder: (c)=> ParcelDeliveringScreen(
-    //   purchaserId: purchaserId,
-    //   purchaserAddress: purchaserAddress,
-    //   purchaserLat: purchaserLat,
-    //   purchaserLng: purchaserLng,
-    //   sellerId: sellerId,
-    //   getOrderId: getOrderId,
-    // )));
+  var data = json.decode(response.body);
+  print(data['message']); // Handle the response as needed
+  //         Navigator.push(context, MaterialPageRoute(builder: (c)=> ParcelDeliveringScreen(
+  //   purchaserId: purchaserId,
+  //   purchaserAddress: purchaserAddress,
+  //   purchaserLat: purchaserLat,
+  //   purchaserLng: purchaserLng,
+  //   sellerId: sellerId,
+  //   getOrderId: getOrderId,
+  // )));
   } else {
-    print('Failed to update the order');
+  print('Failed to update the order');
   }
 
 }
