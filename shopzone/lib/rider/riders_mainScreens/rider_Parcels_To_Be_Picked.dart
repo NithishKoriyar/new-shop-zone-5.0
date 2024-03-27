@@ -7,12 +7,12 @@ import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:shopzone/rider/riders_widgets/rider_order_card.dart';
 import 'package:http/http.dart' as http;
 
-class ParcelInProgressScreen extends StatefulWidget {
+class ParcelToBePickedScreen extends StatefulWidget {
   @override
-  _ParcelInProgressScreenState createState() => _ParcelInProgressScreenState();
+  _ParcelToBePickedScreenState createState() => _ParcelToBePickedScreenState();
 }
 
-class _ParcelInProgressScreenState extends State<ParcelInProgressScreen> {
+class _ParcelToBePickedScreenState extends State<ParcelToBePickedScreen> {
   final CurrentRider currentRiderController = Get.put(CurrentRider());
   late String riderName;
   late String riderEmail;
@@ -73,7 +73,7 @@ class _ParcelInProgressScreenState extends State<ParcelInProgressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Parcel In Progress"),
+        title: const Text("Parcels To Be Picked"),
         elevation: 20,
         centerTitle: true,
       ),

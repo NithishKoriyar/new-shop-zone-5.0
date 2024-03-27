@@ -10,15 +10,15 @@ import 'package:http/http.dart' as http;
 
 
 
-class NotYetDeliveredScreen extends StatefulWidget
+class DeliveryConfirmation extends StatefulWidget
 {
   @override
-  _NotYetDeliveredScreenState createState() => _NotYetDeliveredScreenState();
+  _DeliveryConfirmationState createState() => _DeliveryConfirmationState();
 }
 
 
 
-class _NotYetDeliveredScreenState extends State<NotYetDeliveredScreen>
+class _DeliveryConfirmationState extends State<DeliveryConfirmation>
 {
 
     final CurrentRider currentRiderController = Get.put(CurrentRider());
@@ -47,8 +47,8 @@ class _NotYetDeliveredScreenState extends State<NotYetDeliveredScreen>
 
 
   Stream<List<dynamic>> fetchOrders() async* {
-    // Assuming your API endpoint is something like this
-    const String apiUrl = API.parcelNotYetDeliverScreenRDR;
+    // Assuming your API endpoint is something like ev
+    const String apiUrl = API.endingParcelScreenRDR;
 
     try {
       final response =
@@ -83,7 +83,8 @@ class _NotYetDeliveredScreenState extends State<NotYetDeliveredScreen>
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("To be delivered"),
+          
+          title: Text("Delivery Confirmation"),
         ),
         body: StreamBuilder<List<dynamic>>(
         stream: fetchOrders(),

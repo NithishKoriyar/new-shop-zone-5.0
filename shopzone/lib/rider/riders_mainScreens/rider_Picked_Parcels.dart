@@ -1,24 +1,26 @@
 import 'dart:convert';
-import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:shopzone/rider/riders_widgets/rider_order_card.dart';
-import 'package:shopzone/rider/riders_widgets/rider_simple_app_bar.dart';
+import 'package:http/http.dart' as http;
 
-class HistoryScreen extends StatefulWidget
+
+
+class PickedParcels extends StatefulWidget
 {
   @override
-  _HistoryScreenState createState() => _HistoryScreenState();
+  _PickedParcelsState createState() => _PickedParcelsState();
 }
 
 
 
-class _HistoryScreenState extends State<HistoryScreen>
+class _PickedParcelsState extends State<PickedParcels>
 {
-  
+
     final CurrentRider currentRiderController = Get.put(CurrentRider());
   late String riderName;
   late String riderEmail;
@@ -44,11 +46,9 @@ class _HistoryScreenState extends State<HistoryScreen>
   }
 
 
-  Stream<List<dynamic>> fetchEndedOrders() async* {
+  Stream<List<dynamic>> fetchOrders() async* {
     // Assuming your API endpoint is something like this
-
-    const String apiUrl = API.parcelHistoryScreenRDR;
-  
+    const String apiUrl = API.pickedParcelScreenRDR;
 
     try {
       final response =
@@ -75,13 +75,18 @@ class _HistoryScreenState extends State<HistoryScreen>
       yield [];
     }
   }
+
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: SimpleAppBar(title: "History",),
-        body:  StreamBuilder<List<dynamic>>(
-        stream: fetchEndedOrders(),
+        appBar: AppBar(
+          title: Text("Picked Parcels"),
+        ),
+        body: StreamBuilder<List<dynamic>>(
+        stream: fetchOrders(),
         builder: (context, dataSnapshot) {
           if (dataSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(

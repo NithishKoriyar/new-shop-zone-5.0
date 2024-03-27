@@ -4,14 +4,14 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopzone/api_key.dart';
 import 'dart:convert';
-import 'package:shopzone/foodSeller/earningsScreen/food_seller_earnings_screen.dart';
 import 'package:shopzone/foodSeller/historyScreen/food_seller_history_screen.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_preferences.dart';
 import 'package:shopzone/rider/riders_global/global.dart';
+import 'package:shopzone/rider/riders_mainScreens/rider_Delivery_Confirmation.dart';
 import 'package:shopzone/rider/riders_mainScreens/rider_new_orders_screen.dart';
-import 'package:shopzone/rider/riders_mainScreens/rider_not_yet_delivered.dart';
-import 'package:shopzone/rider/riders_mainScreens/rider_parcel_in_progress_screen.dart';
+import 'package:shopzone/rider/riders_mainScreens/rider_Picked_Parcels.dart';
+import 'package:shopzone/rider/riders_mainScreens/rider_Parcels_To_Be_Picked.dart';
 import '../riders_authentication/riders_auth_screen.dart';
 
 class RidersHomeScreen extends StatefulWidget {
@@ -38,21 +38,25 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
             }
             if (index == 1) {
               //Parcels in Progress
-              Navigator.push(context,MaterialPageRoute(builder: (c) => ParcelInProgressScreen()));
+              Navigator.push(context,MaterialPageRoute(builder: (c) => ParcelToBePickedScreen()));
             }
             if (index == 2) {
               //Not Yet Delivered
-              Navigator.push(context,MaterialPageRoute(builder: (c) => NotYetDeliveredScreen()));
+              Navigator.push(context,MaterialPageRoute(builder: (c) => PickedParcels()));
             }
-            if (index == 3) {
+             if (index == 3) {
+              //Not Yet Delivered
+              Navigator.push(context,MaterialPageRoute(builder: (c) => DeliveryConfirmation()));
+            }
+            if (index == 4) {
               //History
               Navigator.push(context, MaterialPageRoute(builder: (c) => HistoryScreen()));
             }
-            if (index == 4) {
-              //Total Earnings
-              //Navigator.push(context, MaterialPageRoute(builder: (c) => EarningsScreen()));
-            }
             if (index == 5) {
+              //Total Earnings
+              // Navigator.push(context, MaterialPageRoute(builder: (c) => EarningsScreen()));
+            }
+            if (index == 6) {
               //Logout
               RememberRiderPrefs.removeUserInfo();
               Navigator.push(context,
@@ -69,7 +73,7 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
                 child: Icon(
                   iconData,
                   size: 40,
-                  color: Color.fromARGB(255, 255, 153, 0),
+                  color: Color.fromARGB(255, 0, 0, 0),
                 ),
               ),
               const SizedBox(height: 10.0),
@@ -78,10 +82,11 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
                   title,
                   style: const TextStyle(
                     fontSize: 16,
-                    color: Color.fromARGB(255, 255, 153, 0),
+                    color: Color.fromARGB(255, 47, 47, 47),
                   ),
                 ),
               ),
+              
             ],
           ),
         ),
@@ -196,17 +201,18 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
         automaticallyImplyLeading: false,
       ),
       body: Container(
-        padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 1),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 1),
         child: GridView.count(
           crossAxisCount: 2,
-          padding: const EdgeInsets.all(2),
+          padding: const EdgeInsets.all(1),
           children: [
-            makeDashboardItem("New Available Orders", Icons.assignment, 0),
-            makeDashboardItem("Parcels in Progress", Icons.airport_shuttle, 1),
-            makeDashboardItem("Not Yet Delivered", Icons.location_history, 2),
-            makeDashboardItem("History", Icons.done_all, 3),
-            makeDashboardItem("Total Earnings", Icons.monetization_on, 4),
-            makeDashboardItem("Logout", Icons.logout, 5),
+            makeDashboardItem("New Orders", Icons.assignment, 0),
+            makeDashboardItem("Parcels To Be Picked", Icons.post_add_sharp, 1),
+            makeDashboardItem("Picked Parcels", Icons.delivery_dining_sharp, 2),
+            makeDashboardItem("Delivery ", Icons.delivery_dining_sharp, 3),
+            makeDashboardItem("History", Icons.done_all, 4),
+            makeDashboardItem("Total Earnings", Icons.monetization_on, 5),
+            makeDashboardItem("Logout", Icons.logout, 6),
           ],
         ),
       ),

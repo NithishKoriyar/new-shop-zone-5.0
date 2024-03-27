@@ -9,7 +9,7 @@ import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/riders_assistantMethods/get_current_location.dart';
 import 'package:shopzone/rider/riders_global/global.dart';
 import 'package:shopzone/rider/riders_mainScreens/rider_new_orders_screen.dart';
-import 'package:shopzone/rider/riders_mainScreens/rider_parcel_in_progress_screen.dart';
+import 'package:shopzone/rider/riders_mainScreens/rider_Parcels_To_Be_Picked.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopzone/rider/riders_widgets/lat_lang.dart';
@@ -139,16 +139,43 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
         }));
 
     if (response.statusCode == 200) {
-      var data = json.decode(response.body);
-      print(data['message']); // Handle the response as needed
-      //         Navigator.push(context, MaterialPageRoute(builder: (c)=> ParcelDeliveringScreen(
-      //   purchaserId: purchaserId,
-      //   purchaserAddress: purchaserAddress,
-      //   purchaserLat: purchaserLat,
-      //   purchaserLng: purchaserLng,
-      //   sellerId: sellerId,
-      //   getOrderId: getOrderId,
-      // )));
+                  Fluttertoast.showToast(
+            msg: "Confirmed Successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Color.fromARGB(255, 34, 255, 0),
+            textColor: Colors.white,
+            fontSize: 16.0);
+
+    } else {
+      print('Failed to update the order');
+    }
+  }
+
+  //! Function to handle pick the Parcel and set delivering to ended when parcel is delivering---------------------------------------------------------------------------------
+  void confirmParcelHasBeenEnding(
+      BuildContext context, getOrderId, purchaserLat, purchaserLng,riderUID) async {
+    var url = Uri.parse(
+        API.updateStatusToEndingRDR); // Replace with your actual API endpoint URL
+    var response = await http.post(url,
+        body: json.encode({
+          "orderId": getOrderId,
+          "status": "ending",
+          "lat": purchaserLat,
+          "lng": purchaserLng,
+           "riderUID": riderUID
+        }));
+
+    if (response.statusCode == 200) {// Handle the response as needed
+            Fluttertoast.showToast(
+            msg: "Confirmed Successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Color.fromARGB(255, 34, 255, 0),
+            textColor: Colors.white,
+            fontSize: 16.0);
     } else {
       print('Failed to update the order');
     }
@@ -354,8 +381,10 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
                         MapUtils.lauchMapFromSourceToDestination(
                             "${currentPosition.latitude}",
                             "${currentPosition.longitude}",
-                            widget.model?.lat, // Ensure this is defined somewhere in your widget
-                            widget.model?.lng); // Ensure this is defined somewhere in your widget
+                            widget.model
+                                ?.lat, // Ensure this is defined somewhere in your widget
+                            widget.model
+                                ?.lng); // Ensure this is defined somewhere in your widget
                       },
                       child: Text('Open Delivery Location'),
                       style: ButtonStyle(
@@ -394,13 +423,12 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
                                     // Then proceed with the original button actions
                                     UserLocation uLocation = UserLocation();
                                     uLocation.getCurrentLocation();
-                                    confirmParcelHasBeenPicked(
+                                    confirmParcelHasBeenEnding(
                                       context,
                                       widget.model!.orderId,
-                                      widget.model!.sellerUID,
-                                      widget.model!.completeAddress,
                                       widget.model!.lat,
                                       widget.model!.lng,
+                                      widget.model!.riderUID
                                     );
 
                                     Navigator.pop(context);
@@ -412,8 +440,8 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
                           },
                         );
                       },
-                      child: Text(
-                        'Pick the Parcel',
+                      child: const Text(
+                        'Confirm Deliver',
                         style: TextStyle(color: Colors.white),
                       ),
                       style: ButtonStyle(
@@ -436,6 +464,7 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
           child: Center(
             child: ElevatedButton(
               onPressed: () {
+                print(widget.model?.riderUID);
                 Navigator.pop(context);
               },
               child: const Text('Go Back'),

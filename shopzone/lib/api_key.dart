@@ -212,14 +212,15 @@ class API {
   static const updateOrderPicking = "$hostRider/updateOrderPicking.php";
   static const parcelInProgressScreenRDR =
       "$hostRider/parcelInProgressScreenRDR.php";
-  static const parcelNotYetDeliverScreenRDR =
-      "$hostRider/parcelNotYetDeliverScreenRDR.php";
+  static const pickedParcelScreenRDR =
+      "$hostRider/pickedParcelScreenRDR.php";
+      static const endingParcelScreenRDR =
+      "$hostRider/EndingParcelScreenRDR.php";
   static const parcelHistoryScreenRDR = "$hostRider/parcelHistoryScreenRDR.php";
   static const getOrderDetailsRDR = "$hostRider/getOrderDetails.php";
   static const getSellerDataRDR = "$hostRider/getSellerData.php";
-  static const updateStatusToEnded = "$hostRider/updateStatusToEnded.php";
   
-  static const updateStatusToEndedRDR = "$hostRider/updateStatusToEnded.php";
+  static const updateStatusToEndingRDR = "$hostRider/updateStatusToEnding.php";
   
   static const updateEarningsRDR = "$hostRider/updateEarningsRDR.php";
 
