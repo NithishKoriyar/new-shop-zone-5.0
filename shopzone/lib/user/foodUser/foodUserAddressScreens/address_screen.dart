@@ -131,7 +131,7 @@ elevation: 20,
       Uri requestUri = Uri.parse('${API.foodUserFetchAddress}?uid=$userID');
       print("Requesting URI: $requestUri");
 
-      final response = await http.get(requestUri);
+      final response =  await http.get(requestUri);
 
       if (response.statusCode == 200) {
         print("Data received: ${response.body}");

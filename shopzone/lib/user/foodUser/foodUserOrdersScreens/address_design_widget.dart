@@ -35,24 +35,25 @@ class AddressDesign extends StatelessWidget {
     }
     print("sellerUID is ${sellerUID}");
     String sellerDeviceToken = await getSellerDeviceTokenFromAPI(sellerUID);
-    print("Retrieved seller device token-------------------------------------------------------------------------------------------: ${sellerDeviceToken}");
+    print(
+        "Retrieved seller device token-------------------------------------------------------------------------------------------: ${sellerDeviceToken}");
 
     if (sellerDeviceToken.isNotEmpty) {
       //print("-------------------------------------notificationFormat----------------------------------------------");
 
-      notificationFormat(
-        sellerDeviceToken,
-        userOrderID,
-        model!.name!
-      );
+      notificationFormat(sellerDeviceToken, userOrderID, model!.name!);
       print(sellerDeviceToken);
-      print(model!.orderId!,);
+      print(
+        model!.orderId!,
+      );
       print(model!.name!);
     }
   }
-    Future<String> getSellerDeviceTokenFromAPI(String sellerUID) async {
+
+  Future<String> getSellerDeviceTokenFromAPI(String sellerUID) async {
     final response = await http.get(
-      Uri.parse('${API.foodUserGetSellerDeviceTokenInUserApp}?sellerUID=$sellerUID'),
+      Uri.parse(
+          '${API.foodUserGetSellerDeviceTokenInUserApp}?sellerUID=$sellerUID'),
     );
     print("================================================================");
     print('${API.foodUserGetSellerDeviceTokenInUserApp}?sellerUID=$sellerUID');
@@ -60,7 +61,8 @@ class AddressDesign extends StatelessWidget {
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       if (data['sellerDeviceToken'] != null) {
-        print("-----------------------------------------------------------------------------------");
+        print(
+            "-----------------------------------------------------------------------------------");
         print('seller device token${data}');
         return data['sellerDeviceToken'].toString();
       }
@@ -73,55 +75,50 @@ class AddressDesign extends StatelessWidget {
     return "";
   }
 
-
-
-
-
-
-
-
 //!------------------------------------------
-Future<void> notificationFormat(sellerDeviceToken, getUserOrderID, userName) async {
-  final Map<String, String> headerNotification = {
-    'Content-Type': 'application/json',
-    'Authorization': fcmServerToken, // Assuming fcmServerToken is a variable holding your server key.
-  };
+  Future<void> notificationFormat(
+      sellerDeviceToken, getUserOrderID, userName) async {
+    final Map<String, String> headerNotification = {
+      'Content-Type': 'application/json',
+      'Authorization':
+          fcmServerToken, // Assuming fcmServerToken is a variable holding your server key.
+    };
 
-  final Map<String, dynamic> bodyNotification = {
-    'body': "Dear seller, Parcel (# $getUserOrderID) has Received Successfully by user $userName. \nPlease Check Now",
-    'title': "Parcel Received by User",
-  };
+    final Map<String, dynamic> bodyNotification = {
+      'body':
+          "Dear seller, Parcel (# $getUserOrderID) has Received Successfully by user $userName. \nPlease Check Now",
+      'title': "Parcel Received by User",
+    };
 
-  final Map<String, dynamic> dataMap = {
-    "click_action": "FLUTTER_NOTIFICATION_CLICK",
-    "id": "1",
-    "orderStatus": "done",
-    "userOrderId": getUserOrderID,
-  };
+    final Map<String, dynamic> dataMap = {
+      "click_action": "FLUTTER_NOTIFICATION_CLICK",
+      "id": "1",
+      "orderStatus": "done",
+      "userOrderId": getUserOrderID,
+    };
 
-  final Map<String, dynamic> officialNotificationFormat = {
-    'notification': bodyNotification,
-    'data': dataMap,
-    'priority': 'high',
-    'to': sellerDeviceToken,
-  };
+    final Map<String, dynamic> officialNotificationFormat = {
+      'notification': bodyNotification,
+      'data': dataMap,
+      'priority': 'high',
+      'to': sellerDeviceToken,
+    };
 
-  final response = await http.post(
-    Uri.parse("https://fcm.googleapis.com/fcm/send"),
-    headers: headerNotification,
-    body: jsonEncode(officialNotificationFormat),
-  );
+    final response = await http.post(
+      Uri.parse("https://fcm.googleapis.com/fcm/send"),
+      headers: headerNotification,
+      body: jsonEncode(officialNotificationFormat),
+    );
 
-  if (response.statusCode == 200) {
-    // Notification sent successfully. You can process the response data if needed.
-    print("Notification sent successfully");
-  } else {
-    // Handle the error. Inspect the response for details.
-    print("Error sending notification. Status code: ${response.statusCode}");
-    print("Response body: ${response.body}");
+    if (response.statusCode == 200) {
+      // Notification sent successfully. You can process the response data if needed.
+      print("Notification sent successfully");
+    } else {
+      // Handle the error. Inspect the response for details.
+      print("Error sending notification. Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -183,16 +180,11 @@ Future<void> notificationFormat(sellerDeviceToken, getUserOrderID, userName) asy
         ),
         GestureDetector(
           onTap: () async {
-            if (model?.orderStatus == "normal") {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MySplashScreen()));
-            } else if (model?.orderStatus == "shifted") {
-             
+             if (model?.orderStatus == "ending") {
               const String apiURL = API.foodUserUpdateNotReceivedStatus;
               final Map<String, dynamic> data = {
                 'orderId': model?.orderId,
               };
-              print("data ${data}");
 
               final response = await http.post(
                 Uri.parse(apiURL),
@@ -205,8 +197,11 @@ Future<void> notificationFormat(sellerDeviceToken, getUserOrderID, userName) asy
                     json.decode(response.body);
 
                 if (responseBody["status"] == "success") {
-                   //! Shifted and normal status is not
-              sendNotificationToSeller(model?.sellerUID, model?.orderId,);// Make sure orderByUser and orderId are set before this call
+                  //! Shifted and normal status is not
+                  sendNotificationToSeller(
+                    model?.sellerUID,
+                    model?.orderId,
+                  ); // Make sure orderByUser and orderId are set before this call
 
                   Fluttertoast.showToast(
                       msg:
@@ -225,14 +220,15 @@ Future<void> notificationFormat(sellerDeviceToken, getUserOrderID, userName) asy
               }
             } else if (model?.orderStatus == "ended") {
               // Rate the Seller feature
-                      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (c) => RateSellerScreen(
-              model: model,
-            ),
-          ),
-        );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (c) => RateSellerScreen(
+                    model: model,
+                  ),
+                ),
+              );
+              
             } else {
               Navigator.push(
                   context,
@@ -243,18 +239,7 @@ Future<void> notificationFormat(sellerDeviceToken, getUserOrderID, userName) asy
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.black,
-                    Colors.black,
-                  ],
-                  begin: FractionalOffset(0.0, 0.0),
-                  end: FractionalOffset(1.0, 0.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp,
-                ),
-              ),
+              color: Colors.green,
               width: MediaQuery.of(context).size.width - 40,
               height: model?.orderStatus == "ended"
                   ? 60
@@ -269,6 +254,9 @@ Future<void> notificationFormat(sellerDeviceToken, getUserOrderID, userName) asy
             ),
           ),
         ),
+        ElevatedButton(onPressed:(){
+          Navigator.pop(context);
+        }, child: const Text('Go Back'))
       ],
     );
   }
@@ -276,12 +264,10 @@ Future<void> notificationFormat(sellerDeviceToken, getUserOrderID, userName) asy
   String getModelStatusText() {
     if (model?.orderStatus == "ended") {
       return "Do you want to Rate this Seller?";
-    } else if (model?.orderStatus == "shifted") {
+    } else if (model?.orderStatus == "ending") {
       return "Parcel Received, \nClick to Confirm";
-    } else if (model?.orderStatus == "normal") {
-      return "Go Back";
     } else {
-      return "";
+      return "Parcel In Progress please wait";
     }
   }
 }

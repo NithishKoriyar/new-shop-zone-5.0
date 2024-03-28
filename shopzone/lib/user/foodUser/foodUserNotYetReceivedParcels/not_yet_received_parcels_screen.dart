@@ -58,6 +58,7 @@ class _NotYetReceivedParcelsScreenState extends State<NotYetReceivedParcelsScree
   bool isLoading = true;
 
   Stream<List<dynamic>> fetchNotReceived() async* {
+    while(true){
     // Assuming your API endpoint is something like this
     const String apiUrl = API.foodUserNotYetReceivedParcelsScreen;
 
@@ -65,29 +66,23 @@ class _NotYetReceivedParcelsScreenState extends State<NotYetReceivedParcelsScree
       final response =
           await http.post(Uri.parse(apiUrl), body: {'userID': userID});
 
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
 
         if (responseData.containsKey('error')) {
           // If there's an error message in the response
-          print("Server Error: ${responseData['error']}");
           yield []; // yield an empty list or handle error differently
         } else {
           final List<dynamic> fetchedItems = responseData['orders'] ?? [];
           // Assuming the fetched items are under the 'orders' key. Use a null check just in case.
           yield fetchedItems;
-          print(fetchedItems);
         }
       } else {
-        print("Error fetching cart items");
         yield []; // yield an empty list or handle error differently
       }
     } catch (e) {
-      print("Exception while fetching orders: $e");
       yield [];
+    }
     }
   }
 

@@ -1,4 +1,3 @@
-
 class API {
   //! web server
   static const hostConnect =
@@ -204,28 +203,24 @@ class API {
   static const riderLogin = "$hostRider/log_In.php";
   static const upProfileImage = "$hostRider/uploadProfileImage.php";
   static const riderEarnings = "$hostRider/rider_earnings.php"; //rider Earnings
-  static const deliveryAmount ="$hostRider/get_per_parcel_delivery_amount.php"; //get_per_parcel_delivery_amount
+  static const deliveryAmount =
+      "$hostRider/get_per_parcel_delivery_amount.php"; //get_per_parcel_delivery_amount
   static const normalOrdersRDR = "$hostRider/riderOrderScreen.php";
   static const updateOrderStatusRDR = "$hostRider/updateOrderStatus.php";
-  static const updateDeliveryAndEndedOrderStatusRDR = "$hostRider/updateDeliveryAndEndedOrderStatusRDR.php";
+  static const updateDeliveryAndEndedOrderStatusRDR =
+      "$hostRider/updateDeliveryAndEndedOrderStatusRDR.php";
   static const getLatLngOfSellerInRDR = "$hostRider/getLatLngOfSellerInRDR.php";
   static const updateOrderPicking = "$hostRider/updateOrderPicking.php";
   static const parcelInProgressScreenRDR =
       "$hostRider/parcelInProgressScreenRDR.php";
-  static const pickedParcelScreenRDR =
-      "$hostRider/pickedParcelScreenRDR.php";
-      static const endingParcelScreenRDR =
-      "$hostRider/EndingParcelScreenRDR.php";
+  static const pickedParcelScreenRDR = "$hostRider/pickedParcelScreenRDR.php";
+  static const endingParcelScreenRDR = "$hostRider/EndingParcelScreenRDR.php";
   static const parcelHistoryScreenRDR = "$hostRider/parcelHistoryScreenRDR.php";
   static const getOrderDetailsRDR = "$hostRider/getOrderDetails.php";
   static const getSellerDataRDR = "$hostRider/getSellerData.php";
-  
   static const updateStatusToEndingRDR = "$hostRider/updateStatusToEnding.php";
-  
-  static const updateEarningsRDR = "$hostRider/updateEarningsRDR.php";
-
-   static const updateSellerEarningsRDR = "$hostRider/updateSellerEarningsRDR.php";
-   
-   static const updateOrderStatusEndingRDR = "$hostRider/updateOrderStatusRDR.php";
-      static const getSellerAddressRDR = "$hostRider/get_seller_address.php";
+  // static const updateEarningsRDR = "$hostRider/updateEarningsRDR.php";
+  // static const updateREarningsRDR = "$hostRider/updateSellerEarningsRDR.php";
+  static const getEarningsRDR = "$hostRider/earnings.php";
+  static const getSellerAddressRDR = "$hostRider/get_seller_address.php";
 }

@@ -9,6 +9,7 @@ import 'package:shopzone/rider/ridersPreferences/riders_current_user.dart';
 import 'package:shopzone/rider/ridersPreferences/riders_preferences.dart';
 import 'package:shopzone/rider/riders_global/global.dart';
 import 'package:shopzone/rider/riders_mainScreens/rider_Delivery_Confirmation.dart';
+import 'package:shopzone/rider/riders_mainScreens/rider_earnings_screen.dart';
 import 'package:shopzone/rider/riders_mainScreens/rider_new_orders_screen.dart';
 import 'package:shopzone/rider/riders_mainScreens/rider_Picked_Parcels.dart';
 import 'package:shopzone/rider/riders_mainScreens/rider_Parcels_To_Be_Picked.dart';
@@ -54,7 +55,7 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
             }
             if (index == 5) {
               //Total Earnings
-              // Navigator.push(context, MaterialPageRoute(builder: (c) => EarningsScreen()));
+               Navigator.push(context, MaterialPageRoute(builder: (c) => EarningsScreen()));
             }
             if (index == 6) {
               //Logout
@@ -209,7 +210,7 @@ class _RidersHomeScreenState extends State<RidersHomeScreen> {
             makeDashboardItem("New Orders", Icons.assignment, 0),
             makeDashboardItem("Parcels To Be Picked", Icons.post_add_sharp, 1),
             makeDashboardItem("Picked Parcels", Icons.delivery_dining_sharp, 2),
-            makeDashboardItem("Delivery ", Icons.delivery_dining_sharp, 3),
+            makeDashboardItem("Delivery ", Icons.hail_sharp, 3),
             makeDashboardItem("History", Icons.done_all, 4),
             makeDashboardItem("Total Earnings", Icons.monetization_on, 5),
             makeDashboardItem("Logout", Icons.logout, 6),

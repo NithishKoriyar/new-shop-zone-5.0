@@ -125,6 +125,24 @@ class _OrderCardState extends State<OrderCard> {
                           ),
                         ],
                       ),
+                                            Row(
+                        children: [
+                          const Text(
+                            "Order Status: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                           widget.model!.orderStatus.toString(),
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
