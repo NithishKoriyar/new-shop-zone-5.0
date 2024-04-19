@@ -43,6 +43,8 @@ class Orders {
     this.completeAddress,
   });
 
+  
+
   Orders.fromJson(Map<String, dynamic> json) {
     brandID = json["brandID"];
     itemID = json["itemID"];

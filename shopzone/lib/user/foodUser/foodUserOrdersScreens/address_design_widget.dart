@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shopzone/api_key.dart';
+import 'package:shopzone/rider/maps/map_utils.dart';
+import 'package:shopzone/rider/riders_widgets/lat_lang.dart';
 import 'package:shopzone/seller/global/seller_global.dart';
 import 'package:shopzone/user/models/orders.dart';
 import 'package:shopzone/user/foodUser/foodUserRatingScreen/rate_seller_screen.dart';
@@ -55,21 +58,14 @@ class AddressDesign extends StatelessWidget {
       Uri.parse(
           '${API.foodUserGetSellerDeviceTokenInUserApp}?sellerUID=$sellerUID'),
     );
-    print("================================================================");
-    print('${API.foodUserGetSellerDeviceTokenInUserApp}?sellerUID=$sellerUID');
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       if (data['sellerDeviceToken'] != null) {
-        print(
-            "-----------------------------------------------------------------------------------");
-        print('seller device token${data}');
         return data['sellerDeviceToken'].toString();
       }
-      print('seller device token${data}');
     } else {
       // Handle the error accordingly
-      print('Failed to load seller device token');
     }
 
     return "";
@@ -180,7 +176,7 @@ class AddressDesign extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () async {
-             if (model?.orderStatus == "ending") {
+            if (model?.orderStatus == "ending") {
               const String apiURL = API.foodUserUpdateNotReceivedStatus;
               final Map<String, dynamic> data = {
                 'orderId': model?.orderId,
@@ -228,7 +224,6 @@ class AddressDesign extends StatelessWidget {
                   ),
                 ),
               );
-              
             } else {
               Navigator.push(
                   context,
@@ -254,9 +249,27 @@ class AddressDesign extends StatelessWidget {
             ),
           ),
         ),
-        ElevatedButton(onPressed:(){
-          Navigator.pop(context);
-        }, child: const Text('Go Back'))
+        ElevatedButton(
+            onPressed: () async {
+              LatLang latLang = LatLang();
+              await latLang
+                  .requestPermission(); // Ensure permissions are granted
+              Position currentPosition =
+                  await latLang.getPosition(); // Fetch current position
+              // Use currentPosition to get latitude and longitude
+              MapUtils.lauchMapFromSourceToDestination(
+                  "${currentPosition.latitude}",
+                  "${currentPosition.longitude}",
+                  model?.lat, // Ensure this is defined somewhere in your widget
+                  model
+                      ?.lng); // Ensure this is defined somewhere in your widget
+            },
+            child: const Text('Track your parcel')),
+        ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Go Back'))
       ],
     );
   }

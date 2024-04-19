@@ -103,7 +103,7 @@ class _CartItemDesignWidgetState extends State<CartItemDesignWidget> {
                       ),
 
                       const SizedBox(
-                        height: 4,
+                        height: 10,
                       ),
 
                       //Quantity: 4

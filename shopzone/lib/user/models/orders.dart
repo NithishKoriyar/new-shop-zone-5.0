@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Orders {
@@ -19,6 +21,8 @@ class Orders {
   String? name;
   String? phoneNumber;
   String? completeAddress;
+  Double? lat;
+  Double? lng;
 
   Orders({
     this.brandID,
@@ -39,6 +43,8 @@ class Orders {
     this.name,
     this.phoneNumber,
     this.completeAddress,
+    this.lat,
+    this.lng,
   });
 
   Orders.fromJson(Map<String, dynamic> json) {
@@ -77,5 +83,7 @@ class Orders {
     name = json["name"];
     phoneNumber = json["phoneNumber"];
     completeAddress = json["completeAddress"];
+    lat = json["lat"];
+    lng = json["lng"];
   }
 }

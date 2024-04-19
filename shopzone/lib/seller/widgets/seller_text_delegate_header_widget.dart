@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 
-
-class TextDelegateHeaderWidget extends SliverPersistentHeaderDelegate
-{
+class TextDelegateHeaderWidget extends SliverPersistentHeaderDelegate {
   String? title;
-  TextDelegateHeaderWidget({this.title,});
+  TextDelegateHeaderWidget({
+    this.title,
+  });
 
   @override
-  Widget build(BuildContext context, double shrinkOffSet, bool overlapsContent,)
-  {
+  Widget build(
+    BuildContext context,
+    double shrinkOffSet,
+    bool overlapsContent,
+  ) {
     return InkWell(
       child: Container(
         decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors:
-              [
-                Colors.black87,
-                Colors.black87,
-              ],
-              begin: FractionalOffset(0.0, 0.0),
-              end: FractionalOffset(1.0, 0.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp,
-            )
-        ),
+          colors: [
+            Colors.black87,
+            Colors.black87,
+          ],
+          begin: FractionalOffset(0.0, 0.0),
+          end: FractionalOffset(1.0, 0.0),
+          stops: [0.0, 1.0],
+          tileMode: TileMode.clamp,
+        )),
         height: 82,
         width: MediaQuery.of(context).size.width,
         alignment: Alignment.center,
@@ -33,7 +34,7 @@ class TextDelegateHeaderWidget extends SliverPersistentHeaderDelegate
             maxLines: 2,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 15,
               letterSpacing: 3,
               color: Colors.white,
             ),
@@ -52,7 +53,6 @@ class TextDelegateHeaderWidget extends SliverPersistentHeaderDelegate
   double get minExtent => 50;
 
   @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => true;
-
-
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
+      true;
 }

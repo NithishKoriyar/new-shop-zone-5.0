@@ -50,7 +50,13 @@ class API {
   static const saveFcmTokenUser =
       "$hostConnectUser/saveFcmToken.php"; // save Fcm Token User
   static const getSellerDeviceTokenInUserApp =
-      "$hostConnectUser/getSellerDeviceTokenInUserApp.php"; // save Fcm Token User
+      "$hostConnectUser/getSellerDeviceTokenInUserApp.php";
+     
+      static const display16Brands =
+      "$hostConnectUser/display16Brands.php";
+      
+      static const displayItems =
+      "$hostConnectUser/displayItems.php";
 
   //! food user api ------------------------------------------------------
   static const hostConnectFoodUser = "$userFolder/foodUser";
@@ -103,7 +109,13 @@ class API {
   static const foodUserSaveFcmTokenUser =
       "$hostConnectFoodUser/saveFcmToken.php"; // save Fcm Token User
   static const foodUserGetSellerDeviceTokenInUserApp =
-      "$hostConnectFoodUser/getSellerDeviceTokenInUserApp.php"; // save Fcm Token User
+      "$hostConnectFoodUser/getSellerDeviceTokenInUserApp.php"; 
+      // save Fcm Token User
+      static const displayAllBrands =
+      "$hostConnectFoodUser/displayAllBrands.php"; 
+      static const displayfoodItems =
+      "$hostConnectFoodUser/displayItems.php"; 
+     
 
   //!------------------------------SELLERS API CONNECTIONS --------------------------------
 

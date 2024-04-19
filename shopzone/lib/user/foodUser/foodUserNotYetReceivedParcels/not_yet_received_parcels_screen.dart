@@ -8,18 +8,14 @@ import 'package:shopzone/user/foodUser/foodUserOrdersScreens/order_card.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 import 'package:http/http.dart' as http;
 
-
-
-class NotYetReceivedParcelsScreen extends StatefulWidget
-{
+class NotYetReceivedParcelsScreen extends StatefulWidget {
   @override
-  State<NotYetReceivedParcelsScreen> createState() => _NotYetReceivedParcelsScreenState();
+  State<NotYetReceivedParcelsScreen> createState() =>
+      _NotYetReceivedParcelsScreenState();
 }
 
-
-
-class _NotYetReceivedParcelsScreenState extends State<NotYetReceivedParcelsScreen> {
-
+class _NotYetReceivedParcelsScreenState
+    extends State<NotYetReceivedParcelsScreen> {
   List<int>? itemQuantityList;
   final CurrentUser currentUserController = Get.put(CurrentUser());
 
@@ -58,31 +54,31 @@ class _NotYetReceivedParcelsScreenState extends State<NotYetReceivedParcelsScree
   bool isLoading = true;
 
   Stream<List<dynamic>> fetchNotReceived() async* {
-    while(true){
-    // Assuming your API endpoint is something like this
-    const String apiUrl = API.foodUserNotYetReceivedParcelsScreen;
+    while (true) {
+      // Assuming your API endpoint is something like this
+      const String apiUrl = API.foodUserNotYetReceivedParcelsScreen;
+      print(API.foodUserNotYetReceivedParcelsScreen);
+      try {
+        final response =
+            await http.post(Uri.parse(apiUrl), body: {'userID': userID});
 
-    try {
-      final response =
-          await http.post(Uri.parse(apiUrl), body: {'userID': userID});
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-
-        if (responseData.containsKey('error')) {
-          // If there's an error message in the response
-          yield []; // yield an empty list or handle error differently
+          if (responseData.containsKey('error')) {
+            // If there's an error message in the response
+            yield []; // yield an empty list or handle error differently
+          } else {
+            final List<dynamic> fetchedItems = responseData['orders'] ?? [];
+            // Assuming the fetched items are under the 'orders' key. Use a null check just in case.
+            yield fetchedItems;
+          }
         } else {
-          final List<dynamic> fetchedItems = responseData['orders'] ?? [];
-          // Assuming the fetched items are under the 'orders' key. Use a null check just in case.
-          yield fetchedItems;
+          yield []; // yield an empty list or handle error differently
         }
-      } else {
-        yield []; // yield an empty list or handle error differently
+      } catch (e) {
+        yield [];
       }
-    } catch (e) {
-      yield [];
-    }
     }
   }
 
@@ -91,7 +87,7 @@ class _NotYetReceivedParcelsScreenState extends State<NotYetReceivedParcelsScree
     return Scaffold(
       appBar: AppBar(
         title: const Text("Not Yet Received Parcels"),
-         elevation: 20,
+        elevation: 20,
         centerTitle: true,
       ),
       body: StreamBuilder<List<dynamic>>(

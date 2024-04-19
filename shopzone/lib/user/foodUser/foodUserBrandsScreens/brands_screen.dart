@@ -22,23 +22,22 @@ class BrandsScreen extends StatefulWidget {
 }
 
 class _BrandsScreenState extends State<BrandsScreen> {
+  Stream<List<Brands>> _getBrands(String uid) async* {
+    print('---------------  ${widget.model}');
 
+    final response =
+        await http.get(Uri.parse('${API.foodUserMenuView}?uid=$uid'));
+    print("response.body");
+    print('${API.foodUserMenuView}?uid=$uid');
+    if (response.statusCode == 200) {
+      print(response.body);
+      List<dynamic> data = json.decode(response.body);
 
-Stream<List<Brands>> _getBrands(String uid) async* {
-  print('---------------  ${widget.model}');
-  
-  final response = await http.get(Uri.parse('${API.foodUserMenuView}?uid=$uid'));
-  print("response.body");
-  print('${API.foodUserMenuView}?uid=$uid');
-  if (response.statusCode == 200) {
-     print(response.body);
-    List<dynamic> data = json.decode(response.body);
-   
-    yield data.map((brandData) => Brands.fromJson(brandData)).toList();
-  } else {
-    throw Exception('Failed to load Menus');
+      yield data.map((brandData) => Brands.fromJson(brandData)).toList();
+    } else {
+      throw Exception('Failed to load Menus');
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +45,7 @@ Stream<List<Brands>> _getBrands(String uid) async* {
       backgroundColor: Colors.white,
       drawer: MyDrawer(),
       appBar: AppBar(
- elevation: 20,
+        elevation: 20,
         title: const Text(
           "Food Zone",
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -59,7 +58,7 @@ Stream<List<Brands>> _getBrands(String uid) async* {
           SliverPersistentHeader(
             pinned: true,
             delegate: TextDelegateHeaderWidget(
-              title: '${widget.model!.sellerName} - Mens',
+              title: '${widget.model!.sellerName}',
             ),
           ),
           StreamBuilder(
