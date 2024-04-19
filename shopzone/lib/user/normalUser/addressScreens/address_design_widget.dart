@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/normalUser/addressScreens/address_screen.dart';
+import 'package:shopzone/user/normalUser/addressScreens/payment_method_screen.dart';
 import 'package:shopzone/user/normalUser/assistantMethods/address_changer.dart';
 import 'package:shopzone/user/models/address.dart';
 import 'package:shopzone/user/models/cart.dart';
@@ -206,16 +207,22 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                           print("cartId: ${widget.cartId}");
 
                           // Send the user to Place Order Screen
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (c) => PlaceOrderScreen(
+                          //       sellerUID :widget.sellerUID,
+                          //       addressID: widget.addressID,
+                          //       totalAmount: widget.totalPrice,
+                          //       cartId: widget.cartId,
+                          //       model: widget.model,
+                          //     ),
+                          //   ),
+                          // );
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (c) => PlaceOrderScreen(
-                                sellerUID :widget.sellerUID,
-                                addressID: widget.addressID,
-                                totalAmount: widget.totalPrice,
-                                cartId: widget.cartId,
-                                model: widget.model,
-                              ),
+                              builder: (c) => PaymentMethodScreen(),
                             ),
                           );
                         },

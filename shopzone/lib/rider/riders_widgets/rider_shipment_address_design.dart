@@ -378,13 +378,12 @@ class _ShipmentAddressDesignState extends State<ShipmentAddressDesign> {
                         Position currentPosition = await latLang
                             .getPosition(); // Fetch current position
                         // Use currentPosition to get latitude and longitude
-                        MapUtils.lauchMapFromSourceToDestination(
+                        MapUtils.lauchMapFromSourceToDestinationName(
                             "${currentPosition.latitude}",
                             "${currentPosition.longitude}",
-                            widget.model
-                                ?.lat, // Ensure this is defined somewhere in your widget
-                            widget.model
-                                ?.lng); // Ensure this is defined somewhere in your widget
+                           widget.model!.completeAddress!);// Ensure this is defined somewhere in your widget
+                          
+ // Ensure this is defined somewhere in your widget
                       },
                       child: Text('Open Delivery Location'),
                       style: ButtonStyle(
