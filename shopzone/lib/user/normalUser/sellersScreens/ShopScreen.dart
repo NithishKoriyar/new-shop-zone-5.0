@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/notification_service.dart';
 import 'package:shopzone/user/models/brands.dart';
@@ -12,9 +11,7 @@ import 'package:shopzone/user/normalUser/global/global.dart';
 import 'package:shopzone/user/models/sellers.dart';
 import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart';
 import 'package:shopzone/user/normalUser/itemsScreens/items_screen.dart';
-import 'package:shopzone/user/normalUser/itemsScreens/items_ui_design_widget.dart';
 import 'package:shopzone/user/normalUser/push_notifications/push_notifications_system.dart';
-import 'package:shopzone/user/normalUser/sellersScreens/sellers_ui_design_widget.dart';
 import 'package:shopzone/user/normalUser/widgets/my_drawer.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
@@ -132,97 +129,102 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
 
           ///...............circes in shop name
-          StreamBuilder<List<Sellers>>(
-            stream: getSellersStream(),
-            builder: (context, AsyncSnapshot<List<Sellers>> dataSnapshot) {
-              if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                return SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              } else if (dataSnapshot.hasData &&
-                  dataSnapshot.data!.isNotEmpty) {
-                return SliverToBoxAdapter(
-                  child: Container(
-                    height: 150, // Set the height of the container
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: dataSnapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        Sellers model = dataSnapshot.data![index];
-                        return InkWell(
-                          onTap: () {
-                            // Perform your action on tap!
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (c) => BrandsScreen(
-                                          model: model,
-                                        )));
-                            // You can navigate to a new page or display a dialog, etc.
-                          },
-                          child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 15),
-                            width: 80, // Set the width for each seller's widget
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 100, // Diameter of the circle
-                                  height: 100, // Diameter of the circle
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color(
-                                        0xfff0e4f4), // Background color of the circle
-                                    image: DecorationImage(
-                                      image: NetworkImage(API.sellerImage +
-                                          model.sellerProfile),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        spreadRadius: 2,
-                                        blurRadius: 10,
-                                        offset: Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Text(
-                                  model.sellerName,
-                                  style: TextStyle(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                  softWrap: false,
-                                  maxLines: 1,
-                                ),
-                                SmoothStarRating(
-                                  rating: model.rating == null
-                                      ? 0.0
-                                      : double.parse(model.rating.toString()),
-                                  starCount: 5,
-                                  color: Colors.pinkAccent,
-                                  borderColor: Colors.pinkAccent,
-                                  size: 12,
-                                ),
-                              ],
+StreamBuilder<List<Sellers>>(
+  stream: getSellersStream(),
+  builder: (context, AsyncSnapshot<List<Sellers>> dataSnapshot) {
+    if (dataSnapshot.connectionState == ConnectionState.waiting) {
+      return SliverFillRemaining(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
+      return SliverToBoxAdapter(
+        child: Container(
+          height: 150, // Set the height of the container
+          padding: EdgeInsets.all(5),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: dataSnapshot.data!.length,
+            itemBuilder: (context, index) {
+              Sellers model = dataSnapshot.data![index];
+              return InkWell(
+                onTap: () {
+                  // Perform your action on tap!
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (c) => BrandsScreen(
+                        model: model,
+                      ),
+                    ),
+                  );
+                  // You can navigate to a new page or display a dialog, etc.
+                },
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 15),
+                  width: 80, // Set the width for each seller's widget
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 100, // Diameter of the circle
+                        height: 100, // Diameter of the circle
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white, // Background color of the circle
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromARGB(255, 69, 69, 69).withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        padding: EdgeInsets.all(5), // Padding for the circle
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: NetworkImage(API.sellerImage + model.sellerProfile),
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                      Text(
+                        model.sellerName,
+                        style: TextStyle(fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                        maxLines: 1,
+                      ),
+                      SmoothStarRating(
+                        rating: model.rating == null ? 0.0 : double.parse(model.rating.toString()),
+                        starCount: 5,
+                        color: Colors.pinkAccent,
+                        borderColor: Colors.pinkAccent,
+                        size: 12,
+                      ),
+                    ],
                   ),
-                );
-              } else {
-                return const SliverToBoxAdapter(
-                  child: Center(
-                    child: Text("No Sellers Data exists."),
-                  ),
-                );
-              }
+                ),
+              );
             },
           ),
+        ),
+      );
+    } else {
+      return const SliverToBoxAdapter(
+        child: Center(
+          child: Text("No Sellers Data exists."),
+        ),
+      );
+    }
+  },
+),
+
           SliverPadding(
             padding: EdgeInsets.all(1),
             sliver: SliverToBoxAdapter(
@@ -276,7 +278,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                 height:
                                     70, // Same as above, adjust if necessary
                                 padding: EdgeInsets.all(
-                                    8), // Adjust the padding value as needed
+                                    5), // Adjust the padding value as needed
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                   color: Colors.white,
@@ -291,7 +293,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                 ),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(5),
                                     image: DecorationImage(
                                       image: NetworkImage(
                                         API.brandImage +
@@ -385,13 +387,14 @@ class _ShopScreenState extends State<ShopScreen> {
                             ],
                           ),
                           child: Column(
+                
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
                                 width:
                                     170, // You might need to adjust this based on your padding
                                 height:
-                                    170, // Same as above, adjust if necessary
+                                    160, // Same as above, adjust if necessary
                                 padding: EdgeInsets.all(
                                     8), // Adjust the padding value as needed
 

@@ -251,18 +251,22 @@ class AddressDesign extends StatelessWidget {
         ),
         ElevatedButton(
             onPressed: () async {
-              LatLang latLang = LatLang();
-              await latLang
-                  .requestPermission(); // Ensure permissions are granted
-              Position currentPosition =
-                  await latLang.getPosition(); // Fetch current position
-              // Use currentPosition to get latitude and longitude
-              MapUtils.lauchMapFromSourceToDestination(
-                  "${currentPosition.latitude}",
-                  "${currentPosition.longitude}",
-                  model?.lat, // Ensure this is defined somewhere in your widget
-                  model
-                      ?.lng); // Ensure this is defined somewhere in your widget
+              // LatLang latLang = LatLang();
+              // await latLang
+              //     .requestPermission(); // Ensure permissions are granted
+              // Position currentPosition =
+              //     await latLang.getPosition(); // Fetch current position
+              // // Use currentPosition to get latitude and longitude
+              // MapUtils.lauchMapFromSourceToDestination(
+              //     "${currentPosition.latitude}",
+              //     "${currentPosition.longitude}",
+              //     model?.lat, // Ensure this is defined somewhere in your widget
+              //     model
+              //         ?.lng); // Ensure this is defined somewhere in your widget
+              print("lat");
+              print(model?.lat);
+              print("lng");
+              print(model?.lng);
             },
             child: const Text('Track your parcel')),
         ElevatedButton(

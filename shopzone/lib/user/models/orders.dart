@@ -21,8 +21,8 @@ class Orders {
   String? name;
   String? phoneNumber;
   String? completeAddress;
-  Double? lat;
-  Double? lng;
+  double? lat;
+  double? lng;
 
   Orders({
     this.brandID,
@@ -83,7 +83,8 @@ class Orders {
     name = json["name"];
     phoneNumber = json["phoneNumber"];
     completeAddress = json["completeAddress"];
-    lat = json["lat"];
-    lng = json["lng"];
+lat = json["lat"] != null ? double.tryParse(json["lat"]) : null;
+lng = json["lng"] != null ? double.tryParse(json["lng"]) : null;
+
   }
 }

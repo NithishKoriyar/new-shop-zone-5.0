@@ -184,99 +184,101 @@ class _FoodScreenState extends State<FoodScreen> {
           ),
 //..............
           StreamBuilder<List<Sellers>>(
-            stream: getSellersStream(),
-            builder: (context, AsyncSnapshot<List<Sellers>> dataSnapshot) {
-              if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                return SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              } else if (dataSnapshot.hasData &&
-                  dataSnapshot.data!.isNotEmpty) {
-                return SliverToBoxAdapter(
-                  child: Container(
-                    height: 150, // Set the height of the container
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: dataSnapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        Sellers model = dataSnapshot.data![index];
-                        return InkWell(
-                          onTap: () {
-                            print("Rating...");
+  stream: getSellersStream(),
+  builder: (context, AsyncSnapshot<List<Sellers>> dataSnapshot) {
+    if (dataSnapshot.connectionState == ConnectionState.waiting) {
+      return SliverFillRemaining(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
+      return SliverToBoxAdapter(
+        child: Container(
+          height: 150, // Set the height of the container
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: dataSnapshot.data!.length,
+            itemBuilder: (context, index) {
+              Sellers model = dataSnapshot.data![index];
+              return InkWell(
+                onTap: () {
+                  print("Rating...");
 
-                            //send user to a seller's brands screen
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (c) => BrandsScreen(
-                                          model: model,
-                                        )));
-                          },
-                          child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 15),
-                            width: 80, // Set the width for each seller's widget
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 100, // Diameter of the circle
-                                  height: 100, // Diameter of the circle
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color(
-                                        0xfff0e4f4), // Background color of the circle
-                                    image: DecorationImage(
-                                      image: NetworkImage(
-                                          API.foodSellerImageInFoodUser +
-                                              model.sellerProfile),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        spreadRadius: 2,
-                                        blurRadius: 10,
-                                        offset: Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Text(
-                                  model.sellerName,
-                                  style: TextStyle(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                  softWrap: false,
-                                  maxLines: 1,
-                                ),
-                                SmoothStarRating(
-                                  // ignore: unnecessary_null_comparison
-                                  rating: model.rating == null
-                                      ? 0.0
-                                      : double.parse(model.rating.toString()),
-                                  starCount: 5,
-                                  color: Colors.pinkAccent,
-                                  borderColor: Colors.pinkAccent,
-                                  size: 12,
-                                ),
-                              ],
+                  //send user to a seller's brands screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (c) => BrandsScreen(
+                        model: model,
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 15),
+                  width: 80, // Set the width for each seller's widget
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 100, // Diameter of the circle
+                        height: 100, // Diameter of the circle
+                        padding: EdgeInsets.all(5), // Padding for the circle
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white, // Background color of the circle
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromARGB(255, 69, 69, 69).withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: NetworkImage(API.foodSellerImageInFoodUser + model.sellerProfile),
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                      Text(
+                        model.sellerName,
+                        style: TextStyle(fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                        maxLines: 1,
+                      ),
+                      SmoothStarRating(
+                        // ignore: unnecessary_null_comparison
+                        rating: model.rating == null ? 0.0 : double.parse(model.rating.toString()),
+                        starCount: 5,
+                        color: Colors.pinkAccent,
+                        borderColor: Colors.pinkAccent,
+                        size: 12,
+                      ),
+                    ],
                   ),
-                );
-              } else {
-                return const SliverToBoxAdapter(
-                  child: Center(
-                    child: Text("No Sellers Data exists."),
-                  ),
-                );
-              }
+                ),
+              );
             },
           ),
+        ),
+      );
+    } else {
+      return const SliverToBoxAdapter(
+        child: Center(
+          child: Text("No Sellers Data exists."),
+        ),
+      );
+    }
+  },
+),
 
           SliverPadding(
             padding: EdgeInsets.all(1),
@@ -327,7 +329,7 @@ class _FoodScreenState extends State<FoodScreen> {
                                 height:
                                     70, // Same as above, adjust if necessary
                                 padding: EdgeInsets.all(
-                                    8), // Adjust the padding value as needed
+                                    5), // Adjust the padding value as needed
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                   color: Colors.white,
@@ -342,7 +344,7 @@ class _FoodScreenState extends State<FoodScreen> {
                                 ),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(5),
                                     image: DecorationImage(
                                       image: NetworkImage(
                                         API.foodSellerBrandImage +
@@ -442,7 +444,7 @@ class _FoodScreenState extends State<FoodScreen> {
                                 width:
                                     170, // You might need to adjust this based on your padding
                                 height:
-                                    170, // Same as above, adjust if necessary
+                                    160, // Same as above, adjust if necessary
                                 padding: EdgeInsets.all(
                                     8), // Adjust the padding value as needed
 
