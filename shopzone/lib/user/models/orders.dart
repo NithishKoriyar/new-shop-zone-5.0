@@ -58,7 +58,7 @@ class Orders {
     } else {
       price = json["price"];
     }
-        if (json["totalAmount"] is int) {
+    if (json["totalAmount"] is int) {
       totalAmount = json["totalAmount"].toString();
     } else {
       totalAmount = json["totalAmount"];
@@ -83,8 +83,7 @@ class Orders {
     name = json["name"];
     phoneNumber = json["phoneNumber"];
     completeAddress = json["completeAddress"];
-lat = json["lat"] != null ? double.tryParse(json["lat"]) : null;
-lng = json["lng"] != null ? double.tryParse(json["lng"]) : null;
-
+    lat = json["lat"] != null ? double.tryParse(json["lat"]) : null;
+    lng = json["lng"] != null ? double.tryParse(json["lng"]) : null;
   }
 }
