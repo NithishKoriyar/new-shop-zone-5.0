@@ -184,101 +184,109 @@ class _FoodScreenState extends State<FoodScreen> {
           ),
 //..............
           StreamBuilder<List<Sellers>>(
-  stream: getSellersStream(),
-  builder: (context, AsyncSnapshot<List<Sellers>> dataSnapshot) {
-    if (dataSnapshot.connectionState == ConnectionState.waiting) {
-      return SliverFillRemaining(
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
-      return SliverToBoxAdapter(
-        child: Container(
-          height: 150, // Set the height of the container
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: dataSnapshot.data!.length,
-            itemBuilder: (context, index) {
-              Sellers model = dataSnapshot.data![index];
-              return InkWell(
-                onTap: () {
-                  print("Rating...");
+            stream: getSellersStream(),
+            builder: (context, AsyncSnapshot<List<Sellers>> dataSnapshot) {
+              if (dataSnapshot.connectionState == ConnectionState.waiting) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              } else if (dataSnapshot.hasData &&
+                  dataSnapshot.data!.isNotEmpty) {
+                return SliverToBoxAdapter(
+                  child: Container(
+                    height: 150, // Set the height of the container
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: dataSnapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        Sellers model = dataSnapshot.data![index];
+                        return InkWell(
+                          onTap: () {
+                            print("Rating...");
 
-                  //send user to a seller's brands screen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (c) => BrandsScreen(
-                        model: model,
-                      ),
-                    ),
-                  );
-                },
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 15),
-                  width: 80, // Set the width for each seller's widget
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 100, // Diameter of the circle
-                        height: 100, // Diameter of the circle
-                        padding: EdgeInsets.all(5), // Padding for the circle
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white, // Background color of the circle
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color.fromARGB(255, 69, 69, 69).withOpacity(0.2),
-                              spreadRadius: 1,
-                              blurRadius: 5,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: NetworkImage(API.foodSellerImageInFoodUser + model.sellerProfile),
-                              fit: BoxFit.cover,
+                            //send user to a seller's brands screen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (c) => BrandsScreen(
+                                  model: model,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 15),
+                            width: 80, // Set the width for each seller's widget
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 100, // Diameter of the circle
+                                  height: 100, // Diameter of the circle
+                                  padding: EdgeInsets.all(
+                                      5), // Padding for the circle
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors
+                                        .white, // Background color of the circle
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color.fromARGB(255, 69, 69, 69)
+                                            .withOpacity(0.2),
+                                        spreadRadius: 1,
+                                        blurRadius: 5,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                            API.foodSellerImageInFoodUser +
+                                                model.sellerProfile),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  model.sellerName,
+                                  style: TextStyle(fontSize: 12),
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: false,
+                                  maxLines: 1,
+                                ),
+                                SmoothStarRating(
+                                  // ignore: unnecessary_null_comparison
+                                  rating: model.rating == null
+                                      ? 0.0
+                                      : double.parse(model.rating.toString()),
+                                  starCount: 5,
+                                  color: Colors.pinkAccent,
+                                  borderColor: Colors.pinkAccent,
+                                  size: 12,
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                      ),
-                      Text(
-                        model.sellerName,
-                        style: TextStyle(fontSize: 12),
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                        maxLines: 1,
-                      ),
-                      SmoothStarRating(
-                        // ignore: unnecessary_null_comparison
-                        rating: model.rating == null ? 0.0 : double.parse(model.rating.toString()),
-                        starCount: 5,
-                        color: Colors.pinkAccent,
-                        borderColor: Colors.pinkAccent,
-                        size: 12,
-                      ),
-                    ],
+                        );
+                      },
+                    ),
                   ),
-                ),
-              );
+                );
+              } else {
+                return const SliverToBoxAdapter(
+                  child: Center(
+                    child: Text("No Sellers Data exists."),
+                  ),
+                );
+              }
             },
           ),
-        ),
-      );
-    } else {
-      return const SliverToBoxAdapter(
-        child: Center(
-          child: Text("No Sellers Data exists."),
-        ),
-      );
-    }
-  },
-),
 
           SliverPadding(
             padding: EdgeInsets.all(1),
@@ -581,29 +589,102 @@ class _FoodScreenState extends State<FoodScreen> {
     }
   }
 
-  //..................displaying menus
+  //1234567890
   Stream<List<Brands>> getBrandStream() async* {
-    final response = await http.get(Uri.parse(API.displayAllBrands));
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+    try {
+      // Obtain the current location
+      Position position = await getCurrentLocation();
+      double latitude = position.latitude;
+      double longitude = position.longitude;
 
-      yield data.map((brandData) => Brands.fromJson(brandData)).toList();
-    } else {
-      throw Exception('Failed to load brands');
+      // Construct the URL with latitude and longitude in the path
+      String baseUrl = API.displayAllBrands;
+      var url = Uri.parse(baseUrl).replace(queryParameters: {
+        'latitude': latitude.toString(),
+        'longitude': longitude.toString(),
+      });
+      print(url);
+
+      final response = await http.get(url);
+
+      // Check for a successful response
+      if (response.statusCode == 200) {
+        final BrandsList = json.decode(response.body) as List;
+        print(
+            "----------------------------------------------------------------------jjjjjjjjjjjjjjjjjjjjjjjjjjjj--------------------");
+        print(BrandsList);
+        final brandsObjects =
+            BrandsList.map((brandData) => Brands.fromJson(brandData)).toList();
+        yield brandsObjects;
+      } else {
+        // Handle different types of errors
+        throw Exception('Failed to load sellers: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle exceptions
+      throw Exception('Error occurred: $e');
     }
   }
+
+  //1234567890
+
+  //..................displaying menus
+  // Stream<List<Brands>> getBrandStream() async* {
+  //   final response = await http.get(Uri.parse(API.displayAllBrands));
+  //   if (response.statusCode == 200) {
+  //     List<dynamic> data = json.decode(response.body);
+
+  //     yield data.map((brandData) => .fromJson(brandData)).toList();
+  //   } else {
+  //     throw Exception('Failed to load brands');
+  //   }
+  // }
 
   //item
+
   Stream<List<Items>> getItemStream() async* {
-    final response = await http.get(Uri.parse(API.displayfoodItems));
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      print(API.displayfoodItems);
-      yield data.map((brandData) => Items.fromJson(brandData)).toList();
-    } else {
-      throw Exception('Failed to load brands');
+    try {
+      // Obtain the current location
+      Position position = await getCurrentLocation();
+      double latitude = position.latitude;
+      double longitude = position.longitude;
+
+      // Construct the URL with latitude and longitude in the path
+      String baseUrl = API.displayfoodItems;
+      var url = Uri.parse(baseUrl).replace(queryParameters: {
+        'latitude': latitude.toString(),
+        'longitude': longitude.toString(),
+      });
+      print(url);
+
+      final response = await http.get(url);
+
+      // Check for a successful response
+      if (response.statusCode == 200) {
+        final BrandsList = json.decode(response.body) as List;
+        final brandsObjects =
+            BrandsList.map((brandData) => Items.fromJson(brandData)).toList();
+        yield brandsObjects;
+      } else {
+        // Handle different types of errors
+        throw Exception('Failed to load sellers: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle exceptions
+      throw Exception('Error occurred: $e');
     }
   }
+  //00000000000000000000000000
+  // Stream<List<Items>> getItemStream() async* {
+  //   final response = await http.get(Uri.parse(API.displayfoodItems));
+  //   if (response.statusCode == 200) {
+  //     List<dynamic> data = json.decode(response.body);
+  //     print(API.displayfoodItems);
+  //     yield data.map((brandData) => Items.fromJson(brandData)).toList();
+  //   } else {
+  //     throw Exception('Failed to load brands');
+  //   }
+  // }
 
   //! get user current lat lang to fined nearby seller
 
