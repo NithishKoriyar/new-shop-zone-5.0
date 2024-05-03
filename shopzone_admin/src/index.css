@@ -1,0 +1,144 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+nav li {
+  float: left;
+}
+
+nav li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+/* Change the link color to #111 on hover */
+nav li a:hover {
+  background-color: #111;
+}
+
+@media screen and (max-width: 600px) {
+  nav li {
+    float: none;
+  }
+}
+
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.horizontalDirection {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+/* Overall layout and centering */
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Use full height of the viewport */
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4; /* Light grey background */
+}
+
+/* Styling for category list */
+.category-list {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow */
+  border-radius: 10px;
+}
+
+.category-list div {
+  margin: 10px;
+  text-align: center;
+}
+
+.category-list img {
+  border-radius: 5px; /* Rounded corners for images */
+}
+
+/* Button styling */
+button {
+  background-color: #007BFF; /* Bootstrap primary blue */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Form styling */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+input[type="file"],
+input[type="text"] {
+  margin: 10px 0;
+  padding: 8px;
+  width: 300px; /* Fixed width for inputs */
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+input[type="text"]::placeholder {
+  color: #aaa;
+}
+
+/* Image preview styling */
+img {
+  margin-top: 10px;
+  border-radius: 5px;
+}

@@ -1,10 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/rider/riders_mainScreens/rider_order_details_screen.dart';
 import 'package:shopzone/rider/riders_model/orders.dart';
 import 'package:shopzone/rider/riders_model/rider_items.dart';
 
+// ignore: must_be_immutable
 class OrderCard extends StatefulWidget {
   Orders? model;
   int? quantityNumber;

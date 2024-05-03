@@ -206,25 +206,25 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                           print("totalAmount: ${widget.totalPrice}");
                           print("cartId: ${widget.cartId}");
 
-                          // Send the user to Place Order Screen
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (c) => PlaceOrderScreen(
-                          //       sellerUID :widget.sellerUID,
-                          //       addressID: widget.addressID,
-                          //       totalAmount: widget.totalPrice,
-                          //       cartId: widget.cartId,
-                          //       model: widget.model,
-                          //     ),
-                          //   ),
-                          // );
+                          //Send the user to Place Order Screen
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (c) => PaymentMethodScreen(),
+                              builder: (c) => PlaceOrderScreen(
+                                sellerUID :widget.sellerUID,
+                                addressID: widget.addressID,
+                                totalAmount: widget.totalPrice,
+                                cartId: widget.cartId,
+                                model: widget.model,
+                              ),
                             ),
                           );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (c) => PaymentMethodScreen(),
+                          //   ),
+                          // );
                         },
                         child: const Text("Proceed"),
                       ),
