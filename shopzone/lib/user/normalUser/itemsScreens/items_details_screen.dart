@@ -84,7 +84,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             width: 10,
           ),
           FloatingActionButton.extended(
-            
             onPressed: () {
               int itemCounter = counterLimit;
               cartMethods.addItemToCart(
@@ -107,8 +106,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 itemCounter,
                 userID,
               );
-                              Navigator.push(context,
-                    MaterialPageRoute(builder: (c) => CartScreenUser()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (c) => CartScreenUser()));
             },
             label: const Text("Buy Now"),
             icon: const Icon(
@@ -121,12 +120,20 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Hero(
-              tag: API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10), // Border radius of 10
-                child: Image.network(
-                  API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Material(
+                elevation: 9.0, // Apply elevation to create a shadow effect
+                borderRadius: BorderRadius.circular(
+                    10), // Keep the border radius consistent with the ClipRRect
+                child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.circular(10), // Border radius of 10
+                  child: Image.network(
+                    API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+                    fit: BoxFit
+                        .contain, // Ensure the image covers the entire container area
+                  ),
                 ),
               ),
             ),

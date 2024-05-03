@@ -63,6 +63,7 @@ class API {
 
        static const  fetchSubCategories= "$hostConnectUser/subCategory.php";
        static const  fetchRelatedCategoriesItems= "$hostConnectUser/subCategoryItem.php";
+       static const  fetchRelatedSubCategoriesItems= "$hostConnectUser/fetchRelatedSubCategoriesItems.php";
  
   //! food user api ------------------------------------------------------
   static const hostConnectFoodUser = "$userFolder/foodUser";
