@@ -29,6 +29,10 @@ class UploadItemsScreen extends StatefulWidget {
 class _UploadItemsScreenState extends State<UploadItemsScreen> {
   XFile? imgXFile;
   final ImagePicker imagePicker = ImagePicker();
+  String? selectedCategory;
+  String? selectedSubcategory;
+  List categories = [];
+  List subcategories = [];
 
   TextEditingController itemInfoTextEditingController = TextEditingController();
   TextEditingController itemTitleTextEditingController =
@@ -46,7 +50,9 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
       if (itemInfoTextEditingController.text.isNotEmpty &&
           itemTitleTextEditingController.text.isNotEmpty &&
           itemDescriptionTextEditingController.text.isNotEmpty &&
-          itemPriceTextEditingController.text.isNotEmpty) {
+          itemPriceTextEditingController.text.isNotEmpty &&
+          selectedCategory != null &&
+          selectedSubcategory != null) {
         var imageBytes = await imgXFile!.readAsBytes();
         var base64Image = base64Encode(imageBytes);
 
@@ -60,6 +66,8 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
           'sellerUID': sellerID,
           'sellerName': sellerName,
           'image': base64Image,
+          'category_id': selectedCategory,
+          'sub_category_id': selectedSubcategory,
         };
 
         var response = await http.post(
@@ -242,6 +250,52 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
             color: Colors.black,
             thickness: 1,
           ),
+          DropdownButton<String>(
+            value: selectedCategory,
+            hint: Text("Select Category"),
+            items: categories.map<DropdownMenuItem<String>>((category) {
+              return DropdownMenuItem<String>(
+                value: category['category_id'].toString(),
+                child: Text(category['name']),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              print(newValue);
+              setState(() {
+                selectedCategory = newValue;
+                selectedSubcategory =
+                    null; // Reset subcategory on category change
+                fetchSubcategories(newValue!);
+              });
+            },
+          ),
+          const Divider(
+            color: Colors.black,
+            thickness: 1,
+          ),
+          if (selectedCategory != null && subcategories.isNotEmpty) ...[
+            DropdownButton<String>(
+              value: selectedCategory != null && subcategories.isNotEmpty
+                  ? selectedSubcategory
+                  : null,
+              hint: Text("Select Subcategory"),
+              items: subcategories.map<DropdownMenuItem<String>>((subcategory) {
+                return DropdownMenuItem<String>(
+                  value: subcategory['subcategory_id'].toString(),
+                  child: Text(subcategory['name']),
+                );
+              }).toList(),
+              onChanged: (newValue) {
+                setState(() {
+                  selectedSubcategory = newValue;
+                });
+              },
+            ),
+          ],
+          const Divider(
+            color: Colors.black,
+            thickness: 1,
+          ),
         ],
       ),
     );
@@ -262,6 +316,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
       setSellerInfo();
       printSellerInfo();
     });
+    fetchCategories();
   }
 
   void setSellerInfo() {
@@ -275,6 +330,35 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
     print('Seller Name: $sellerName');
     print('Seller Email: $sellerEmail');
     print('Seller Email: $sellerID');
+  }
+
+  Future<void> fetchCategories() async {
+    var url = Uri.parse(API.itemUploadFetchCategory);
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      var jsonData = json.decode(response.body) as List;
+      setState(() {
+        categories = jsonData;
+      });
+    } else {
+      // Handle error or show a message
+      print('Failed to load categories');
+    }
+  }
+
+  Future<void> fetchSubcategories(String categoryId) async {
+    var url =
+        Uri.parse('${API.itemUploadFetchCategory}?categoryId=$categoryId');
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      var jsonData = json.decode(response.body) as List;
+      setState(() {
+        subcategories = jsonData;
+      });
+    } else {
+      // Handle error or show a message
+      print('Failed to load subcategories');
+    }
   }
 
   //!seller information--------------------------------------

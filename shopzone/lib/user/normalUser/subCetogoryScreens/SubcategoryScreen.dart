@@ -21,21 +21,20 @@ class SubCategoryScreen extends StatefulWidget {
 
 class _SubCategoryScreenState extends State<SubCategoryScreen> {
   late List<Subcategory> subcategories = [];
+
   @override
   void initState() {
     super.initState();
     fetchSubCategories(widget.categoryId.toString());
   }
 
-  Future<void> fetchSubCategories(categoryId) async {
+  Future<void> fetchSubCategories(String categoryId) async {
     try {
       final response = await http.get(
-        Uri.parse(
-            '${API.fetchSubCategories}?id=$categoryId'), // Append the category ID to the URL
+        Uri.parse('${API.fetchSubCategories}?id=$categoryId'),
       );
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        print(data);
         setState(() {
           subcategories =
               data.map((item) => Subcategory.fromJson(item)).toList();
@@ -48,10 +47,11 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.categoryName), // Use the passed categoryName here
+        title: Text(widget.categoryName),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -60,43 +60,43 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
             children: <Widget>[
               Image.network(API.normalImage + widget.categoryImg),
               Divider(
-                color: Colors.grey, // Choose color of the divider
-                height: 20, // The space above and below the divider
-                thickness: 2, // Thickness of the divider
+                color: Colors.grey,
+                height: 20,
+                thickness: 2,
               ),
-              ListView.builder(
+              GridView.builder(
                 shrinkWrap: true,
+                physics:
+                    NeverScrollableScrollPhysics(), // to disable GridView's scrolling
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // Adjust number of columns
+                  childAspectRatio: 1, // Adjust the aspect ratio
+                  crossAxisSpacing: 10, // Horizontal space between items
+                  mainAxisSpacing: 10, // Vertical space between items
+                ),
                 itemCount: subcategories.length,
                 itemBuilder: (context, index) {
                   final subcategory = subcategories[index];
-                  return ListTile(
-                    leading:
-                        API.normalImage + subcategory.img_path.toString() !=
-                                null
-                            ? Image.network(
-                                API.normalImage +
-                                    subcategory.img_path
-                                        .toString(), // Assuming your Subcategory model has an imageUrl field
-                                width: 50, // Define the width
-                                height: 50, // Define the height
-                                fit: BoxFit
-                                    .cover, // Cover the entire space of the box
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Icon(Icons
-                                      .error); // Error icon if image fails to load
-                                },
-                              )
-                            : null, // If no image URL, nothing is shown
-                    title: Text(subcategory.name ?? 'Unnamed Subcategory'),
-                    onTap: () {
-                      print(API.normalImage + subcategory.img_path.toString());
-                      // Define what happens when you tap the ListTile
-                    },
+                  return GridTile(
+                    child: Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: Image.network(
+                            API.normalImage + subcategory.img_path.toString(),
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Icon(Icons.error),
+                          ),
+                        ),
+                        SizedBox(height: 8), // Spacing between image and text
+                        Text(subcategory.name ?? 'Unnamed Subcategory',
+                            textAlign: TextAlign.center),
+                      ],
+                    ),
                   );
                 },
               ),
-
-              // Continue adding other widgets here if needed
             ],
           ),
         ),
