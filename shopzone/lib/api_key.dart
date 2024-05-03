@@ -157,6 +157,8 @@ class API {
       "$hostConnectSeller/getOrderStatus.php"; // get Order Status
   static const getUserDeviceTokenInSellerApp =
       "$hostConnectSeller/getUserDeviceTokenInSellerApp.php"; // get User Device Token In Seller App
+        static const itemUploadFetchCategory =
+      "$hostConnectSeller/itemUploadFetchCategory.php"; // get User Device Token In Seller App
 
   //!------------------------------ FOOD SELLERS API CONNECTIONS --------------------------------
 
