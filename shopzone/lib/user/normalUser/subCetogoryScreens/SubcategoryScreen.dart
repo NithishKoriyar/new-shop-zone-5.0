@@ -178,7 +178,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                         );
                       },
                       child: Card(
-                        color: Colors.amberAccent,
+                        color: Color.fromARGB(255, 223, 212, 173),
                         elevation: 4.0, // Adjust elevation as needed
                         child: GridTile(
                           child: Column(

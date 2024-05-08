@@ -6,6 +6,7 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/normalUser/global/global.dart';
 import 'package:shopzone/user/models/items.dart';
+import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 
 // ignore: must_be_immutable
@@ -72,7 +73,13 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (c) => CartScreenUser()));
               },
-              icon: Icon(Icons.shopping_cart))
+              icon: Icon(Icons.shopping_cart)),
+                IconButton(
+              onPressed: () {
+                // Navigator.push(context,
+                //     MaterialPageRoute(builder: (c) => FavoriteScreen()));
+              },
+              icon: Icon(Icons.favorite_border)),
         ],
         centerTitle: true,
         automaticallyImplyLeading: true,
@@ -221,6 +228,17 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 height: 1,
                 thickness: 2,
                 color: Colors.green,
+              ),
+            ),
+              Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                "Total Price: ₹ ${counterLimit * (double.tryParse(widget.model?.price ?? '0') ?? 0)}",
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
             ),
 
