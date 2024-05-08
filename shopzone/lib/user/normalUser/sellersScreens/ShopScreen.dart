@@ -9,12 +9,15 @@ import 'package:shopzone/user/models/brands.dart';
 import 'package:shopzone/user/models/items.dart';
 import 'package:shopzone/user/models/shopcetogery.dart';
 import 'package:shopzone/user/normalUser/brandsScreens/brands_screen.dart';
+import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/normalUser/global/global.dart';
 import 'package:shopzone/user/models/sellers.dart';
 import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart';
 import 'package:shopzone/user/normalUser/itemsScreens/items_screen.dart';
 import 'package:shopzone/user/normalUser/push_notifications/push_notifications_system.dart';
+import 'package:shopzone/user/normalUser/searchScreen/search_screen.dart';
 import 'package:shopzone/user/normalUser/subCetogoryScreens/SubcategoryScreen.dart';
+import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
 import 'package:shopzone/user/normalUser/widgets/my_drawer.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
@@ -67,49 +70,50 @@ class _ShopScreenState extends State<ShopScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       drawer: MyDrawer(),
+      appBar: AppBar(
+        elevation: 20,
+        title: const Text(
+          "Shop Zone",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (c) => SearchScreen()));
+              
+            },
+          ),
+           IconButton(
+            icon: Icon(Icons.favorite),
+               color: Colors.red,
+            onPressed: () {
+              
+                // Navigator.push(
+                //     context, MaterialPageRoute(builder: (c) => FavoriteScreen()));
+              
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+                Navigator.pop(context);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (c) => CartScreenUser()));
+              // Handle cart action
+            },
+          ),
+        ],
+      ),
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            backgroundColor: Colors.white,
-            floating: true,
-            elevation: 20,
-            pinned: true,
-            title: Text("Shop Zone",
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey)),
-            centerTitle: true,
-            leading: Builder(
-              builder: (context) => IconButton(
-                onPressed: () => Scaffold.of(context).openDrawer(),
-                style: IconButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 221, 221, 221),
-                ),
-                iconSize: 40,
-                icon: Icon(
-                  Ionicons.grid_outline,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            actions: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.shopping_cart_outlined,
-                        color: Colors.grey), // Changed icon style
-                    iconSize: 40, // Increased size
-                    onPressed: () {
-                      // Handle cart icon press
-                    },
-                  ),
-                  // Add other icons here if needed
-                ],
-              ),
-            ],
-          ), //image slider
+       //image slider
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(6.0),
@@ -151,66 +155,20 @@ class _ShopScreenState extends State<ShopScreen> {
               ),
             ),
           ),
-//..image slider new
 
-          // SliverToBoxAdapter(
-          //           child: FutureBuilder<List<String>>(
-          //             future: fetchImages(),
-          //             builder: (context, snapshot) {
-          //               if (snapshot.connectionState == ConnectionState.done) {
-          //                 if (snapshot.hasData) {
-          //                   return CarouselSlider(
-          //                     options: CarouselOptions(
-          //                       height: MediaQuery.of(context).size.height * .9,
-          //                       aspectRatio: 16 / 9,
-          //                       viewportFraction: 0.8,
-          //                       initialPage: 0,
-          //                       enableInfiniteScroll: true,
-          //                       autoPlay: true,
-          //                       autoPlayInterval: Duration(seconds: 2),
-          //                       autoPlayAnimationDuration: Duration(milliseconds: 800),
-          //                       autoPlayCurve: Curves.fastOutSlowIn,
-          //                       enlargeCenterPage: true,
-          //                       scrollDirection: Axis.horizontal,
-          //                     ),
-          //                     items: snapshot.data!.map((imageUrl) {
-          //                       return Builder(
-          //                         builder: (BuildContext context) {
-          //                           return Container(
-          //                             width: MediaQuery.of(context).size.width,
-          //                             margin: EdgeInsets.symmetric(horizontal: 1.0),
-          //                             child: ClipRRect(
-          //                               borderRadius: BorderRadius.circular(40),
-          //                               child: Image.network(
-          //                                 imageUrl,
-          //                                 fit: BoxFit.fill,
-          //                               ),
-          //                             ),
-          //                           );
-          //                         },
-          //                       );
-          //                     }).toList(),
-          //                   );
-          //                 } else if (snapshot.hasError) {
-          //                   return Text("${snapshot.error}");
-          //                 }
-          //               }
-          //               return CircularProgressIndicator(); // Show loading while the images are fetching
-          //             },
-          //           ),
-          //         ),
-          ///...image slider
 
-          // SliverPadding(
-          //   padding: EdgeInsets.all(1),
-          //   sliver: SliverToBoxAdapter(
-          //     child: Center(
-          //         child: Text(
-          //       'Top Sellers',
-          //       style: TextStyle(color: Colors.grey),
-          //     )),
-          //   ),
-          // ),
+     
+
+          SliverPadding(
+            padding: EdgeInsets.all(1),
+            sliver: SliverToBoxAdapter(
+              child: Center(
+                  child: Text(
+                'category',
+                style: TextStyle(color: Colors.grey),
+              )),
+            ),
+          ),
           //displyaing categories section
           StreamBuilder<List<ShopCategory>>(
             stream: getCategoryStream(),
