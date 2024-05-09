@@ -22,45 +22,10 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
   @override
   void initState() {
     super.initState();
-    checkIfInWishlist();
   }
 
-  void checkIfInWishlist() async {
-    // Simulate fetching wishlist state from the server
-    final response = await http.post(
-      Uri.parse(API.checkWishlist),
-      body: {
-        'userId': '1', // Replace with dynamic userId
-        'itemId': widget.model!.itemID.toString(),
-      },
-    );
+ 
 
-    if (response.statusCode == 200 && response.body == 'true') {
-      setState(() {
-        isInWishlist = true;
-      });
-    }
-  }
-
-  void toggleWishlist() async {
-    final response = await http.post(
-      Uri.parse(isInWishlist ? API.removeFromWishlist : API.addToWishlist),
-      body: {
-        'userId': '1', // Replace with dynamic userId
-        'itemId': widget.model!.itemID.toString(),
-      },
-    );
-
-    if (response.statusCode == 200) {
-      Fluttertoast.showToast(
-          msg: isInWishlist ? 'Removed from wishlist' : 'Added to wishlist');
-      setState(() {
-        isInWishlist = !isInWishlist;
-      });
-    } else {
-      Fluttertoast.showToast(msg: 'Action failed. Please try again.');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,13 +83,7 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                IconButton(
-                  icon: Icon(
-                    isInWishlist ? Icons.favorite : Icons.favorite_border,
-                    color: Colors.red,
-                  ),
-                  onPressed: toggleWishlist,
-                ),
+
               ],
             ),
           ),

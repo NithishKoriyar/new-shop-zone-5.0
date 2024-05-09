@@ -12,6 +12,7 @@ class Items {
   String? sellerUID;
   String? status;
   String? thumbnailUrl;
+  String? isWishListed;
 
   Items({
     this.brandID,
@@ -25,22 +26,39 @@ class Items {
     this.sellerUID,
     this.status,
     this.thumbnailUrl,
+    this.isWishListed,
   });
 
-  Items.fromJson(Map<String, dynamic> json) {
-    brandID = json["brandID"];
-    itemID = json["itemID"];
-    itemInfo = json["itemInfo"];
-    itemTitle = json["itemTitle"];
-    longDescription = json["longDescription"];
-    price = json["price"];
+  Items.fromJson(Map<String, dynamic> json)
+      : brandID = json["brandID"],
+        itemID = json["itemID"],
+        itemInfo = json["itemInfo"],
+        itemTitle = json["itemTitle"],
+        longDescription = json["longDescription"],
+        price = json["price"],
+        publishedDate = json["publishedDate"] is Timestamp
+            ? json["publishedDate"] as Timestamp
+            : null,
+        sellerName = json["sellerName"],
+        sellerUID = json["sellerUID"],
+        status = json["status"],
+        thumbnailUrl = json["thumbnailUrl"],
+        isWishListed = json["IsWishlisted"];
 
-    if (json["publishedDate"] is Timestamp) {
-      publishedDate = json["publishedDate"] as Timestamp;
-    }
-    sellerName = json["sellerName"];
-    sellerUID = json["sellerUID"];
-    status = json["status"];
-    thumbnailUrl = json["thumbnailUrl"];
+  Map<String, dynamic> toJson() {
+    return {
+      "brandID": brandID,
+      "itemID": itemID,
+      "itemInfo": itemInfo,
+      "itemTitle": itemTitle,
+      "longDescription": longDescription,
+      "price": price,
+      "publishedDate": publishedDate,
+      "sellerName": sellerName,
+      "sellerUID": sellerUID,
+      "status": status,
+      "thumbnailUrl": thumbnailUrl,
+      "IsWishlisted": isWishListed,
+    };
   }
 }

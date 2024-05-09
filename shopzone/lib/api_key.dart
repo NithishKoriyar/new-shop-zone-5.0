@@ -64,15 +64,10 @@ class API {
        static const  fetchSubCategories= "$hostConnectUser/subCategory.php";
        static const  fetchRelatedCategoriesItems= "$hostConnectUser/subCategoryItem.php";
        static const  fetchRelatedSubCategoriesItems= "$hostConnectUser/fetchRelatedSubCategoriesItems.php";
+              static const  wishListToggle= "$hostConnectUser/wishListToggle.php";
+                   static const  fetchWishListItems= "$hostConnectUser/fetchWishListItems.php";
    
-        static const checkWishlist =
-      "$hostConnectUser/checkWishlist.php"; 
-   
-        static const removeFromWishlist =
-      "$hostConnectUser/removeFromWishlist.php";
-   
-         static const addToWishlist =
-      "$hostConnectUser/   addToWishlist.php";
+
  
   //! food user api ------------------------------------------------------
   static const hostConnectFoodUser = "$userFolder/foodUser";

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shopzone/api_key.dart';
-import 'package:shopzone/user/models/wishlist.dart';
 import 'package:shopzone/user/normalUser/addressScreens/address_design_widget.dart';
 import 'package:shopzone/user/normalUser/addressScreens/save_new_address_screen.dart';
 import 'package:shopzone/user/normalUser/assistantMethods/address_changer.dart';
