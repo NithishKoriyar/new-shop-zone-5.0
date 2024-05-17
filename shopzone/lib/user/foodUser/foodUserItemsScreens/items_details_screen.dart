@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shopzone/api_key.dart';
+import 'package:shopzone/user/foodUser/foodUserCart/cart_screen.dart';
 import 'package:shopzone/user/foodUser/foodUserGlobal/global.dart';
 import 'package:shopzone/user/models/items.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
@@ -67,6 +68,17 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         ),
         centerTitle: true,
         automaticallyImplyLeading: true,
+         actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CartScreenUser()),
+              );
+            },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -147,6 +159,18 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
               child: Text(
                 widget.model!.longDescription.toString(),
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  color: Colors.grey,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+              Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
+              child: Text(
+                widget.model!.status.toString(),
                 textAlign: TextAlign.justify,
                 style: const TextStyle(
                   fontWeight: FontWeight.normal,

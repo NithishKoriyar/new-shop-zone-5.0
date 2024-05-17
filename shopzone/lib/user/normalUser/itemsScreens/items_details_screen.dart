@@ -6,7 +6,7 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/normalUser/global/global.dart';
 import 'package:shopzone/user/models/items.dart';
-import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
+
 import 'package:shopzone/user/userPreferences/current_user.dart';
 
 // ignore: must_be_immutable
@@ -74,12 +74,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                     MaterialPageRoute(builder: (c) => CartScreenUser()));
               },
               icon: Icon(Icons.shopping_cart)),
-                IconButton(
-              onPressed: () {
-                // Navigator.push(context,
-                //     MaterialPageRoute(builder: (c) => FavoriteScreen()));
-              },
-              icon: Icon(Icons.favorite_border)),
+               
         ],
         centerTitle: true,
         automaticallyImplyLeading: true,
@@ -142,9 +137,35 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                         .contain, // Ensure the image covers the entire container area
                   ),
                 ),
+               
               ),
             ),
-
+            //.........................
+            //  Container(
+            //   height: 80, // Set a fixed height for the scroll area
+            //   child: ListView.builder(
+            //     scrollDirection: Axis.horizontal,
+            //     itemCount: widget.model?.thumbnailUrl?.length ?? 0, // Ensure you have a list of other image URLs in your model
+            //     itemBuilder: (BuildContext context, int index) {
+            //       return GestureDetector(
+            //         onTap: () {
+            //           setState(() {
+            //             // Update the main image to the one selected
+            //             widget.model!.thumbnailUrl = widget.model?.thumbnailUrl?[index];
+            //           });
+            //         },
+            //         child: Padding(
+            //           padding: const EdgeInsets.all(8.0),
+            //           child: Image.network(
+            //               API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+            //             fit: BoxFit.cover,
+            //             width: 70,
+            //           ),
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
             //implement the item counter
             Padding(
               padding: const EdgeInsets.all(8.0),

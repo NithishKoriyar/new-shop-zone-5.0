@@ -8,9 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/notification_service.dart';
 import 'package:shopzone/user/foodUser/foodUserBrandsScreens/brands_screen.dart';
+import 'package:shopzone/user/foodUser/foodUserCart/cart_screen.dart';
 import 'package:shopzone/user/foodUser/foodUserGlobal/global.dart';
 import 'package:shopzone/user/foodUser/foodUserItemsScreens/items_details_screen.dart';
 import 'package:shopzone/user/foodUser/foodUserItemsScreens/items_screen.dart';
+import 'package:shopzone/user/foodUser/foodUserSearchScreen/search_screen.dart';
 import 'package:shopzone/user/models/brands.dart';
 import 'package:shopzone/user/models/items.dart';
 import 'package:shopzone/user/models/sellers.dart';
@@ -106,7 +108,27 @@ class _FoodScreenState extends State<FoodScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (c) => SearchScreen()));
+            },
+          ),
+        
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (c) => CartScreenUser()));
+              // Handle cart action
+            },
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [

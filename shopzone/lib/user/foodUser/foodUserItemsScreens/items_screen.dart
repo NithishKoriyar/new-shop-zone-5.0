@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shopzone/api_key.dart';
+import 'package:shopzone/user/foodUser/foodUserCart/cart_screen.dart';
 import 'package:shopzone/user/foodUser/foodUserItemsScreens/items_ui_design_widget.dart';
 import 'package:shopzone/user/models/brands.dart';
 import 'package:shopzone/user/models/items.dart';
@@ -29,8 +30,8 @@ class _ItemsScreenState extends State<ItemsScreen>
   {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-    elevation: 20,
+       appBar: AppBar(
+        elevation: 20,
         title: const Text(
           "Food Zone",
           style: TextStyle(
@@ -38,8 +39,21 @@ class _ItemsScreenState extends State<ItemsScreen>
             fontWeight: FontWeight.bold,
           ),
         ),
+
         centerTitle: true,
-        automaticallyImplyLeading: true,
+        actions: [
+       
+        
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (c) => CartScreenUser()));
+              // Handle cart action
+            },
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [

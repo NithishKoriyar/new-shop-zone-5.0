@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/noConnectionPage.dart';
+import 'package:shopzone/user/models/items.dart';
 import 'package:shopzone/user/models/sellers.dart';
+import 'package:shopzone/user/normalUser/itemsScreens/items_ui_design_widget.dart';
 import 'package:shopzone/user/normalUser/sellersScreens/sellers_ui_design_widget.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -14,10 +16,8 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   String sellerNameText = "";
-  Future<QuerySnapshot>? storesDocumentsList;
 
-  Future<List<Sellers>> initializeSearchingStores(
-      String textEnteredbyUser) async {
+  Future<List<Sellers>> initializeSearchingStores(String textEnteredbyUser) async {
     final response = await http
         .get(Uri.parse("${API.searchStores}?searchTerm=$textEnteredbyUser"));
 
@@ -29,12 +29,24 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  Future<List<Items>> initializeSearchingItems(String textEnteredbyUser) async {
+    final response = await http
+        .get(Uri.parse("${API.searchStores}?searchTerm=$textEnteredbyUser"));
+
+    if (response.statusCode == 200) {
+      Iterable data = json.decode(response.body);
+      return data.map((item) => Items.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load data.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-elevation: 20,
+        elevation: 20,
         automaticallyImplyLeading: true,
         title: TextField(
           onChanged: (textEntered) {
@@ -43,12 +55,12 @@ elevation: 20,
             });
           },
           decoration: InputDecoration(
-            hintText: "Search Seller here...",
+            hintText: "Search here...",
             hintStyle: const TextStyle(color: Colors.white54),
             suffixIcon: IconButton(
               onPressed: () async {
                 setState(() {
-                  initializeSearchingStores(sellerNameText);
+                  // trigger search
                 });
               },
               icon: const Icon(Icons.search),
@@ -60,27 +72,45 @@ elevation: 20,
           ),
         ),
       ),
-      body: FutureBuilder<List<Sellers>>(
-        future: initializeSearchingStores(sellerNameText),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    Sellers model = snapshot.data![index];
+      body: FutureBuilder(
+        future: Future.wait([
+          initializeSearchingStores(sellerNameText),
+          initializeSearchingItems(sellerNameText),
+        ]),
+        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (snapshot.hasData) {
+            List<Sellers> sellers = snapshot.data![0];
+            List<Items> items = snapshot.data![1];
 
+            if (sellers.isEmpty && items.isEmpty) {
+              return const Center(
+                child: Text("No record found."),
+              );
+            } else {
+              return ListView.builder(
+                itemCount: sellers.length + items.length,
+                itemBuilder: (context, index) {
+                  if (index < sellers.length) {
+                    Sellers model = sellers[index];
                     return SellersUIDesignWidget(
                       model: model,
                     );
-                  },
-            );
+                  } else {
+                    Items itemsModel = items[index - sellers.length];
+                    return ItemsUiDesignWidget(
+                      model: itemsModel,
+                    );
+                  }
+                },
+              );
+            }
           } else if (snapshot.hasError) {
             return Center(
-              child: Center(child: NoConnectionPage()),
+              child: NoConnectionPage(),
             );
           } else {
             return const Center(
-              child: Text("No record found."),
+              child: CircularProgressIndicator(),
             );
           }
         },
