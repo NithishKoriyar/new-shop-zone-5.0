@@ -1,7 +1,7 @@
 class API {
   //! web server
   static const hostConnect =
-      "https://nithish.atozasindia.in/shop_zone_combination_api/";
+      "https://nithish.atozasindia.in/shop_zone_combination_api";
   //!------------------------------USER API CONNECTIONS --------------------------------
 
   static const userFolder = "$hostConnect/user"; //! to select the user folder

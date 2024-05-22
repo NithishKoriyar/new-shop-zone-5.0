@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
+
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/notification_service.dart';
 import 'package:shopzone/user/models/brands.dart';
@@ -18,6 +18,7 @@ import 'package:shopzone/user/normalUser/itemsScreens/items_screen.dart';
 import 'package:shopzone/user/normalUser/push_notifications/push_notifications_system.dart';
 import 'package:shopzone/user/normalUser/searchScreen/search_screen.dart';
 import 'package:shopzone/user/normalUser/subCetogoryScreens/SubcategoryScreen.dart';
+import 'package:shopzone/user/normalUser/subCetogoryScreens/categoryScreen.dart';
 import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
 import 'package:shopzone/user/normalUser/widgets/my_drawer.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
@@ -126,6 +127,32 @@ class _ShopScreenState extends State<ShopScreen> {
       ),
       body: CustomScrollView(
         slivers: [
+          //...........
+           SliverToBoxAdapter(
+  child: Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: TextField(
+      decoration: InputDecoration(
+        hintText: 'Search for Products,Brands and More',
+        prefixIcon: Icon(Icons.search),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        filled: true,
+        fillColor: Colors.blue[50],
+        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20), // Adjust the padding here
+      ),
+      onSubmitted: (String query) {
+        // Navigate to the search screen without passing the query for now
+        Navigator.push(
+          context, MaterialPageRoute(builder: (c) => SearchScreen()));
+      },
+    ),
+  ),
+),
+
+          //..........................
           //image slider
           SliverToBoxAdapter(
             child: Padding(
@@ -169,16 +196,38 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
           ),
 
-          SliverPadding(
-            padding: EdgeInsets.all(1),
-            sliver: SliverToBoxAdapter(
-              child: Center(
-                  child: Text(
-                'category',
-                style: TextStyle(color: Colors.grey),
-              )),
+       SliverPadding(
+  padding: EdgeInsets.all(1),
+  sliver: SliverToBoxAdapter(
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Category',
+            style: TextStyle(color: Colors.black),
+          ),
+          InkWell(
+            onTap: () {
+              //Navigate to the screen that shows all categories
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CategoryScreen(),
+                ),
+              );
+            },
+            child: Text(
+              'See All',
+              style: TextStyle(color: Colors.blue),
             ),
           ),
+        ],
+      ),
+    ),
+  ),
+),
           //displyaing categories section
           StreamBuilder<List<ShopCategory>>(
             stream: getCategoryStream(),
@@ -602,8 +651,9 @@ class _ShopScreenState extends State<ShopScreen> {
                             ),
                             // Heart-shaped wishlist icon
                             Positioned(
-                              top: 8,
-                              right: 8,
+                              top: 0.5,
+                              right: 3,
+                              left:10,
                               child: GestureDetector(
                                 onTap: () {
                                   // Toggle the wishlist state
@@ -639,6 +689,7 @@ class _ShopScreenState extends State<ShopScreen> {
               }
             },
           )
+
         ],
       ),
     );

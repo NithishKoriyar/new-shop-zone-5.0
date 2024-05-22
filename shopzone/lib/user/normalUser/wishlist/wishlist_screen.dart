@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shopzone/api_key.dart';
-import 'package:shopzone/user/foodUser/foodUserItemsScreens/items_details_screen.dart';
+
 import 'package:shopzone/user/models/items.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart';
 
 class WishListScreen extends StatefulWidget {
   final String userID;

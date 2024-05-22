@@ -58,6 +58,7 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
                       height: 220,
                       fit: BoxFit.cover,
                     ),
+                    
                   ),
                 ),
                 const SizedBox(
