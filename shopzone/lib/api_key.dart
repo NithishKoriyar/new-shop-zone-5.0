@@ -66,6 +66,8 @@ class API {
        static const  fetchRelatedSubCategoriesItems= "$hostConnectUser/fetchRelatedSubCategoriesItems.php";
               static const  wishListToggle= "$hostConnectUser/wishListToggle.php";
                    static const  fetchWishListItems= "$hostConnectUser/fetchWishListItems.php";
+                  
+                                     static const  displyingThreeImages= "$hostConnectUser/ displyingThreeImages.php";
    
 
  
