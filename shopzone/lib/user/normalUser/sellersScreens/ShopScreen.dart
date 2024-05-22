@@ -96,7 +96,6 @@ class _ShopScreenState extends State<ShopScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-
         centerTitle: true,
         actions: [
           IconButton(
@@ -111,7 +110,9 @@ class _ShopScreenState extends State<ShopScreen> {
             color: Colors.red,
             onPressed: () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (c) =>  WishListScreen(userID : userID)));
+                  context,
+                  MaterialPageRoute(
+                      builder: (c) => WishListScreen(userID: userID)));
             },
           ),
           IconButton(
@@ -128,29 +129,30 @@ class _ShopScreenState extends State<ShopScreen> {
       body: CustomScrollView(
         slivers: [
           //...........
-           SliverToBoxAdapter(
-  child: Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: TextField(
-      decoration: InputDecoration(
-        hintText: 'Search for Products,Brands and More',
-        prefixIcon: Icon(Icons.search),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        filled: true,
-        fillColor: Colors.blue[50],
-        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20), // Adjust the padding here
-      ),
-      onSubmitted: (String query) {
-        // Navigate to the search screen without passing the query for now
-        Navigator.push(
-          context, MaterialPageRoute(builder: (c) => SearchScreen()));
-      },
-    ),
-  ),
-),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search for Products,Brands and More',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.blue[50],
+                  contentPadding: EdgeInsets.symmetric(
+                      vertical: 10, horizontal: 20), // Adjust the padding here
+                ),
+                onSubmitted: (String query) {
+                  // Navigate to the search screen without passing the query for now
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (c) => SearchScreen()));
+                },
+              ),
+            ),
+          ),
 
           //..........................
           //image slider
@@ -196,38 +198,38 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
           ),
 
-       SliverPadding(
-  padding: EdgeInsets.all(1),
-  sliver: SliverToBoxAdapter(
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Category',
-            style: TextStyle(color: Colors.black),
-          ),
-          InkWell(
-            onTap: () {
-              //Navigate to the screen that shows all categories
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CategoryScreen(),
+          SliverPadding(
+            padding: EdgeInsets.all(1),
+            sliver: SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Category',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        //Navigate to the screen that shows all categories
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CategoryScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'See All',
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ),
+                  ],
                 ),
-              );
-            },
-            child: Text(
-              'See All',
-              style: TextStyle(color: Colors.blue),
+              ),
             ),
           ),
-        ],
-      ),
-    ),
-  ),
-),
           //displyaing categories section
           StreamBuilder<List<ShopCategory>>(
             stream: getCategoryStream(),
@@ -546,6 +548,379 @@ class _ShopScreenState extends State<ShopScreen> {
               }
             },
           ),
+          //0000000000000000000000000000000000000000000
+
+          StreamBuilder<List<Items>>(
+            stream: getItemStream(userID),
+            builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
+              if (dataSnapshot.connectionState == ConnectionState.waiting) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              } else if (dataSnapshot.hasData &&
+                  dataSnapshot.data!.isNotEmpty) {
+                return SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1,
+                    childAspectRatio: 1.0, // Adjust aspect ratio
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      // Assuming there are multiple items in dataSnapshot.data
+                      Items model1 = dataSnapshot.data![index * 3];
+                      Items model2 = dataSnapshot.data![index * 3 + 1];
+                      Items model3 = dataSnapshot.data![index * 3 + 2];
+
+                      return Container(
+                        margin: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromARGB(255, 233, 230, 230),
+                              spreadRadius: 0.1,
+                              blurRadius: 5,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (c) =>
+                                          ItemsDetailsScreen(model: model1),
+                                    ),
+                                  );
+                                },
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: double.infinity,
+                                      height: 210,
+                                      padding: EdgeInsets.all(8),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          image: DecorationImage(
+                                            image: NetworkImage(
+                                              API.getItemsImage +
+                                                  (model1.thumbnailUrl ?? ''),
+                                            ),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            model1.itemTitle.toString(),
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: false,
+                                            maxLines: 1,
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            model1.itemInfo.toString(),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: false,
+                                            maxLines: 1,
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            "₹ ${model1.price.toString()}",
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.green,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: false,
+                                            maxLines: 1,
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            "EMI from ₹587/month",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: false,
+                                            maxLines: 1,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (c) => ItemsDetailsScreen(
+                                                model: model2),
+                                          ),
+                                        );
+                                      },
+                                      child: Column(
+                                        children: [
+                                          Flexible(
+                                            flex: 3,
+                                            child: Container(
+                                              height: 105,
+                                              margin: EdgeInsets.all(5),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color.fromARGB(
+                                                        255, 233, 230, 230),
+                                                    spreadRadius: 0.1,
+                                                    blurRadius: 5,
+                                                    offset: Offset(0, 4),
+                                                  ),
+                                                ],
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                    API.getItemsImage +
+                                                        (model2.thumbnailUrl ??
+                                                            ''),
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Flexible(
+                                            flex: 2,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    model2.itemTitle.toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    softWrap: false,
+                                                    maxLines: 1,
+                                                  ),
+                                                  Text(
+                                                    model2.itemInfo.toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    softWrap: false,
+                                                    maxLines: 1,
+                                                  ),
+                                                  Text(
+                                                    "₹ ${model2.price.toString()}",
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      color: Colors.green,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    softWrap: false,
+                                                    maxLines: 1,
+                                                  ),
+                                                  Text(
+                                                    "EMI from ₹587/month",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    softWrap: false,
+                                                    maxLines: 1,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (c) => ItemsDetailsScreen(
+                                                model: model3),
+                                          ),
+                                        );
+                                      },
+                                      child: Column(
+                                        children: [
+                                          Flexible(
+                                            flex: 3,
+                                            child: Container(
+                                              height: 105,
+                                              margin: EdgeInsets.all(5),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color.fromARGB(
+                                                        255, 233, 230, 230),
+                                                    spreadRadius: 0.1,
+                                                    blurRadius: 5,
+                                                    offset: Offset(0, 4),
+                                                  ),
+                                                ],
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                    API.getItemsImage +
+                                                        (model3.thumbnailUrl ??
+                                                            ''),
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Flexible(
+                                            flex: 2,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    model3.itemTitle.toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    softWrap: false,
+                                                    maxLines: 1,
+                                                  ),
+                                                  Text(
+                                                    model3.itemInfo.toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    softWrap: false,
+                                                    maxLines: 1,
+                                                  ),
+                                                  Text(
+                                                    "₹ ${model3.price.toString()}",
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      color: Colors.green,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    softWrap: false,
+                                                    maxLines: 1,
+                                                  ),
+                                                  Text(
+                                                    "EMI from ₹587/month",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    softWrap: false,
+                                                    maxLines: 1,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    childCount: (dataSnapshot.data!.length / 3).ceil(),
+                  ),
+                );
+              } else {
+                return SliverToBoxAdapter(
+                  child: Center(
+                    child: Text("No Items Data exists."),
+                  ),
+                );
+              }
+            },
+          ),
+
+          //0000000000000000000000000000000000000000000
 
           ///items---------------------------------------------------------------
           const SliverPadding(
@@ -556,6 +931,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       style: TextStyle(color: Colors.grey))),
             ),
           ),
+
           StreamBuilder<List<Items>>(
             stream: getItemStream(userID),
             builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
@@ -651,9 +1027,9 @@ class _ShopScreenState extends State<ShopScreen> {
                             ),
                             // Heart-shaped wishlist icon
                             Positioned(
-                              top: 0.5,
-                              right: 3,
-                              left:10,
+                              top: 0.7,
+                              right: 7,
+                              // left:3,
                               child: GestureDetector(
                                 onTap: () {
                                   // Toggle the wishlist state
@@ -689,11 +1065,11 @@ class _ShopScreenState extends State<ShopScreen> {
               }
             },
           )
-
         ],
       ),
     );
   }
+  //...........................................
 
   Future<List<String>> fetchImages() async {
     final response = await http.get(Uri.parse(API.imageSlider));
@@ -820,4 +1196,25 @@ class _ShopScreenState extends State<ShopScreen> {
       print('Server error: ${response.statusCode}');
     }
   }
+
+  // Stream<List<Items>> getNewItemThreeStream(String userId) async* {
+  //   final response = await http.post(
+  //     Uri.parse(API.displyingThreeImages),
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: json.encode({
+  //       'user_id': userId,
+  //     }),
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     List<dynamic> data = json.decode(response.body);
+  //     print(data);
+
+  //     yield data.map((itemData) => Items.fromJson(itemData)).toList();
+  //   } else {
+  //     throw Exception('Failed to load new items');
+  //   }
+  // }
 }

@@ -1,11 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/noConnectionPage.dart';
 import 'package:shopzone/user/models/items.dart';
-import 'package:shopzone/user/models/sellers.dart';
+import 'package:shopzone/user/models/brands.dart'; // Assuming you have a Brands model
 import 'package:shopzone/user/normalUser/itemsScreens/items_ui_design_widget.dart';
-import 'package:shopzone/user/normalUser/sellersScreens/sellers_ui_design_widget.dart';
+import 'package:shopzone/user/normalUser/brandsScreens/brands_ui_design_widget.dart'; // Assuming you have a Brands UIDesign widget
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -15,27 +14,14 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  String sellerNameText = "";
+  String searchTerm = "";
 
-  Future<List<Sellers>> initializeSearchingStores(String textEnteredbyUser) async {
-    final response = await http
-        .get(Uri.parse("${API.searchStores}?searchTerm=$textEnteredbyUser"));
-
-    if (response.statusCode == 200) {
-      Iterable data = json.decode(response.body);
-      return data.map((seller) => Sellers.fromJson(seller)).toList();
-    } else {
-      throw Exception('Failed to load data.');
-    }
-  }
-
-  Future<List<Items>> initializeSearchingItems(String textEnteredbyUser) async {
-    final response = await http
-        .get(Uri.parse("${API.searchStores}?searchTerm=$textEnteredbyUser"));
+  Future<Map<String, dynamic>> initializeSearching(String searchTerm) async {
+    final response = await http.get(Uri.parse("${API.searchStores}?searchTerm=$searchTerm"));
 
     if (response.statusCode == 200) {
-      Iterable data = json.decode(response.body);
-      return data.map((item) => Items.fromJson(item)).toList();
+      Map<String, dynamic> data = json.decode(response.body);
+      return data;
     } else {
       throw Exception('Failed to load data.');
     }
@@ -51,14 +37,14 @@ class _SearchScreenState extends State<SearchScreen> {
         title: TextField(
           onChanged: (textEntered) {
             setState(() {
-              sellerNameText = textEntered;
+              searchTerm = textEntered;
             });
           },
           decoration: InputDecoration(
             hintText: "Search here...",
             hintStyle: const TextStyle(color: Colors.white54),
             suffixIcon: IconButton(
-              onPressed: () async {
+              onPressed: () {
                 setState(() {
                   // trigger search
                 });
@@ -67,51 +53,54 @@ class _SearchScreenState extends State<SearchScreen> {
               color: Colors.white,
             ),
           ),
-          style: const TextStyle(
-            color: Colors.white,
-          ),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
       body: FutureBuilder(
-        future: Future.wait([
-          initializeSearchingStores(sellerNameText),
-          initializeSearchingItems(sellerNameText),
-        ]),
-        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        future: initializeSearching(searchTerm),
+        builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
           if (snapshot.hasData) {
-            List<Sellers> sellers = snapshot.data![0];
-            List<Items> items = snapshot.data![1];
+            List<Items> items = (snapshot.data!['items'] as List).map((item) => Items.fromJson(item)).toList();
+            List<Brands> brands = (snapshot.data!['brands'] as List).map((brand) => Brands.fromJson(brand)).toList();
 
-            if (sellers.isEmpty && items.isEmpty) {
-              return const Center(
-                child: Text("No record found."),
-              );
+            if (items.isEmpty && brands.isEmpty) {
+              return const Center(child: Text("No record found."));
             } else {
-              return ListView.builder(
-                itemCount: sellers.length + items.length,
-                itemBuilder: (context, index) {
-                  if (index < sellers.length) {
-                    Sellers model = sellers[index];
-                    return SellersUIDesignWidget(
-                      model: model,
-                    );
-                  } else {
-                    Items itemsModel = items[index - sellers.length];
-                    return ItemsUiDesignWidget(
-                      model: itemsModel,
-                    );
-                  }
-                },
+              return Column(
+                children: [
+                  // Horizontal list for brands
+                  Container(
+                    height: 150,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: brands.length,
+                      itemBuilder: (context, index) {
+                        Brands model = brands[index];
+                        return BrandsUiDesignWidget(
+                          model: model,
+                        );
+                      },
+                    ),
+                  ),
+                  // Vertical list for items
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: items.length,
+                      itemBuilder: (context, index) {
+                        Items itemsModel = items[index];
+                        return ItemsUiDesignWidget(
+                          model: itemsModel,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               );
             }
           } else if (snapshot.hasError) {
-            return Center(
-              child: NoConnectionPage(),
-            );
+            return Center(child: NoConnectionPage());
           } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),

@@ -41,5 +41,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-//
-//SELECT i.*, CASE WHEN wl.wishlist_id is not null THEN TRUE ELSE FALSE END as IsWishlisted FROM `items` i LEFT JOIN wishlist wl on wl.item_id COLLATE utf8mb4_general_ci = i.itemID and wl.user_id = 116;
