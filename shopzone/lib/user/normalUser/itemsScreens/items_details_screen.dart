@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -6,8 +8,9 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/normalUser/global/global.dart';
 import 'package:shopzone/user/models/items.dart';
-
 import 'package:shopzone/user/userPreferences/current_user.dart';
+import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
+import 'package:http/http.dart' as http; // Import your wishlist screen
 
 // ignore: must_be_immutable
 class ItemsDetailsScreen extends StatefulWidget {
@@ -55,6 +58,38 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     print('user image: $userImg');
   }
 
+  // void toggleWishlist(Items model, userId) {
+  //   setState(() {
+  //     model.isWishListed = (model.isWishListed == "1" ? "0" : "1").toString();
+  //   });
+
+  //   // You can update this in your backend or local database here
+  //   updateWishlistInBackend(model, userId);
+  // }
+
+  // void updateWishlistInBackend(Items model, userId) async {
+  //   const String apiUrl = API.wishListToggle;
+  //   final response = await http.post(
+  //     Uri.parse(apiUrl),
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: jsonEncode({
+  //       'user_id': userId,
+  //       'item_id': model.itemID,
+  //     }),
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     final result = jsonDecode(response.body);
+  //     if (result['status'] == 'error') {
+  //       print('Error updating wishlist: ${result['message']}');
+  //     } else {
+  //       print('Wishlist status: ${result['status']}');
+  //     }
+  //   } else {
+  //     print('Server error: ${response.statusCode}');
+  //   }
+  // }
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -69,12 +104,12 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (c) => CartScreenUser()));
-              },
-              icon: Icon(Icons.shopping_cart)),
-               
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (c) => CartScreenUser()));
+            },
+            icon: Icon(Icons.shopping_cart),
+          ),
         ],
         centerTitle: true,
         automaticallyImplyLeading: true,
@@ -137,35 +172,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                         .contain, // Ensure the image covers the entire container area
                   ),
                 ),
-               
               ),
             ),
-            //.........................
-            //  Container(
-            //   height: 80, // Set a fixed height for the scroll area
-            //   child: ListView.builder(
-            //     scrollDirection: Axis.horizontal,
-            //     itemCount: widget.model?.thumbnailUrl?.length ?? 0, // Ensure you have a list of other image URLs in your model
-            //     itemBuilder: (BuildContext context, int index) {
-            //       return GestureDetector(
-            //         onTap: () {
-            //           setState(() {
-            //             // Update the main image to the one selected
-            //             widget.model!.thumbnailUrl = widget.model?.thumbnailUrl?[index];
-            //           });
-            //         },
-            //         child: Padding(
-            //           padding: const EdgeInsets.all(8.0),
-            //           child: Image.network(
-            //               API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-            //             fit: BoxFit.cover,
-            //             width: 70,
-            //           ),
-            //         ),
-            //       );
-            //     },
-            //   ),
-            // ),
             //implement the item counter
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -191,17 +199,41 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.only(left: 8.0, top: 8.0),
-              child: Text(
-                "${widget.model!.itemTitle}",
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.black,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      "${widget.model!.itemTitle}",
+                      textAlign: TextAlign.justify,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     // Toggle the wishlist state
+                  //     print(model.isWishListed);
+                  //     toggleWishlist(model, userID);
+                  //   },
+                  //   child: Container(
+                  //     child: Icon(
+                  //       model.isWishListed == "1"
+                  //           ? Icons.favorite
+                  //           : Icons.favorite_border,
+                  //       color: model.isWishListed == "1"
+                  //           ? Colors.orange
+                  //           : Colors.orange,
+                  //       size: 28,
+                  //     ),
+                  //   ),
+                  // ),
+                ],
               ),
             ),
             Padding(
@@ -216,7 +248,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
               child: Text(
@@ -229,7 +260,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
@@ -242,7 +272,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
-
             const Padding(
               padding: EdgeInsets.only(left: 8.0, right: 320.0),
               child: Divider(
@@ -251,7 +280,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 color: Colors.green,
               ),
             ),
-              Padding(
+            Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
                 "Total Price: ₹ ${counterLimit * (double.tryParse(widget.model?.price ?? '0') ?? 0)}",
@@ -262,7 +291,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
-
             const SizedBox(
               height: 80,
             ),
