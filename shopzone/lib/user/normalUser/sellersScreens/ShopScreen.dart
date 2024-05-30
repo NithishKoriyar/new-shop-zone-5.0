@@ -907,7 +907,7 @@ class _ShopScreenState extends State<ShopScreen> {
                         ),
                       );
                     },
-                    childCount: (dataSnapshot.data!.length / 3).ceil(),
+                     childCount: (dataSnapshot.data!.length / 3).ceil(),
                   ),
                 );
               } else {
