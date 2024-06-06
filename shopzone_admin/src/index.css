@@ -191,5 +191,216 @@ img {
   border-radius: 4px;
 }
 
+/* navbar time css */
+/* .navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #333;
+  color: white;
+}
+
+.navbar-menu {
+  display: flex;
+  list-style: none;
+}
+
+.navbar-item {
+  margin-right: 20px;
+}
+
+.navbar-item a {
+  color: white;
+  text-decoration: none;
+} */
+
+/* Base styles for navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #333;
+  color: white;
+}
+
+.navbar-menu {
+  display: flex;
+  list-style: none;
+}
+
+.navbar-item {
+  margin-right: 20px;
+}
+
+.navbar-item a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar-menu {
+    flex-direction: column;
+    width: 100%;
+    margin: 0;
+  }
+
+  .navbar-item {
+    margin: 10px 0;
+  }
+
+  .navbar-item a {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 5px;
+  }
+
+  .navbar-item {
+    margin: 5px 0;
+  }
+
+  .navbar-item a {
+    padding: 5px 0;
+  }
+}
+
+.dashboard {
+  background-color: burlywood;
+  min-height: 95vh; /* Ensure it covers the full viewport height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.dashboard-time {
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.dashboard-images {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 60px;
+  justify-items: center;
+}
+
+.dashboard-image {
+  width: 100px; /* Adjust size as needed */
+  height: 100px; /* Adjust size as needed */
+}
+
+/* verifiedusers */
+
+.verified-users-content {
+  padding: 20px;
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-item {
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  position: relative; /* To allow absolute positioning of profile image */
+}
+
+.user-profile {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 15px;
+  position: absolute; /* Position profile image absolutely */
+  top: 10px; /* Adjust the top value to position it higher */
+}
+
+.user-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center the text vertically */
+  margin-left: 80px; /* Offset user info to account for profile image */
+}
+
+.user-info p {
+  margin: 5px 0;
+}
+
+.block-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 5px; /* Reduced padding for a smaller button */
+  margin-left: 10px; /* Space between info and button */
+}
+
+.block-button img {
+  width: 20px; /* Reduced size */
+  height: 20px; /* Reduced size */
+  margin-right: 5px; /* Space between icon and text */
+}
+
+/* dialog */
+.dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dialog-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.dialog-content button {
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #ff0080;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.dialog-content button:first-child {
+  background-color: grey;
+}
+
+
+
+
+
 
 
