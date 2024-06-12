@@ -38,7 +38,7 @@ class _LoginTabPageState extends State<LoginTabPage> {
       context: context,
       builder: (c) {
         return LoadingDialogWidget(
-          message: "Checking credentials",
+          message: "Your account is blocked. Please contact support",
         );
       },
     );

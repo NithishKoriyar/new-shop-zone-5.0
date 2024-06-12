@@ -13,7 +13,11 @@ import Sellerpiechart from "./screens/sellerpiechart";
 import Userpiechart from "./screens/userpiechart";
 import PrivateRoute from "./components/PrivateRoute";
 import VerifiedUsers from "./users/verified_users";
-import BlockedUsers from "./users/blockedusers";
+ import BlockedUsers from "./users/blockedusers";
+import Verifiedseller from "./sellers/verifiedseller";
+import BlockedSellers from "./sellers/blockedsellers";
+
+ 
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -60,6 +64,15 @@ function App() {
         <Route
           path="/BlockedUsers"
           element={<PrivateRoute isLoggedIn={isLoggedIn} element={<BlockedUsers />} />} 
+
+          />
+            <Route
+          path="/VerifiedSellers"
+          element={<PrivateRoute isLoggedIn={isLoggedIn} element={<Verifiedseller />} />}
+        />
+        <Route
+          path="/blockedsellers"
+          element={<PrivateRoute isLoggedIn={isLoggedIn} element={<BlockedSellers />} />} 
 
           />
       </Routes>

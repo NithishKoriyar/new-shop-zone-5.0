@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopzone/user/foodUser/foodUserAddressScreens/address_screen.dart';
@@ -35,6 +36,29 @@ class AddressDesignWidget extends StatefulWidget {
 }
 
 class _AddressDesignWidgetState extends State<AddressDesignWidget> {
+Razorpay razorpay = Razorpay();
+
+void _handlePaymentSuccess(PaymentSuccessResponse response) {
+  // Do something when payment succeeds
+}
+
+void _handlePaymentError(PaymentFailureResponse response) {
+  // Do something when payment fails
+}
+
+
+@override
+void dispose() {
+  // TODO: implement dispose
+  super.dispose();
+
+  try{
+    razorpay.clear();
+  } catch (e){
+    print(e);
+  }
+}
+
   Future<void> _deleteAddress(int addressID) async {
     final url = Uri.parse(API.foodUserDeleteAddress);
     final response =
@@ -61,6 +85,9 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
 
   @override
   Widget build(BuildContext context) {
+    
+razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     return Card(
       color: Colors.white24,
       child: Column(
@@ -205,19 +232,32 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                           print("totalAmount: ${widget.totalPrice}");
                           print("cartId: ${widget.cartId}");
 
+                          var options = {
+  'key': 'rzp_test_xFDe0Osp6j1a8I',
+  'amount': 100,
+  'name': 'Akhila.',
+  'description': 'Fine T-Shirt',
+  'prefill': {
+    'contact': '8888888888',
+    'email': 'test@razorpay.com'
+  }
+};
+
                           // Send the user to Place Order Screen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (c) => PlaceOrderScreen(
-                                sellerUID: widget.sellerUID,
-                                addressID: widget.addressID,
-                                totalAmount: widget.totalPrice,
-                                cartId: widget.cartId,
-                                model: widget.model,
-                              ),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (c) => PlaceOrderScreen(
+                          //       sellerUID: widget.sellerUID,
+                          //       addressID: widget.addressID,
+                          //       totalAmount: widget.totalPrice,
+                          //       cartId: widget.cartId,
+                          //       model: widget.model,
+                          //     ),
+                          //   ),
+                          // );
+                          razorpay.open(options);
+                          
                         },
                         child: const Text("Proceed"),
                       ),
