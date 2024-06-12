@@ -17,8 +17,8 @@ const Userpiechart = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const approvedResponse = await axios.get('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/adseller/Verifiedsellers.php');
-        const notApprovedResponse = await axios.get('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/adseller/Verifiedsellers.php');
+        const approvedResponse = await axios.get('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/aduser/approved_users_endpoint.php');
+        const notApprovedResponse = await axios.get('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/aduser/not_approved_users_endpoint.php');
 
         setUserData({
           approved: approvedResponse.data.length,

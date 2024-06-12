@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/notification_service.dart';
@@ -21,6 +23,7 @@ import 'package:shopzone/user/normalUser/subCetogoryScreens/SubcategoryScreen.da
 import 'package:shopzone/user/normalUser/subCetogoryScreens/categoryScreen.dart';
 import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
 import 'package:shopzone/user/normalUser/widgets/my_drawer.dart';
+import 'package:shopzone/user/splashScreen/my_splash_screen.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
@@ -53,6 +56,50 @@ class _ShopScreenState extends State<ShopScreen> {
     //     cartMethods.clearCart(context);
     //   }
     // });
+
+    {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? userId = sharedPreferences.getString("uid");
+
+    if (userId != null) {
+      try {
+        var res = await http.post(
+          Uri.parse(API.checkuserstatus),
+          body: {
+            "user_id": userId,
+          },
+        );
+
+        if (res.statusCode == 200) {
+          var resBody = jsonDecode(res.body);
+
+          if (resBody['success'] == true) {
+            if (resBody['status'] == 'approved') {
+              // User is approved
+              // Add your logic here if needed
+            } else {
+              // User is blocked
+              Fluttertoast.showToast(msg: resBody['message']);
+              // Perform sign out and navigate to splash screen
+              // Add your sign-out logic here
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (c) => MySplashScreen()),
+              );
+            }
+          } else {
+            Fluttertoast.showToast(msg: resBody['message']);
+          }
+        } else {
+          Fluttertoast.showToast(msg: "Error: Unable to communicate with server.");
+        }
+      } catch (e) {
+        Fluttertoast.showToast(msg: "Error: ${e.toString()}");
+      }
+    } else {
+      Fluttertoast.showToast(msg: "User ID is missing.");
+    }
+  }
   }
   //!notification Services requesting
   NotificationServices notificationServices = NotificationServices();
