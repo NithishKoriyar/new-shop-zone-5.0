@@ -13,7 +13,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/login.php', {
+      const response = await axios.post('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/aduser/login.php', {
         username,
         password
       });

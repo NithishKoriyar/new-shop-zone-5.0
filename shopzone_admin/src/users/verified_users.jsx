@@ -13,8 +13,9 @@ const VerifiedUsers = () => {
 
   const fetchApprovedUsers = async () => {
     try {
-      const response = await axios.get('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/VerifiedUsers.php');
+      const response = await axios.get('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/aduser/VerifiedUsers.php');
       // Ensure the response is an array
+      console.log('API Response:', response.data);
       if (Array.isArray(response.data)) {
         setUsers(response.data);
       } else {
@@ -32,7 +33,7 @@ const VerifiedUsers = () => {
 
   const blockUser = async () => {
     try {
-      await axios.post('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/block_user.php', new URLSearchParams({ userId: selectedUserId }));
+      await axios.post('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/aduser/block_user.php', new URLSearchParams({ userId: selectedUserId }));
       // Update the UI after blocking the user
       setUsers(users.filter(user => user.user_id !== selectedUserId));
       alert('You blocked successfully.');

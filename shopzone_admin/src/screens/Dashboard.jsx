@@ -39,10 +39,20 @@ function Dashboard() {
           src={blockedUser}
           alt="Blocked User"
           className="dashboard-image"
-          onClick={() => handleImageClick('/blockedusers')} // Update the click handler
+          onClick={() => handleImageClick('/blockedusers')}
         />
-        <img src={verifiedSeller} alt="Verified Seller" className="dashboard-image" />
-        <img src={blockedSeller} alt="Blocked Seller" className="dashboard-image" />
+        <img
+          src={verifiedSeller}
+          alt="Verified Seller"
+          className="dashboard-image"
+          onClick={() => handleImageClick('/verifiedsellers')}
+        />
+        <img
+          src={blockedSeller}
+          alt="Blocked Seller"
+          className="dashboard-image"
+          onClick={() => handleImageClick('/blockedsellers')}
+        />
       </div>
     </div>
   );
