@@ -14,7 +14,6 @@ import 'package:shopzone/user/normalUser/widgets/custom_text_field.dart';
 import 'package:shopzone/user/normalUser/widgets/loading_dialog.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
-
 class RegistrationTabPage extends StatefulWidget {
   const RegistrationTabPage({Key? key}) : super(key: key);
 
@@ -27,8 +26,7 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
   TextEditingController nameTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
-  TextEditingController confirmPasswordTextEditingController =
-      TextEditingController();
+  TextEditingController confirmPasswordTextEditingController = TextEditingController();
 
   XFile? imageXFile;
   String? imagename;
@@ -36,11 +34,10 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
   File? imagepath;
 
   final ImagePicker _picker = ImagePicker();
-  bool _isRegistering = false; // Add this line
+  bool _isRegistering = false;
 
   String usersImageUrl = "";
 
-// The ImagePicker
   Future<void> _getImage() async {
     imageXFile = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
@@ -48,11 +45,8 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
       String? originalName = imageXFile?.path.split('/').last.split('.').first;
       String? extension = imageXFile?.path.split('.').last;
 
-      // Get the current date and time and format it
-      String formattedDateTime =
-          DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      String formattedDateTime = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
 
-      // Combine the original name with the formatted date and time
       imagename = "${originalName}_$formattedDateTime.$extension";
 
       imagepath = File(imageXFile!.path);
@@ -60,7 +54,6 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
     });
   }
 
-//this function sends the image to the PHP code and it will upload to a folder with a unique name
   Future<void> uploadImage() async {
     try {
       var res = await http.post(
@@ -70,7 +63,7 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
       var response = jsonDecode(res.body);
 
       if (response["success"] == true) {
-        usersImageUrl = response["path"]; // Update the sellerImageUrl variable
+        usersImageUrl = response["path"];
       } else {
         print("Something went wrong");
       }
@@ -79,36 +72,30 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
     }
   }
 
-  //this function is get current location
-  //the form validation
   Future<void> formValidation() async {
-    if (_isRegistering) return; // Prevent multiple submissions
+    if (_isRegistering) return;
 
     if (imageXFile == null) {
       Fluttertoast.showToast(msg: "Please select an image.");
     } else {
-      if (passwordTextEditingController.text ==
-          confirmPasswordTextEditingController.text) {
+      if (passwordTextEditingController.text == confirmPasswordTextEditingController.text) {
         if (confirmPasswordTextEditingController.text.isNotEmpty &&
             emailTextEditingController.text.isNotEmpty &&
             nameTextEditingController.text.isNotEmpty) {
           setState(() {
-            _isRegistering = true; // Disable the button
+            _isRegistering = true;
           });
-          authenticateSeller();
+          authenticateUser();
         } else {
-          Fluttertoast.showToast(
-              msg: "Please write the complete required info for Registration.");
+          Fluttertoast.showToast(msg: "Please write the complete required info for Registration.");
         }
       } else {
-        Fluttertoast.showToast(msg: "Password do not match.");
+        Fluttertoast.showToast(msg: "Passwords do not match.");
       }
     }
   }
 
-  //this function send the sellers email to the php code and check is it all ready registered or not
-
-  void authenticateSeller() async {
+  void authenticateUser() async {
     try {
       var res = await http.post(
         Uri.parse(API.validateEmail),
@@ -118,75 +105,59 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
       );
 
       if (res.statusCode == 200) {
-        //from flutter app the connection with api to server - success
         var resBodyOfValidateEmail = jsonDecode(res.body);
-        //if email is not registered it send back response ['emailFound'] ==true
+
         if (resBodyOfValidateEmail['emailFound'] == true) {
-          Fluttertoast.showToast(
-              msg: "Email is already in someone else use. Try another email.");
+          Fluttertoast.showToast(msg: "Email is already in use. Try another email.");
         } else {
           showDialog(
             context: context,
             builder: (c) {
-              return LoadingDialogWidget(
-                message: "Registering Account",
-              );
+              return LoadingDialogWidget(message: "Registering Account");
             },
           );
-          //if everything is successful then it call uploadImage function
-          //start uploading image
-          await uploadImage(); // Upload the image
 
-          //registering the seller to database my Sql
+          await uploadImage();
+
           registerAndSaveUserRecord();
         }
       } else {
-        print("failed to register");
+        print("Failed to register");
       }
     } catch (e) {
-      print("failed to register");
+      print("Failed to register");
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());
     } finally {
       setState(() {
-        _isRegistering = false; // Re-enable the button
+        _isRegistering = false;
       });
     }
   }
 
-  //so this function will save the data in mysql
-  registerAndSaveUserRecord() async {
-    //here it send the data to the users_user.dart in sellers_madel and change
-    //to the json format Go check users_user.dart
-
+  void registerAndSaveUserRecord() async {
     User userModel = User(
       1,
       nameTextEditingController.text.trim(),
       emailTextEditingController.text.trim(),
       confirmPasswordTextEditingController.text.trim(),
       usersImageUrl,
+      'approved', // Default value for status
     );
+
     try {
-      //here the data is sent to the php file
       var res = await http.post(
-        //Api is class were its in api_sellers_app/users_api_connection.dart
         Uri.parse(API.register),
         body: userModel.toJson(),
       );
       if (res.statusCode == 200) {
-        //from flutter app the connection with api to server - success
         var resBodyOfSignUp = jsonDecode(res.body);
         if (resBodyOfSignUp['success'] == true) {
-          //also get user data from php file as a response
-          //its in json format so decode using User class and save data in userInfo variable
           User userInfo = User.fromJson(resBodyOfSignUp['userData']);
-          //save userInfo to local Storage using Shared Prefrences inside /sellersPreferences/users_preferences.dart
           await RememberUserPrefs.storeUserInfo(userInfo);
 
-          //everything go good the user will be sent to SellersHomePage
           Navigator.pop(context);
-          Navigator.push(
-              context, MaterialPageRoute(builder: (c) => HomeScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (c) => HomeScreen()));
         } else {
           Fluttertoast.showToast(msg: "Error Occurred, Try Again.");
         }
@@ -206,9 +177,7 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             InkWell(
               onTap: () {
                 _getImage();
@@ -216,9 +185,7 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
               child: CircleAvatar(
                 radius: MediaQuery.of(context).size.width * 0.20,
                 backgroundColor: Colors.white,
-                backgroundImage: imageXFile == null
-                    ? null
-                    : FileImage(File(imageXFile!.path)),
+                backgroundImage: imageXFile == null ? null : FileImage(File(imageXFile!.path)),
                 child: imageXFile == null
                     ? Icon(
                         Icons.add_photo_alternate,
@@ -228,14 +195,11 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
                     : null,
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Form(
               key: _formKey,
               child: Column(
                 children: [
-                  //name
                   CustomTextField(
                     textEditingController: nameTextEditingController,
                     iconData: Icons.person,
@@ -243,8 +207,6 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
                     isObsecre: false,
                     enabled: true,
                   ),
-
-                  //email
                   CustomTextField(
                     textEditingController: emailTextEditingController,
                     iconData: Icons.email,
@@ -252,8 +214,6 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
                     isObsecre: false,
                     enabled: true,
                   ),
-
-                  //pass
                   CustomTextField(
                     textEditingController: passwordTextEditingController,
                     iconData: Icons.lock,
@@ -261,8 +221,6 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
                     isObsecre: true,
                     enabled: true,
                   ),
-
-                  //confirm pass
                   CustomTextField(
                     textEditingController: confirmPasswordTextEditingController,
                     iconData: Icons.lock,
@@ -272,45 +230,31 @@ class _RegistrationTabPageState extends State<RegistrationTabPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (c) => const SellerSplashScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (c) => const SellerSplashScreen()));
                     },
                     child: const Text(
-                      "Are you an Seller? Click Here",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                      "Are you a Seller? Click Here",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
-
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
             ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
-                ),
-                onPressed: () {
-                  formValidation();
-                },
-                child: const Text(
-                  "Sign Up",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )),
-            const SizedBox(
-              height: 30,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
+              ),
+              onPressed: () {
+                formValidation();
+              },
+              child: const Text(
+                "Sign Up",
+                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              ),
             ),
+            const SizedBox(height: 30),
           ],
         ),
       ),

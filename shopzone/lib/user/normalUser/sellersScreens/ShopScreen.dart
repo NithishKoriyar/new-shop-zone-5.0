@@ -23,8 +23,10 @@ import 'package:shopzone/user/normalUser/subCetogoryScreens/SubcategoryScreen.da
 import 'package:shopzone/user/normalUser/subCetogoryScreens/categoryScreen.dart';
 import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
 import 'package:shopzone/user/normalUser/widgets/my_drawer.dart';
+import 'package:shopzone/user/splashScreen/blocked_screen.dart';
 import 'package:shopzone/user/splashScreen/my_splash_screen.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
+import 'package:shopzone/user/userPreferences/user_preferences.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 class ShopScreen extends StatefulWidget {
@@ -37,85 +39,26 @@ class _ShopScreenState extends State<ShopScreen> {
   final CurrentUser currentUserController = Get.put(CurrentUser());
   late String userID;
   bool dataLoaded = false;
-  restrictBlockedUsersFromUsingUsersApp() async {
-    // await FirebaseFirestore.instance
-    //     .collection("users")
-    //     .doc(sharedPreferences!.getString("uid"))
-    //     .get().then((snapshot)
-    // {
-    //   if(snapshot.data()!["status"] != "approved")
-    //   {
-    //     showReusableSnackBar(context, "you are blocked by admin.");
-    //     showReusableSnackBar(context, "contact admin: admin2@jan-G-shopy.com");
 
-    //     FirebaseAuth.instance.signOut();
-    //     Navigator.push(context, MaterialPageRoute(builder: (c)=> MySplashScreen()));
-    //   }
-    //   else
-    //   {
-    //     cartMethods.clearCart(context);
-    //   }
-    // });
-
-    {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? userId = sharedPreferences.getString("uid");
-
-    if (userId != null) {
-      try {
-        var res = await http.post(
-          Uri.parse(API.checkuserstatus),
-          body: {
-            "user_id": userId,
-          },
-        );
-
-        if (res.statusCode == 200) {
-          var resBody = jsonDecode(res.body);
-
-          if (resBody['success'] == true) {
-            if (resBody['status'] == 'approved') {
-              // User is approved
-              // Add your logic here if needed
-            } else {
-              // User is blocked
-              Fluttertoast.showToast(msg: resBody['message']);
-              // Perform sign out and navigate to splash screen
-              // Add your sign-out logic here
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (c) => MySplashScreen()),
-              );
-            }
-          } else {
-            Fluttertoast.showToast(msg: resBody['message']);
-          }
-        } else {
-          Fluttertoast.showToast(msg: "Error: Unable to communicate with server.");
-        }
-      } catch (e) {
-        Fluttertoast.showToast(msg: "Error: ${e.toString()}");
-      }
-    } else {
-      Fluttertoast.showToast(msg: "User ID is missing.");
-    }
-  }
-  }
-  //!notification Services requesting
   NotificationServices notificationServices = NotificationServices();
+
   @override
   void initState() {
     super.initState();
-    //!notification Services requesting
+    
     notificationServices.requestNotificationPermissions();
     PushNotificationsSystem pushNotificationsSystem = PushNotificationsSystem();
     pushNotificationsSystem.whenNotificationReceived(context);
     pushNotificationsSystem.generateDeviceRecognitionToken();
-
+    currentUserController.getUserInfo().then((_) {
+      setUserInfo();
+      printUserInfo();
+      // Once the seller info is set, call setState to trigger a rebuild.
+      setState(() {});
+    });
     restrictBlockedUsersFromUsingUsersApp();
     getSellersStream();
     getCategoryStream();
-    // getSubCategoryStream();
   }
 
   void setUserInfo() {
@@ -124,12 +67,55 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   void printUserInfo() {
-    print('user ID: $userID');
+    print('user ID ----------------: $userID');
   }
+
+ restrictBlockedUsersFromUsingUsersApp() async {
+  await Future.delayed(Duration(milliseconds: 500)); // Ensure userID is set
+  print('user ID ----------------: $userID');
+  if (userID != null && userID.isNotEmpty) {
+    try {
+      var res = await http.post(
+        Uri.parse(API.checkUserStatus),
+        body: {
+          "user_id": userID,
+        },
+      );
+
+      if (res.statusCode == 200) {
+        var resBody = jsonDecode(res.body);
+
+        if (resBody['success'] == true) {
+          if (resBody['status'] == 'approved') {
+            // User is approved
+            // Add your logic here if needed
+          } else {
+            // User is blocked
+            Fluttertoast.showToast(msg: resBody['message']);
+            RememberUserPrefs.removeUserInfo();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (c) => BlockedScreen()),
+            );
+          }
+        } else {
+          Fluttertoast.showToast(msg: resBody['message']);
+        }
+      } else {
+        Fluttertoast.showToast(
+            msg: "Error: Unable to communicate with server.");
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
+    }
+  } else {
+    Fluttertoast.showToast(msg: "User ID is missing.");
+  }
+}
 
   @override
   Widget build(BuildContext context) {
-    setUserInfo(); // Set the user information
+  // Set the user information
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -954,7 +940,7 @@ class _ShopScreenState extends State<ShopScreen> {
                         ),
                       );
                     },
-                     childCount: (dataSnapshot.data!.length / 3).ceil(),
+                    childCount: (dataSnapshot.data!.length / 3).ceil(),
                   ),
                 );
               } else {

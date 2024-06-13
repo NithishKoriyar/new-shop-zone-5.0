@@ -61,18 +61,22 @@ class API {
   static const fetchCategories = "$hostConnectUser/cetogory.php";
   static const normalImage = "$userFolder/normalUser/";
 
-       static const  fetchSubCategories= "$hostConnectUser/subCategory.php";
-       static const  fetchRelatedCategoriesItems= "$hostConnectUser/subCategoryItem.php";
-       static const  fetchRelatedSubCategoriesItems= "$hostConnectUser/fetchRelatedSubCategoriesItems.php";
-              static const  wishListToggle= "$hostConnectUser/wishListToggle.php";
-                   static const  fetchWishListItems= "$hostConnectUser/fetchWishListItems.php";
-                  
-                                     static const  displyingThreeImages= "$hostConnectUser/ displyingThreeImages.php";
-                                     
-                                      static const checkuserstatus = "$hostConnectUser/check_user_status.php";
-   
+  static const fetchSubCategories = "$hostConnectUser/subCategory.php";
+  static const fetchRelatedCategoriesItems =
+      "$hostConnectUser/subCategoryItem.php";
+  static const fetchRelatedSubCategoriesItems =
+      "$hostConnectUser/fetchRelatedSubCategoriesItems.php";
+  static const wishListToggle = "$hostConnectUser/wishListToggle.php";
+  static const fetchWishListItems = "$hostConnectUser/fetchWishListItems.php";
 
- 
+  static const displyingThreeImages =
+      "$hostConnectUser/ displyingThreeImages.php";
+
+  static const checkUserStatus = "$hostConnectUser/check_user_status.php";
+
+   static const logedin = "$hostConnectUser/  logedin.php";
+
+
   //! food user api ------------------------------------------------------
   static const hostConnectFoodUser = "$userFolder/foodUser";
   //!-
@@ -167,7 +171,7 @@ class API {
       "$hostConnectSeller/getOrderStatus.php"; // get Order Status
   static const getUserDeviceTokenInSellerApp =
       "$hostConnectSeller/getUserDeviceTokenInSellerApp.php"; // get User Device Token In Seller App
-        static const itemUploadFetchCategory =
+  static const itemUploadFetchCategory =
       "$hostConnectSeller/itemUploadFetchCategory.php"; // get User Device Token In Seller App
 
   //!------------------------------ FOOD SELLERS API CONNECTIONS --------------------------------

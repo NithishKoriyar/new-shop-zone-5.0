@@ -6,7 +6,7 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/seller/splashScreen/seller_my_splash_screen.dart';
 import 'package:shopzone/user/home/home.dart';
 import 'package:shopzone/user/models/user.dart';
-import 'package:shopzone/user/splashScreen/my_splash_screen.dart';
+import 'package:shopzone/user/splashScreen/blocked_screen.dart';
 import 'dart:convert';
 import 'package:shopzone/user/userPreferences/user_preferences.dart';
 import 'package:shopzone/user/normalUser/widgets/custom_text_field.dart';
@@ -34,74 +34,63 @@ class _LoginTabPageState extends State<LoginTabPage> {
     }
   }
 
-loginNow() async {
-  showDialog(
-    context: context,
-    builder: (c) {
-      return LoadingDialogWidget(
-        message: "Checking your credentials...",
-      );
-    },
-  );
-
-  try {
-    var res = await http.post(
-      Uri.parse(API.login),
-      body: {
-        "user_email": emailTextEditingController.text.trim(),
-        "user_password": passwordTextEditingController.text.trim(),
-      },
+ loginNow() async {
+    showDialog(
+      context: context,
+      builder: (c) => LoadingDialogWidget(message: "Checking credentials"),
     );
 
-    Navigator.pop(context); // Close the loading dialog
+    try {
+      var res = await http.post(
+        Uri.parse(API.login),
+        body: {
+          "user_email": emailTextEditingController.text.trim(),
+          "user_password": passwordTextEditingController.text.trim(),
+        },
+      );
 
-    print("Response body: ${res.body}");
-
-    if (res.statusCode == 200) {
-      var resBody = res.body;
-      try {
-        var resBodyOfLogin = jsonDecode(resBody);
-
+      if (res.statusCode == 200) {
+        var resBodyOfLogin = jsonDecode(res.body);
         if (resBodyOfLogin['success'] == true) {
-          Fluttertoast.showToast(msg: "You are logged-in successfully.");
-
           User userInfo = User.fromJson(resBodyOfLogin["userData"]);
 
-          // Save userInfo to local storage using Shared Preferences
-          await RememberUserPrefs.storeUserInfo(userInfo);
+          // Check if the user is blocked before proceeding
+          var statusRes = await http.post(
+            Uri.parse(API.checkUserStatus),
+            body: {"user_id": userInfo.user_id.toString()},
+          );
 
-          Future.delayed(Duration(milliseconds: 2000), () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (c) => HomeScreen()),
-            );
-          });
+          if (statusRes.statusCode == 200) {
+            var statusResBody = jsonDecode(statusRes.body);
+            if (statusResBody['success'] == true && statusResBody['status'] == 'approved') {
+              // Save userInfo to local Storage using Shared Preferences
+              await RememberUserPrefs.storeUserInfo(userInfo);
+              Fluttertoast.showToast(msg: "You are logged-in Successfully.");
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (c) => HomeScreen()));
+            } else {
+              Fluttertoast.showToast(msg: statusResBody['message']);
+              Navigator.pop(context);
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => BlockedScreen()));
+            }
+          } else {
+            Fluttertoast.showToast(msg: "Error: Unable to check user status.");
+            Navigator.pop(context);
+          }
         } else {
           Fluttertoast.showToast(msg: resBodyOfLogin['message']);
-          if (resBodyOfLogin['message'].contains("blocked")) {
-            // Perform sign out and navigate to splash screen
-            // Add your sign-out logic here
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (c) => MySplashScreen()),
-            );
-          }
+          Navigator.pop(context);
         }
-      } catch (e) {
-        Fluttertoast.showToast(msg: "Error: Invalid response format.");
-        print("Error parsing response: $e");
-        print("Response body: $resBody");
+      } else {
+        Fluttertoast.showToast(msg: "Status is not 200");
+        Navigator.pop(context);
       }
-    } else {
-      Fluttertoast.showToast(msg: "Status is not 200");
+    } catch (e) {
+      print("Error :: " + e.toString());
+      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
+      Navigator.pop(context);
     }
-  } catch (errorMsg) {
-    Navigator.pop(context); // Close the loading dialog in case of error
-    print("Error :: " + errorMsg.toString());
-    Fluttertoast.showToast(msg: "An error occurred. Please try again.");
   }
-}
-
 
 
 
