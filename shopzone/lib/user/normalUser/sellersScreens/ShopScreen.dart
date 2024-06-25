@@ -45,7 +45,7 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     notificationServices.requestNotificationPermissions();
     PushNotificationsSystem pushNotificationsSystem = PushNotificationsSystem();
     pushNotificationsSystem.whenNotificationReceived(context);
@@ -70,52 +70,54 @@ class _ShopScreenState extends State<ShopScreen> {
     print('user ID ----------------: $userID');
   }
 
- restrictBlockedUsersFromUsingUsersApp() async {
-  await Future.delayed(Duration(milliseconds: 500)); // Ensure userID is set
-  print('user ID ----------------: $userID');
-  if (userID != null && userID.isNotEmpty) {
-    try {
-      var res = await http.post(
-        Uri.parse(API.checkUserStatus),
-        body: {
-          "user_id": userID,
-        },
-      );
+  restrictBlockedUsersFromUsingUsersApp() async {
+    await Future.delayed(Duration(milliseconds: 500)); // Ensure userID is set
+    print('user ID ----------------: $userID');
+    if (userID != null && userID.isNotEmpty) {
+      try {
+        var res = await http.post(
+          Uri.parse(API.checkUserStatus),
+          body: {
+            "user_id": userID,
+          },
+        );
 
-      if (res.statusCode == 200) {
-        var resBody = jsonDecode(res.body);
+        if (res.statusCode == 200) {
+          var resBody = jsonDecode(res.body);
 
-        if (resBody['success'] == true) {
-          if (resBody['status'] == 'approved') {
-            // User is approved
-            // Add your logic here if needed
+          if (resBody['success'] == true) {
+            if (resBody['status'] == 'approved') {
+              // User is approved
+              // Add your logic here if needed
+            } else {
+              // User is blocked
+              print("blocked user-------------------");
+              Fluttertoast.showToast(msg: resBody['message']);
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (c) => BlockedScreen()));
+            }
           } else {
-            // User is blocked
             Fluttertoast.showToast(msg: resBody['message']);
-            RememberUserPrefs.removeUserInfo();
+            Navigator.pop(context);
             Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (c) => BlockedScreen()),
-            );
+                context, MaterialPageRoute(builder: (c) => BlockedScreen()));
           }
         } else {
-          Fluttertoast.showToast(msg: resBody['message']);
+          Fluttertoast.showToast(
+              msg: "Error: Unable to communicate with server.");
         }
-      } else {
-        Fluttertoast.showToast(
-            msg: "Error: Unable to communicate with server.");
+      } catch (e) {
+        Fluttertoast.showToast(msg: "Error: ${e.toString()}");
       }
-    } catch (e) {
-      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
+    } else {
+      Fluttertoast.showToast(msg: "User ID is missing.");
     }
-  } else {
-    Fluttertoast.showToast(msg: "User ID is missing.");
   }
-}
 
   @override
   Widget build(BuildContext context) {
-  // Set the user information
+    // Set the user information
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -165,24 +167,35 @@ class _ShopScreenState extends State<ShopScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search for Products,Brands and More',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.blue[50],
-                  contentPadding: EdgeInsets.symmetric(
-                      vertical: 10, horizontal: 20), // Adjust the padding here
-                ),
-                onSubmitted: (String query) {
-                  // Navigate to the search screen without passing the query for now
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (c) => SearchScreen()));
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SearchScreen()),
+                  );
                 },
+                child: IgnorePointer(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search for Products, Brands and More',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: Colors.blue[50],
+                      contentPadding: EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20), // Adjust the padding here
+                    ),
+                    onSubmitted: (String query) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SearchScreen()),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),
@@ -1251,4 +1264,3 @@ class _ShopScreenState extends State<ShopScreen> {
   //   }
   // }
 }
-//hiiii
