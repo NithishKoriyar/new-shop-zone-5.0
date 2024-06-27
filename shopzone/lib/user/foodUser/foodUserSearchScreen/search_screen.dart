@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:http/http.dart' as http;
@@ -15,7 +15,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   String sellerNameText = "";
-  Future<QuerySnapshot>? storesDocumentsList;
+  // Future<QuerySnapshot>? storesDocumentsList;
 
   Future<List<Sellers>> initializeSearchingStores(
       String textEnteredbyUser) async {

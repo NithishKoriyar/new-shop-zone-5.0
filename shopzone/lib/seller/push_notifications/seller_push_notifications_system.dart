@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:shopzone/api_key.dart';
@@ -14,7 +14,7 @@ class PushNotificationsSystem {
   late String sellerEmail;
   late String sellerID;
   late String sellerImg;
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  //FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   PushNotificationsSystem() {
     _initializeData();
@@ -44,53 +44,53 @@ class PushNotificationsSystem {
   Future whenNotificationReceived(BuildContext context) async {
     //1. Terminated
     //When the app is completely closed and opened directly from the push notification
-    FirebaseMessaging.instance
-        .getInitialMessage()
-        .then((RemoteMessage? remoteMessage) {
-      if (remoteMessage != null) {
-        //open app and show notification data
-        showNotificationWhenOpenApp(
-          remoteMessage.data["userOrderId"],
-          context,
-        );
-      }
-    });
+    // FirebaseMessaging.instance
+    //     .getInitialMessage()
+    //     .then((RemoteMessage? remoteMessage) {
+    //   if (remoteMessage != null) {
+    //     //open app and show notification data
+    //     showNotificationWhenOpenApp(
+    //       remoteMessage.data["userOrderId"],
+    //       context,
+    //     );
+    //   }
+    // });
 
-    //2. Foreground
-    //When the app is open and it receives a push notification
-    FirebaseMessaging.onMessage.listen((RemoteMessage? remoteMessage) {
-      if (remoteMessage != null) {
-        //directly show notification data
-        showNotificationWhenOpenApp(
-          remoteMessage.data["userOrderId"],
-          context,
-        );
-      }
-    });
+    // //2. Foreground
+    // //When the app is open and it receives a push notification
+    // FirebaseMessaging.onMessage.listen((RemoteMessage? remoteMessage) {
+    //   if (remoteMessage != null) {
+    //     //directly show notification data
+    //     showNotificationWhenOpenApp(
+    //       remoteMessage.data["userOrderId"],
+    //       context,
+    //     );
+    //   }
+    // });
 
-    //3. Background
-    //When the app is in the background and opened directly from the push notification.
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage? remoteMessage) {
-      if (remoteMessage != null) {
-        //open the app - show notification data
-        showNotificationWhenOpenApp(
-          remoteMessage.data["userOrderId"],
-          context,
-        );
-      }
-    });
+    // //3. Background
+    // //When the app is in the background and opened directly from the push notification.
+    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage? remoteMessage) {
+    //   if (remoteMessage != null) {
+    //     //open the app - show notification data
+    //     showNotificationWhenOpenApp(
+    //       remoteMessage.data["userOrderId"],
+    //       context,
+    //     );
+    //   }
+    // });
   }
 
   //device recognition token
   Future generateDeviceRecognitionToken() async {
-    String? registrationDeviceToken = await messaging.getToken();
+    //String? registrationDeviceToken = await messaging.getToken();
 
 // Replace the Firestore update with HTTP POST request to your API
     final response = await http.post(
       Uri.parse(API.saveFcmToken),
       body: {
         'uid': sellerID,
-        'token': registrationDeviceToken,
+        'token': "registrationDeviceToken",
       },
     );
     // print(API.saveFcmToken);
@@ -108,8 +108,8 @@ class PushNotificationsSystem {
       //print('Failed to connect to the server');
     }
 
-    messaging.subscribeToTopic("allSellers");
-    messaging.subscribeToTopic("allUsers");
+    // messaging.subscribeToTopic("allSellers");
+    // messaging.subscribeToTopic("allUsers");
   }
 
   showNotificationWhenOpenApp(orderID, context) async {

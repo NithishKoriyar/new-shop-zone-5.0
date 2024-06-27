@@ -1,6 +1,6 @@
 
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class Orders {
   String? brandID;
@@ -10,7 +10,7 @@ class Orders {
   String? longDescription;
   String? price;
   String? totalAmount;
-  Timestamp? publishedDate;
+  DateTime? publishedDate;
   String? sellerName;
   String? sellerUID;
   String? orderStatus;
@@ -63,8 +63,8 @@ class Orders {
     } else {
       totalAmount = json["totalAmount"];
     }
-    if (json["publishedDate"] is Timestamp) {
-      publishedDate = json["publishedDate"] as Timestamp;
+    if (json["publishedDate"] is DateTime) {
+      publishedDate = json["publishedDate"] as DateTime;
     }
     sellerName = json["sellerName"];
     sellerUID = json["sellerUID"];

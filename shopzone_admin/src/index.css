@@ -307,9 +307,9 @@ img {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  margin-right: 15px;
-  position: absolute; /* Position profile image absolutely */
-  top: 10px; /* Adjust the top value to position it higher */
+  margin-right: 5px;
+  position: relative; /* Position profile image absolutely */
+ /* Adjust the top value to position it higher */
 }
 
 .CC{

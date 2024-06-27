@@ -107,7 +107,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
 
 
 
-        
+
 
     Share.share(itemDetails);
   }
@@ -310,5 +310,3 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     );
   }
 }
-
-
