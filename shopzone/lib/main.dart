@@ -3,14 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:shopzone/user/foodUser/foodUserAssistantMethods/address_changer.dart';
 import 'package:shopzone/user/normalUser/assistantMethods/address_changer.dart';
 import 'package:shopzone/user/splashScreen/my_splash_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();    
 
   try {
     // Initialize Firebase  ``
-    await Firebase.initializeApp();
+    //await Firebase.initializeApp();
     runApp(const MyApp());
   } catch (e) {
     print('Error initializing Firebase: $e');

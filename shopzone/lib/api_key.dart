@@ -75,6 +75,8 @@ class API {
   static const checkUserStatus = "$hostConnectUser/check_user_status.php";
 
    static const logedin = "$hostConnectUser/  logedin.php";
+   
+    static const searchProducts = "$hostConnectUser/  search_products.php";
 
 
   //! food user api ------------------------------------------------------

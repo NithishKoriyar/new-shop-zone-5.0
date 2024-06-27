@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class Menus
 {
@@ -6,7 +6,7 @@ class Menus
   String? sellerUID;
   String? menuTitle;
   String? menuInfo;
-  Timestamp? publishedDate;
+  DateTime? publishedDate;
   String? thumbnailUrl;
   String? status;
 

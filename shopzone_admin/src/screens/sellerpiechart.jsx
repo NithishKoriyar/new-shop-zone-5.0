@@ -11,21 +11,21 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
-const SellerPieChart = () => {
-  const [sellerData, setSellerData] = useState({ verified: 0, blocked: 0 });
+const Sellerpiechart = () => {
+  const [sellerData, setSellerData] = useState({ approved: 0, notApproved: 0 });
 
   useEffect(() => {
     const fetchSellerData = async () => {
       try {
-        const verifiedResponse = await axios.get('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/adseller/Verifiedsellers.php');
-        const blockedResponse = await axios.get('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/adseller/blocked_seller.php');
+        const approvedResponse = await axios.get('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/adseller/approved_sellers_endpoint.php');
+        const notApprovedResponse = await axios.get('https://nithish.atozasindia.in/shop_zone_combination_api/Admin_web_portal/adseller/not_approved_sellers_endpoint.php');
 
         setSellerData({
-          verified: verifiedResponse.data.length,
-          blocked: blockedResponse.data.length,
+          approved: approvedResponse.data.length,
+          notApproved: notApprovedResponse.data.length,
         });
       } catch (error) {
-        console.error('Error fetching seller data:', error);
+        console.error('Error fetching user data:', error);
       }
     };
 
@@ -33,10 +33,10 @@ const SellerPieChart = () => {
   }, []);
 
   const data = {
-    labels: ['Verified Sellers', 'Blocked Sellers'],
+    labels: ['Approved Seller', 'Not Approved Seller'],
     datasets: [
       {
-        data: [sellerData.verified, sellerData.blocked],
+        data: [sellerData.approved, sellerData.notApproved],
         backgroundColor: ['#36A2EB', '#FF6384'],
         hoverBackgroundColor: ['#36A2EB', '#FF6384'],
       },
@@ -57,7 +57,7 @@ const SellerPieChart = () => {
       },
       title: {
         display: true,
-        text: 'Seller Verification Status',
+        text: 'Seller Approval Status',
         font: {
           size: 18,
         },
@@ -74,4 +74,4 @@ const SellerPieChart = () => {
   );
 };
 
-export default SellerPieChart;
+export default Sellerpiechart;

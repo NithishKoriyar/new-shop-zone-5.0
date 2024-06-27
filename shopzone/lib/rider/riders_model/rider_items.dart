@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class Items
 {
@@ -7,7 +7,7 @@ class Items
   String? itemID;
   String? title;
   String? shortInfo;
-  Timestamp? publishedDate;
+  DateTime? publishedDate;
   String? thumbnailUrl;
   String? longDescription;
   String? status;
