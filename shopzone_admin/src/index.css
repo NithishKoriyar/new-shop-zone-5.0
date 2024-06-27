@@ -43,7 +43,7 @@ nav li a:hover {
   }
 }
 
-button {
+/* button {
   margin: 10px;
   padding: 10px 20px;
   font-size: 16px;
@@ -56,7 +56,7 @@ button {
 
 button:hover {
   background-color: #45a049;
-}
+} */
 
 .horizontalDirection {
   display: flex;
@@ -110,7 +110,7 @@ button {
 }
 
 button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #1e9124; /* Darker blue on hover #0056b3 */
 }
 
 /* Form styling */
@@ -151,7 +151,7 @@ img {
   justify-content: center;
   height: 100vh;
   background: #f6cd93; /* Updated background color */
-  padding: 20px;
+  padding: 10px;
   position: relative;
 }
  
@@ -190,30 +190,6 @@ img {
   cursor: pointer;
   border-radius: 4px;
 }
-
-/* navbar time css */
-/* .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background-color: #333;
-  color: white;
-}
-
-.navbar-menu {
-  display: flex;
-  list-style: none;
-}
-
-.navbar-item {
-  margin-right: 20px;
-}
-
-.navbar-item a {
-  color: white;
-  text-decoration: none;
-} */
 
 /* Base styles for navbar */
 .navbar {
@@ -331,9 +307,9 @@ img {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  margin-right: 15px;
-  position: absolute; /* Position profile image absolutely */
-  top: 10px; /* Adjust the top value to position it higher */
+  margin-right: 5px;
+  position: relative; /* Position profile image absolutely */
+ /* Adjust the top value to position it higher */
 }
 
 .CC{

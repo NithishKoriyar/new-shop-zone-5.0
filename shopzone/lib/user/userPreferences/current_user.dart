@@ -5,7 +5,7 @@ import 'package:shopzone/user/userPreferences/user_preferences.dart';
 
 class CurrentUser extends GetxController
 {
-  Rx<User> _currentUser = User(0,'','','','').obs;
+  Rx<User> _currentUser = User(0,'','','','','').obs;
 
   User get user => _currentUser.value;
 

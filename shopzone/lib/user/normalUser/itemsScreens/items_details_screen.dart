@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,16 +8,13 @@ import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/normalUser/global/global.dart';
 import 'package:shopzone/user/models/items.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
-import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
-import 'package:http/http.dart' as http; // Import your wishlist screen
+import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
 
-// ignore: must_be_immutable
 class ItemsDetailsScreen extends StatefulWidget {
-  Items? model;
+  final Items? model;
 
-  ItemsDetailsScreen({
-    this.model,
-  });
+  ItemsDetailsScreen({this.model});
 
   @override
   State<ItemsDetailsScreen> createState() => _ItemsDetailsScreenState();
@@ -39,7 +35,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     currentUserController.getUserInfo().then((_) {
       setUserInfo();
       printUserInfo();
-      // Once the seller info is set, call setState to trigger a rebuild.
       setState(() {});
     });
   }
@@ -54,42 +49,70 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   void printUserInfo() {
     print('user Name: $userName');
     print('user Email: $userEmail');
-    print('user ID: $userID'); // Corrected variable name
+    print('user ID: $userID');
     print('user image: $userImg');
   }
 
-  // void toggleWishlist(Items model, userId) {
-  //   setState(() {
-  //     model.isWishListed = (model.isWishListed == "1" ? "0" : "1").toString();
-  //   });
+  void toggleWishlist(Items model, String userId) {
+    setState(() {
+      model.isWishListed = model.isWishListed == "1" ? "0" : "1";
+    });
+    updateWishlistInBackend(model, userId);
+  }
 
-  //   // You can update this in your backend or local database here
-  //   updateWishlistInBackend(model, userId);
-  // }
+  void updateWishlistInBackend(Items model, String userId) async {
+    const String apiUrl = API.wishListToggle;
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'user_id': userId,
+        'item_id': model.itemID,
+        'is_wishlisted': model.isWishListed == "1" ? '1' : '0',
+      }),
+    );
 
-  // void updateWishlistInBackend(Items model, userId) async {
-  //   const String apiUrl = API.wishListToggle;
-  //   final response = await http.post(
-  //     Uri.parse(apiUrl),
-  //     headers: {'Content-Type': 'application/json'},
-  //     body: jsonEncode({
-  //       'user_id': userId,
-  //       'item_id': model.itemID,
-  //     }),
-  //   );
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      if (result['status'] == 'error') {
+        print('Error updating wishlist: ${result['message']}');
+      } else {
+        print('Wishlist status: ${result['status']}');
+        showWishlistMessage(model.isWishListed == '1');
+      }
+    } else {
+      print('Server error: ${response.statusCode}');
+    }
+  }
 
-  //   if (response.statusCode == 200) {
-  //     final result = jsonDecode(response.body);
-  //     if (result['status'] == 'error') {
-  //       print('Error updating wishlist: ${result['message']}');
-  //     } else {
-  //       print('Wishlist status: ${result['status']}');
-  //     }
-  //   } else {
-  //     print('Server error: ${response.statusCode}');
-  //   }
-  // }
+  void showWishlistMessage(bool isAdded) {
+    Fluttertoast.showToast(
+      msg: isAdded
+          ? 'Item added to wishlist!'
+          : 'Item removed from wishlist!',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
 
+  void shareItem(Items model) {
+    final itemDetails = 'Check out this item: ${model.itemTitle}\n\n'
+        'Price: ₹${model.price}\n\n'
+        'Details: ${model.longDescription}\n\n'
+        'Image: ${API.getItemsImage + (model.thumbnailUrl ?? '')}\n\n'
+        'Link: https://www.google.com/${model.itemID}';
+
+
+
+
+
+    Share.share(itemDetails);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -110,6 +133,12 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             },
             icon: Icon(Icons.shopping_cart),
           ),
+          IconButton(
+            onPressed: () {
+              shareItem(widget.model!);
+            },
+            icon: Icon(Icons.share),
+          ),
         ],
         centerTitle: true,
         automaticallyImplyLeading: true,
@@ -117,9 +146,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          SizedBox(
-            width: 10,
-          ),
+          SizedBox(width: 10),
           FloatingActionButton.extended(
             onPressed: () {
               int itemCounter = counterLimit;
@@ -130,9 +157,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
               );
             },
             label: const Text("Add to Cart"),
-            icon: const Icon(
-              Icons.add_shopping_cart_rounded,
-            ),
+            icon: const Icon(Icons.add_shopping_cart_rounded),
           ),
           FloatingActionButton.extended(
             backgroundColor: Colors.green,
@@ -147,9 +172,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                   context, MaterialPageRoute(builder: (c) => CartScreenUser()));
             },
             label: const Text("Buy Now"),
-            icon: const Icon(
-              Icons.credit_score_rounded,
-            ),
+            icon: const Icon(Icons.credit_score_rounded),
           ),
         ],
       ),
@@ -160,38 +183,29 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Material(
-                elevation: 9.0, // Apply elevation to create a shadow effect
-                borderRadius: BorderRadius.circular(
-                    10), // Keep the border radius consistent with the ClipRRect
+                elevation: 9.0,
+                borderRadius: BorderRadius.circular(10),
                 child: ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(10), // Border radius of 10
+                  borderRadius: BorderRadius.circular(10),
                   child: Image.network(
                     API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-                    fit: BoxFit
-                        .contain, // Ensure the image covers the entire container area
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
             ),
-            //implement the item counter
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Center(
                 child: CartStepperInt(
-                  // ignore: deprecated_member_use
                   count: counterLimit,
                   size: 50,
-                  // deActiveBackgroundColor: Colors.red,
-                  // activeForegroundColor: Colors.white,
-                  // activeBackgroundColor: Colors.pinkAccent,
                   didChangeCount: (value) {
                     if (value < 1) {
                       Fluttertoast.showToast(
                           msg: "The quantity cannot be less than 1");
                       return;
                     }
-
                     setState(() {
                       counterLimit = value;
                     });
@@ -215,24 +229,22 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                       ),
                     ),
                   ),
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     // Toggle the wishlist state
-                  //     print(model.isWishListed);
-                  //     toggleWishlist(model, userID);
-                  //   },
-                  //   child: Container(
-                  //     child: Icon(
-                  //       model.isWishListed == "1"
-                  //           ? Icons.favorite
-                  //           : Icons.favorite_border,
-                  //       color: model.isWishListed == "1"
-                  //           ? Colors.orange
-                  //           : Colors.orange,
-                  //       size: 28,
-                  //     ),
-                  //   ),
-                  // ),
+                  GestureDetector(
+                    onTap: () {
+                      toggleWishlist(widget.model!, userID);
+                    },
+                    child: Container(
+                      child: Icon(
+                        widget.model!.isWishListed == "1"
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: widget.model!.isWishListed == "1"
+                            ? Colors.orange
+                            : Colors.grey,
+                        size: 28,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -291,9 +303,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 80,
-            ),
+            const SizedBox(height: 80),
           ],
         ),
       ),

@@ -6,6 +6,7 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/seller/splashScreen/seller_my_splash_screen.dart';
 import 'package:shopzone/user/home/home.dart';
 import 'package:shopzone/user/models/user.dart';
+import 'package:shopzone/user/splashScreen/blocked_screen.dart';
 import 'dart:convert';
 import 'package:shopzone/user/userPreferences/user_preferences.dart';
 import 'package:shopzone/user/normalUser/widgets/custom_text_field.dart';
@@ -33,17 +34,13 @@ class _LoginTabPageState extends State<LoginTabPage> {
     }
   }
 
-  loginNow() async {
+ loginNow() async {
     showDialog(
       context: context,
-      builder: (c) {
-        return LoadingDialogWidget(
-          message: "Your account is blocked. Please contact support",
-        );
-      },
+      builder: (c) => LoadingDialogWidget(message: "Checking credentials"),
     );
-    try
-    {
+
+    try {
       var res = await http.post(
         Uri.parse(API.login),
         body: {
@@ -52,39 +49,47 @@ class _LoginTabPageState extends State<LoginTabPage> {
         },
       );
 
-      if(res.statusCode == 200) 
-      {
+      if (res.statusCode == 200) {
         var resBodyOfLogin = jsonDecode(res.body);
-        if(resBodyOfLogin['success'] == true)
-        {
-          Fluttertoast.showToast(msg: "you are logged-in Successfully.");
-
+        if (resBodyOfLogin['success'] == true) {
           User userInfo = User.fromJson(resBodyOfLogin["userData"]);
 
-          //save userInfo to local Storage using Shared Prefrences
-          await RememberUserPrefs.storeUserInfo(userInfo);
+          // Check if the user is blocked before proceeding
+          var statusRes = await http.post(
+            Uri.parse(API.checkUserStatus),
+            body: {"user_id": userInfo.user_id.toString()},
+          );
 
-          Future.delayed(Duration(milliseconds: 2000), ()
-          {
+          if (statusRes.statusCode == 200) {
+            var statusResBody = jsonDecode(statusRes.body);
+            if (statusResBody['success'] == true && statusResBody['status'] == 'approved') {
+              // Save userInfo to local Storage using Shared Preferences
+              await RememberUserPrefs.storeUserInfo(userInfo);
+              Fluttertoast.showToast(msg: "You are logged-in Successfully.");
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (c) => HomeScreen()));
+            } else {
+              Fluttertoast.showToast(msg: statusResBody['message']);
+              Navigator.pop(context);
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => BlockedScreen()));
+            }
+          } else {
+            Fluttertoast.showToast(msg: "Error: Unable to check user status.");
             Navigator.pop(context);
-             Navigator.push(context, MaterialPageRoute(builder: (c)=>  HomeScreen()));
-          });
+          }
+        } else {
+          Fluttertoast.showToast(msg: resBodyOfLogin['message']);
+          Navigator.pop(context);
         }
-        else
-        {
-          Fluttertoast.showToast(msg: "Incorrect Credentials.\nPlease write correct password or email and Try Again.");
-        }
-      }
-      else
-      {
+      } else {
         Fluttertoast.showToast(msg: "Status is not 200");
+        Navigator.pop(context);
       }
+    } catch (e) {
+      print("Error :: " + e.toString());
+      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
+      Navigator.pop(context);
     }
-    catch(errorMsg)
-    {
-      print("Error :: " + errorMsg.toString());
-    }
-
   }
 
 
