@@ -421,7 +421,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
           return SimpleDialog(
             title: const Center(
               child: Text(
-                "Brand Image",
+                "Brand item Image",
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,

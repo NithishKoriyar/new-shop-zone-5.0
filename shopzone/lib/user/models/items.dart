@@ -45,6 +45,8 @@ class Items {
         thumbnailUrl = json["thumbnailUrl"],
         isWishListed = json["IsWishlisted"];
 
+  get discount => null;
+
   Map<String, dynamic> toJson() {
     return {
       "brandID": brandID,

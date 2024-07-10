@@ -70,14 +70,15 @@ class API {
   static const fetchWishListItems = "$hostConnectUser/fetchWishListItems.php";
 
   static const displyingThreeImages =
-      "$hostConnectUser/ displyingThreeImages.php";
+      "$hostConnectUser/displyingThreeImages.php";
 
   static const checkUserStatus = "$hostConnectUser/check_user_status.php";
 
-   static const logedin = "$hostConnectUser/  logedin.php";
+   static const logedin = "$hostConnectUser/logedin.php";
    
-    static const searchProducts = "$hostConnectUser/  search_products.php";
+    static const searchProducts = "$hostConnectUser/search_products.php";
 
+static const wishListRemoveAll = "$hostConnectUser/wishListRemoveAll.php";
 
   //! food user api ------------------------------------------------------
   static const hostConnectFoodUser = "$userFolder/foodUser";

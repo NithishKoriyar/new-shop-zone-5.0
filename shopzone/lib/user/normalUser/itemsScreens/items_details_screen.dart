@@ -105,10 +105,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         'Image: ${API.getItemsImage + (model.thumbnailUrl ?? '')}\n\n'
         'Link: https://www.google.com/${model.itemID}';
 
-
-
-
-
     Share.share(itemDetails);
   }
 
@@ -197,19 +193,42 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Center(
-                child: CartStepperInt(
-                  count: counterLimit,
-                  size: 50,
-                  didChangeCount: (value) {
-                    if (value < 1) {
-                      Fluttertoast.showToast(
-                          msg: "The quantity cannot be less than 1");
-                      return;
-                    }
-                    setState(() {
-                      counterLimit = value;
-                    });
-                  },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(width: 10),
+                    CartStepperInt(
+                      count: counterLimit,
+                      size: 50,
+                      didChangeCount: (value) {
+                        if (value < 1) {
+                          Fluttertoast.showToast(
+                              msg: "The quantity cannot be less than 1");
+                          return;
+                        }
+                        setState(() {
+                          counterLimit = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 20), // Adjust the width as needed
+                    GestureDetector(
+                      onTap: () {
+                        toggleWishlist(widget.model!, userID);
+                      },
+                      child: Container(
+                        child: Icon(
+                          widget.model!.isWishListed == "1"
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: widget.model!.isWishListed == "1"
+                              ? Colors.orange
+                              : Colors.grey,
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -226,22 +245,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                         color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      toggleWishlist(widget.model!, userID);
-                    },
-                    child: Container(
-                      child: Icon(
-                        widget.model!.isWishListed == "1"
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: widget.model!.isWishListed == "1"
-                            ? Colors.orange
-                            : Colors.grey,
-                        size: 28,
                       ),
                     ),
                   ),
