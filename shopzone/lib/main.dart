@@ -9,7 +9,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();    
 
   try {
-    // Initialize Firebase  ``
+    // Initialize Firebase  ``.
     //await Firebase.initializeApp();
     runApp(const MyApp());
   } catch (e) {
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
+      providers: [ 
         ChangeNotifierProvider(create: (c) => AddressChanger()),
         ChangeNotifierProvider(create: (c) => NormalUserAddressChanger()),
       ],
