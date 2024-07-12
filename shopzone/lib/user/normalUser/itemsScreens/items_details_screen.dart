@@ -10,6 +10,7 @@ import 'package:shopzone/user/models/items.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ItemsDetailsScreen extends StatefulWidget {
   final Items? model;
@@ -110,6 +111,16 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<String?> imageUrls = [
+      widget.model!.thumbnailUrl,
+      widget.model!.secondImageUrl,
+      widget.model!.thirdImageUrl,
+      widget.model!.fourthImageUrl,
+      widget.model!.fifthImageUrl,
+    ];
+
+    final PageController pageController = PageController();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -183,9 +194,44 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 borderRadius: BorderRadius.circular(10),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
-                    API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-                    fit: BoxFit.contain,
+                  child: Container(
+                    height: 300, // Adjust height as needed
+                    child: Stack(
+                      children: [
+                        PageView.builder(
+                          controller: pageController,
+                          itemCount: imageUrls.length,
+                          itemBuilder: (context, index) {
+                            if (imageUrls[index] != null) {
+                              return Image.network(
+                                API.getItemsImage + (imageUrls[index] ?? ''),
+                                fit: BoxFit.contain,
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        ),
+                        Positioned(
+                          bottom: 8,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: SmoothPageIndicator(
+                              controller: pageController,
+                              count: imageUrls.length,
+                              effect: ScrollingDotsEffect(
+                                dotWidth: 8.0,
+                                dotHeight: 8.0,
+                                activeDotScale: 1.5,
+                                activeDotColor: Colors.black,
+                                dotColor: Colors.black.withOpacity(0.2),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

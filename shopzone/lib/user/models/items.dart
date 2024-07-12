@@ -1,5 +1,3 @@
-
-
 class Items {
   String? brandID;
   String? itemID;
@@ -13,6 +11,10 @@ class Items {
   String? status;
   String? thumbnailUrl;
   String? isWishListed;
+  String? secondImageUrl;
+  String? thirdImageUrl;
+  String? fourthImageUrl;
+  String? fifthImageUrl;
 
   Items({
     this.brandID,
@@ -27,6 +29,10 @@ class Items {
     this.status,
     this.thumbnailUrl,
     this.isWishListed,
+    this.secondImageUrl,
+    this.thirdImageUrl,
+    this.fourthImageUrl,
+    this.fifthImageUrl,
   });
 
   Items.fromJson(Map<String, dynamic> json)
@@ -43,6 +49,11 @@ class Items {
         sellerUID = json["sellerUID"],
         status = json["status"],
         thumbnailUrl = json["thumbnailUrl"],
+          secondImageUrl = json["secondImageUrl"],
+            thirdImageUrl = json["thirdImageUrl"],
+              fourthImageUrl = json["fourthImageUrl"],
+                fifthImageUrl = json["fifthImageUrl"],
+
         isWishListed = json["IsWishlisted"];
 
   get discount => null;
@@ -60,6 +71,10 @@ class Items {
       "sellerUID": sellerUID,
       "status": status,
       "thumbnailUrl": thumbnailUrl,
+      "secondImageUrl": secondImageUrl,
+      "thirdImageUrl": thirdImageUrl,
+      "fourthImageUrl": fourthImageUrl,
+      "fifthImageUrl": fifthImageUrl,
       "IsWishlisted": isWishListed,
     };
   }
