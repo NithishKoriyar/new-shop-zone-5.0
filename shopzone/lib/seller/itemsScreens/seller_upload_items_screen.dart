@@ -27,7 +27,6 @@ class UploadItemsScreen extends StatefulWidget {
 }
 
 class _UploadItemsScreenState extends State<UploadItemsScreen> {
-  XFile? imgXFile;
   final ImagePicker imagePicker = ImagePicker();
   String? selectedCategory;
   String? selectedSubcategory;
@@ -45,16 +44,30 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
   bool uploading = false;
   String itemUniqueId = DateTime.now().millisecondsSinceEpoch.toString();
 
+  // Variables for multiple images
+  XFile? thumbnail;
+  XFile? secondImage;
+  XFile? thirdImage;
+  XFile? fourthImage;
+  XFile? fifthImage;
+
   Future<void> validateUploadForm() async {
-    if (imgXFile != null) {
+    if (thumbnail != null &&
+        secondImage != null &&
+        thirdImage != null &&
+        fourthImage != null &&
+        fifthImage != null) {
       if (itemInfoTextEditingController.text.isNotEmpty &&
           itemTitleTextEditingController.text.isNotEmpty &&
           itemDescriptionTextEditingController.text.isNotEmpty &&
           itemPriceTextEditingController.text.isNotEmpty &&
           selectedCategory != null &&
           selectedSubcategory != null) {
-        var imageBytes = await imgXFile!.readAsBytes();
-        var base64Image = base64Encode(imageBytes);
+        var thumbnailBytes = await thumbnail!.readAsBytes();
+        var secondImageBytes = await secondImage!.readAsBytes();
+        var thirdImageBytes = await thirdImage!.readAsBytes();
+        var fourthImageBytes = await fourthImage!.readAsBytes();
+        var fifthImageBytes = await fifthImage!.readAsBytes();
 
         var body = {
           'itemInfo': itemInfoTextEditingController.text.trim(),
@@ -65,7 +78,11 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
           'brandID': widget.model!.brandID.toString(),
           'sellerUID': sellerID,
           'sellerName': sellerName,
-          'image': base64Image,
+          'thumbnail': base64Encode(thumbnailBytes),
+          'secondImage': base64Encode(secondImageBytes),
+          'thirdImage': base64Encode(thirdImageBytes),
+          'fourthImage': base64Encode(fourthImageBytes),
+          'fifthImage': base64Encode(fifthImageBytes),
           'category_id': selectedCategory,
           'sub_category_id': selectedSubcategory,
         };
@@ -95,7 +112,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
         Fluttertoast.showToast(msg: "Please fill complete form.");
       }
     } else {
-      Fluttertoast.showToast(msg: "Please choose an image.");
+      Fluttertoast.showToast(msg: "Please choose all images.");
     }
   }
 
@@ -132,34 +149,17 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
       body: ListView(
         children: [
           uploading == true ? linearProgressBar() : Container(),
-
-          //image
-          SizedBox(
-            height: 230,
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: FileImage(
-                        File(
-                          imgXFile!.path,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
+          // Display selected images
+          imagePreview(thumbnail, "Main Image", () => pickImage('main')),
+          imagePreview(secondImage, "Second Image", () => pickImage('second')),
+          imagePreview(thirdImage, "Third Image", () => pickImage('third')),
+          imagePreview(fourthImage, "Fourth Image", () => pickImage('fourth')),
+          imagePreview(fifthImage, "Fifth Image", () => pickImage('fifth')),
           const Divider(
             color: Colors.black,
             thickness: 1,
           ),
-          //brand title
+          // Item title
           ListTile(
             leading: const Icon(
               Icons.title,
@@ -181,8 +181,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
             color: Colors.black,
             thickness: 1,
           ),
-
-          //brand info
+          // Item info
           ListTile(
             leading: const Icon(
               Icons.perm_device_information,
@@ -204,8 +203,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
             color: Colors.black,
             thickness: 1,
           ),
-
-          //item description
+          // Item description
           ListTile(
             leading: const Icon(
               Icons.description,
@@ -227,8 +225,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
             color: Colors.black,
             thickness: 1,
           ),
-
-          //item price
+          // Item price
           ListTile(
             leading: const Icon(
               Icons.currency_rupee,
@@ -329,7 +326,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
     print("-------items Screens-------");
     print('Seller Name: $sellerName');
     print('Seller Email: $sellerEmail');
-    print('Seller Email: $sellerID');
+    print('Seller ID: $sellerID');
   }
 
   Future<void> fetchCategories() async {
@@ -363,7 +360,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
 
   //!seller information--------------------------------------
   Widget build(BuildContext context) {
-    return imgXFile == null ? defaultScreen() : uploadFormScreen();
+    return thumbnail == null ? defaultScreen() : uploadFormScreen();
   }
 
   defaultScreen() {
@@ -431,7 +428,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
             children: [
               SimpleDialogOption(
                 onPressed: () {
-                  captureImagewithPhoneCamera();
+                  captureImageWithPhoneCamera();
                 },
                 child: const Center(
                   child: Text(
@@ -444,7 +441,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
               ),
               SimpleDialogOption(
                 onPressed: () {
-                  getImageFromGallery();
+                  pickImage('main');
                 },
                 child: const Center(
                   child: Text(
@@ -483,31 +480,95 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
 
     final filePath = file.path;
     final fileName = filePath.split('/').last;
+    final FileFormat = fileName.split('.').last;
+    CompressFormat format;
+    // print(FileFormat);
+    switch (FileFormat) {
+      case 'jpeg':
+        {
+          format = CompressFormat.jpeg;
+          break;
+        }
+      case 'png':
+        {
+          format = CompressFormat.png;
+          break;
+        }
+      case 'webp':
+      {
+        format = CompressFormat.webp;
+        break;
+      }
+      default: {
+        format = CompressFormat.jpeg;
+      }
+    }
     final targetPath = Directory.systemTemp.path + "/$fileName";
 
-    var result = await FlutterImageCompress.compressAndGetFile(
-      filePath,
-      targetPath,
-      quality: 88, // Adjust the quality as needed
-      minWidth: 800, // Adjust the width as needed
-      minHeight: 600, // Adjust the height as needed
-    );
+    var result =
+        await FlutterImageCompress.compressAndGetFile(filePath, targetPath,
+            quality: 88, // Adjust the quality as needed
+            minWidth: 800, // Adjust the width as needed
+            minHeight: 600, // Adjust the height as needed
+            format: format);
 
     return result != null ? XFile(result.path) : null;
   }
 
-  getImageFromGallery() async {
-    Navigator.pop(context);
+  pickImage(String imageType) async {
     var originalImage =
         await imagePicker.pickImage(source: ImageSource.gallery);
-    imgXFile = await compressImage(originalImage, compress: false);
-    setState(() {});
+    var compressedImage = await compressImage(originalImage);
+
+    setState(() {
+      switch (imageType) {
+        case 'main':
+          thumbnail = compressedImage;
+          break;
+        case 'second':
+          secondImage = compressedImage;
+          break;
+        case 'third':
+          thirdImage = compressedImage;
+          break;
+        case 'fourth':
+          fourthImage = compressedImage;
+          break;
+        case 'fifth':
+          fifthImage = compressedImage;
+          break;
+      }
+    });
   }
 
-  captureImagewithPhoneCamera() async {
+  captureImageWithPhoneCamera() async {
     Navigator.pop(context);
     var originalImage = await imagePicker.pickImage(source: ImageSource.camera);
-    imgXFile = await compressImage(originalImage);
-    setState(() {});
+    var compressedImage = await compressImage(originalImage);
+    setState(() {
+      thumbnail = compressedImage;
+    });
+  }
+
+  Widget imagePreview(XFile? image, String label, VoidCallback onPressed) {
+    return Column(
+      children: [
+        Text(label),
+        image == null
+            ? IconButton(
+                icon: Icon(Icons.add_photo_alternate),
+                onPressed: onPressed,
+              )
+            : Image.file(
+                File(image.path),
+                height: 150,
+                width: 150,
+              ),
+        Divider(
+          color: Colors.black,
+          thickness: 1,
+        ),
+      ],
+    );
   }
 }

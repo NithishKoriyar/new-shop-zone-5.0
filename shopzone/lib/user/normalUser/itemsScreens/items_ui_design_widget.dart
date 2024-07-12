@@ -24,19 +24,29 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
     super.initState();
   }
 
- 
+
 
 
   @override
   Widget build(BuildContext context) {
+    List<String?> imageUrls = [
+      widget.model!.thumbnailUrl,
+      widget.model!.secondImageUrl,
+      widget.model!.thirdImageUrl,
+      widget.model!.fourthImageUrl,
+      widget.model!.fifthImageUrl,
+    ];
+    
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (c) => ItemsDetailsScreen(
-                      model: widget.model,
-                    )));
+          context,
+          MaterialPageRoute(
+            builder: (c) => ItemsDetailsScreen(
+              model: widget.model,
+            ),
+          ),
+        );
       },
       child: Card(
         color: Colors.white,
@@ -52,13 +62,22 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
                   borderRadius: BorderRadius.circular(10),
                   child: Hero(
                     tag: API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-                    child: Image.network(
-                      API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-                      //widget.model!.thumbnailUrl.toString(),
+                    child: Container(
                       height: 220,
-                      fit: BoxFit.cover,
+                      child: PageView.builder(
+                        itemCount: imageUrls.length,
+                        itemBuilder: (context, index) {
+                          if (imageUrls[index] != null) {
+                            return Image.network(
+                              API.getItemsImage + (imageUrls[index] ?? ''),
+                              fit: BoxFit.cover,
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
                     ),
-                    
                   ),
                 ),
                 const SizedBox(
@@ -84,12 +103,12 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
               ],
             ),
           ),
         ),
       ),
     );
+    
   }
 }
