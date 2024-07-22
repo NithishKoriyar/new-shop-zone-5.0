@@ -133,13 +133,13 @@ class _ShopScreenState extends State<ShopScreen> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (c) => SearchScreen()));
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.search),
+          //   onPressed: () {
+          //     Navigator.push(
+          //         context, MaterialPageRoute(builder: (c) => SearchScreen()));
+          //   },
+          // ),
           IconButton(
             icon: Icon(Icons.favorite),
             color: Colors.red,
@@ -600,33 +600,56 @@ class _ShopScreenState extends State<ShopScreen> {
 
 
 // Wishlist Section
-const SliverPadding(
-  padding: EdgeInsets.all(8.0), // Increased padding for overall spacing
-  sliver: SliverToBoxAdapter(
-    child: Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min, // Use min size to fit content
-        children: <Widget>[
-          Text(
-            'Recently Shortlisted by You',
-            style: TextStyle(
-              fontSize: 20.0, // Larger font size for the header
-              fontWeight: FontWeight.bold, // Bold font weight
-              color: Color(0xFF757575), // Dark grey, equivalent to grey[600]
+ SliverPadding(
+            padding: EdgeInsets.all(8.0), // Increased padding for overall spacing
+            sliver: SliverToBoxAdapter(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Use min size to fit content
+                  children: <Widget>[
+                    Text(
+                      'Recently Shortlisted by You',
+                      style: TextStyle(
+                        fontSize: 20.0, // Larger font size for the header
+                        fontWeight: FontWeight.bold, // Bold font weight
+                        color: Color(0xFF757575), // Dark grey, equivalent to grey[600]
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Picked from your Wishlist',
+                          style: TextStyle(
+                            fontSize: 16.0, // Slightly smaller font size
+                            color: Color(0xFF9E9E9E), // Light grey, equivalent to grey[500]
+                          ),
+                        ),
+                        SizedBox(width: 8.0), // Add some spacing between text and icon
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => WishListScreen(userID: userID,)),
+                            );
+                          },
+                          child: CircleAvatar(
+                            radius: 12.0,
+                            backgroundColor: Colors.blue,
+                            child: Icon(
+                              Icons.arrow_forward,
+                              color: Colors.white,
+                              size: 16.0, // Adjust icon size as needed
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-          Text(
-            'Picked from your Wishlist',
-            style: TextStyle(
-              fontSize: 16.0, // Slightly smaller font size
-              color: Color(0xFF9E9E9E), // Light grey, equivalent to grey[500]
-            ),
-          ),
-        ],
-      ),
-    ),
-  ),
-),
 
 StreamBuilder<List<Items>>(
   stream: getWishListItemsStream(userID),

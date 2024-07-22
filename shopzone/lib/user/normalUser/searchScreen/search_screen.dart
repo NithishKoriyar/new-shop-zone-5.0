@@ -21,6 +21,7 @@ class _SearchScreenState extends State<SearchScreen> {
   final ImagePicker _picker = ImagePicker();
   XFile? _selectedImage;
   late Future<Map<String, dynamic>> searchResults;
+   List<String> searchHistory = [];
 
   @override
   void initState() {
@@ -29,7 +30,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<Map<String, dynamic>> initializeSearching(String searchTerm) async {
-    final response = await http.get(Uri.parse("${API.searchStores}?searchTerm=$searchTerm"));
+    final response =
+        await http.get(Uri.parse("${API.searchStores}?searchTerm=$searchTerm"));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = json.decode(response.body);
@@ -40,7 +42,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<Map<String, dynamic>> searchByImage(XFile image) async {
-    var request = http.MultipartRequest('POST', Uri.parse(API.searchStores)); // Ensure you have an endpoint for this
+    var request = http.MultipartRequest('POST',
+        Uri.parse(API.searchStores)); // Ensure you have an endpoint for this
     request.files.add(await http.MultipartFile.fromPath('image', image.path));
 
     final response = await request.send();
@@ -88,11 +91,19 @@ class _SearchScreenState extends State<SearchScreen> {
       setState(() {
         _selectedImage = image;
         searchResults = searchByImage(image);
-        Navigator.of(context).pop(); // Close the bottom sheet after selecting an image
+        Navigator.of(context)
+            .pop(); // Close the bottom sheet after selecting an image
       });
     }
   }
-
+  void _addSearchHistory(String term) {
+    setState(() {
+      if (searchHistory.length == 3) {
+        searchHistory.removeAt(0);
+      }
+      searchHistory.add(term);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,6 +113,13 @@ class _SearchScreenState extends State<SearchScreen> {
         automaticallyImplyLeading: true,
         title: TextField(
           onChanged: (textEntered) {
+            setState(() {
+              searchTerm = textEntered;
+                searchResults = initializeSearching(searchTerm);
+            });
+          },
+              onSubmitted: (textEntered) {
+            _addSearchHistory(textEntered);
             setState(() {
               searchTerm = textEntered;
               searchResults = initializeSearching(searchTerm);
@@ -115,6 +133,7 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 IconButton(
                   onPressed: () {
+                     _addSearchHistory(searchTerm);
                     setState(() {
                       searchResults = initializeSearching(searchTerm);
                     });
@@ -145,19 +164,39 @@ class _SearchScreenState extends State<SearchScreen> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text("No record found."));
           } else {
-            List<Items> items = (snapshot.data!['items'] as List).map((item) => Items.fromJson(item)).toList();
-            List<Brands> brands = (snapshot.data!['brands'] as List).map((brand) => Brands.fromJson(brand)).toList();
+            List<Items> items = (snapshot.data!['items'] as List)
+                .map((item) => Items.fromJson(item))
+                .toList();
+            List<Brands> brands = (snapshot.data!['brands'] as List)
+                .map((brand) => Brands.fromJson(brand))
+                .toList();
 
             return Column(
               children: [
                 if (_selectedImage != null)
                   Container(
                     padding: const EdgeInsets.all(8.0),
-                    child: Image.file(File(_selectedImage!.path), height: 200),
+                    child: Image.file(File(_selectedImage!.path), height: 600),
+                  ),
+                    if (searchHistory.isNotEmpty)
+                  Column(
+                    children: [
+                      for (var term in searchHistory)
+                        ListTile(
+                          leading: Icon(Icons.history),
+                          title: Text(term),
+                          onTap: () {
+                            setState(() {
+                              searchTerm = term;
+                              searchResults = initializeSearching(searchTerm);
+                            });
+                          },
+                        ),
+                    ],
                   ),
                 // Horizontal list for brands
                 Container(
-                  height: 150,
+                  height: 300,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: brands.length,
@@ -189,4 +228,3 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
-

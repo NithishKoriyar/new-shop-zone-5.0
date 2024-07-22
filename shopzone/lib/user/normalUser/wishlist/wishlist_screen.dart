@@ -6,6 +6,8 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/models/items.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart';
+import 'package:shopzone/user/normalUser/sellersScreens/ShopScreen.dart';
+ // Import ShopScreen
 
 class WishListScreen extends StatefulWidget {
   final String userID;
@@ -16,7 +18,7 @@ class WishListScreen extends StatefulWidget {
 
 class _WishListScreenState extends State<WishListScreen> {
   late List<Items> wishListItems = [];
-   final _wishlistStreamController = StreamController<List<Items>>.broadcast();
+  final _wishlistStreamController = StreamController<List<Items>>.broadcast();
 
   @override
   void initState() {
@@ -60,11 +62,60 @@ class _WishListScreenState extends State<WishListScreen> {
           ),
         ],
       ),
-    body: StreamBuilder<List<Items>>(
+      body: StreamBuilder<List<Items>>(
         stream: _wishlistStreamController.stream,
         builder: (context, snapshot) {
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("No wishlist items"));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'images/empty_wishlist.png', // Your image asset path
+                      height: 150.0,
+                      width: 150.0,
+                    ),
+                    SizedBox(height: 16.0),
+                    Text(
+                      "You haven't added any products yet",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 18.0, color: Colors.grey),
+                    ),
+                    SizedBox(height: 8.0),
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Click ',
+                            style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                          ),
+                          WidgetSpan(
+                            child: Icon(Icons.favorite, color: Colors.red, size: 16.0),
+                          ),
+                          TextSpan(
+                            text: ' to save products',
+                            style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ShopScreen()),
+                        );
+                      },
+                      child: Text("Find items to save"),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           return SingleChildScrollView(
             child: Padding(
@@ -111,7 +162,8 @@ class _WishListScreenState extends State<WishListScreen> {
                                               API.getItemsImage + (item.thumbnailUrl ?? ''),
                                               width: double.infinity,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+                                              errorBuilder: (context, error, stackTrace) =>
+                                                  const Icon(Icons.error),
                                             ),
                                           ),
                                         ),
@@ -150,7 +202,9 @@ class _WishListScreenState extends State<WishListScreen> {
                                     },
                                     child: Container(
                                       child: Icon(
-                                        item.isWishListed == "1" ? Icons.remove_circle_outlined : Icons.remove_circle_outlined,
+                                        item.isWishListed == "1"
+                                            ? Icons.remove_circle_outlined
+                                            : Icons.remove_circle_outlined,
                                         color: item.isWishListed == "1" ? Colors.orange : Colors.orange,
                                         size: 28,
                                       ),
@@ -177,7 +231,7 @@ class _WishListScreenState extends State<WishListScreen> {
     setState(() {
       model.isWishListed = (model.isWishListed == "1" ? "0" : "1").toString();
     });
-  // Emit a new event to the stream
+    // Emit a new event to the stream
     _wishlistStreamController.add(wishListItems);
     // You can update this in your backend or local database here
     updateWishlistInBackend(model, userId);
@@ -262,33 +316,34 @@ class _WishListScreenState extends State<WishListScreen> {
     );
   }
 
-void removeAllWishlistItems(String userId) async {
-  const String apiUrl = API.wishListRemoveAll;
-  final response = await http.post(
-    Uri.parse(apiUrl),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'user_id': userId,
-    }),
-  );
+  void removeAllWishlistItems(String userId) async {
+    const String apiUrl = API.wishListRemoveAll;
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'user_id': userId,
+      }),
+    );
 
-  if (response.statusCode == 200) {
-    final result = jsonDecode(response.body);
-    if (result['status'] == 'error') {
-      print('Error removing all wishlist items: ${result['message']}');
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      if (result['status'] == 'error') {
+        print('Error removing all wishlist items: ${result['message']}');
+      } else {
+        print('All wishlist items removed: ${result['status']}');
+        setState(() {
+          wishListItems.clear();
+        });
+
+        // Emit a new event to the stream
+        _wishlistStreamController.add(wishListItems);
+      }
     } else {
-      print('All wishlist items removed: ${result['status']}');
-      setState(() {
-        wishListItems.clear();
-      });
-
-      // Emit a new event to the stream
-      _wishlistStreamController.add(wishListItems);
+      print('Server error: ${response.statusCode}');
     }
-  } else {
-    print('Server error: ${response.statusCode}');
   }
-}
+
   @override
   void dispose() {
     _wishlistStreamController.close();

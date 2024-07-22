@@ -1,5 +1,3 @@
-
-
 class Items {
   String? brandID;
   String? itemID;
@@ -12,6 +10,7 @@ class Items {
   String? sellerUID;
   String? status;
   String? thumbnailUrl;
+  String? product_quantity;
 
   Items({
     this.brandID,
@@ -25,6 +24,7 @@ class Items {
     this.sellerUID,
     this.status,
     this.thumbnailUrl,
+    this.product_quantity,
   });
 
   Items.fromJson(Map<String, dynamic> json) {
@@ -42,5 +42,6 @@ class Items {
     sellerUID = json["sellerUID"];
     status = json["status"];
     thumbnailUrl = json["thumbnailUrl"];
+    product_quantity = json["product_quantity"];
   }
 }
