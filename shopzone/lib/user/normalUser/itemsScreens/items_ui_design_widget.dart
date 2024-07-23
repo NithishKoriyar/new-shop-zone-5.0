@@ -24,19 +24,29 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
     super.initState();
   }
 
- 
+
 
 
   @override
   Widget build(BuildContext context) {
+    List<String?> imageUrls = [
+      widget.model!.thumbnailUrl,
+      widget.model!.secondImageUrl,
+      widget.model!.thirdImageUrl,
+      widget.model!.fourthImageUrl,
+      widget.model!.fifthImageUrl,
+    ];
+    
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (c) => ItemsDetailsScreen(
-                      model: widget.model,
-                    )));
+          context,
+          MaterialPageRoute(
+            builder: (c) => ItemsDetailsScreen(
+              model: widget.model,
+            ),
+          ),
+        );
       },
       child: Card(
         color: Colors.white,
@@ -52,13 +62,22 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
                   borderRadius: BorderRadius.circular(10),
                   child: Hero(
                     tag: API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-                    child: Image.network(
-                      API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-                      //widget.model!.thumbnailUrl.toString(),
-                      height: 220,
-                      fit: BoxFit.cover,
+                    child: Container(
+                      height: 80,
+                      child: PageView.builder(
+                        itemCount: imageUrls.length,
+                        itemBuilder: (context, index) {
+                          if (imageUrls[index] != null) {
+                            return Image.network(
+                              API.getItemsImage + (imageUrls[index] ?? ''),
+                              fit: BoxFit.cover,
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
                     ),
-                    
                   ),
                 ),
                 const SizedBox(
@@ -69,27 +88,27 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
                   style: const TextStyle(
                     color: Colors.deepPurple,
                     fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    letterSpacing: 3,
+                    fontSize: 12,
+                    letterSpacing: 2,
                   ),
                 ),
                 const SizedBox(
                   height: 1,
                 ),
-                Text(
-                  widget.model!.itemInfo.toString(),
-                  style: const TextStyle(
-                    color: Colors.black87,
-                    fontSize: 14,
-                  ),
-                ),
+                // Text(
+                //   widget.model!.itemInfo.toString(),
+                //   style: const TextStyle(
+                //     color: Colors.black87,
+                //     fontSize: 14,
+                //   ),
+                // ),
                 const SizedBox(height: 10),
-
               ],
             ),
           ),
         ),
       ),
     );
+    
   }
 }

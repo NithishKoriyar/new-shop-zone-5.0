@@ -4,12 +4,11 @@ import 'package:shopzone/user/foodUser/foodUserAssistantMethods/address_changer.
 import 'package:shopzone/user/normalUser/assistantMethods/address_changer.dart';
 import 'package:shopzone/user/splashScreen/my_splash_screen.dart';
 
-
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();    
+  WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Initialize Firebase  ``
+    // Initialize Firebase  ``.
     //await Firebase.initializeApp();
     runApp(const MyApp());
   } catch (e) {
@@ -20,7 +19,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
@@ -41,3 +39,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+//hiii

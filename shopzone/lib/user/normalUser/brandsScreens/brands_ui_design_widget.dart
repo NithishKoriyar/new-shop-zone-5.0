@@ -39,7 +39,7 @@ class _BrandsUiDesignWidgetState extends State<BrandsUiDesignWidget>
         child: Padding(
           padding: const EdgeInsets.all(4),
           child: SizedBox(
-            height: 270,
+             height: 270,
             width: MediaQuery.of(context).size.width,
             child: Column(
               children: [
@@ -49,7 +49,8 @@ class _BrandsUiDesignWidgetState extends State<BrandsUiDesignWidget>
                   child: Image.network(
                     API.brandImage + (widget.model!.thumbnailUrl ?? ''),
                     // widget.model!.thumbnailUrl.toString(),
-                    height: 220,
+                    // height: 220,
+                    height: 80,
                     fit: BoxFit.cover,
                   ),
                 ),

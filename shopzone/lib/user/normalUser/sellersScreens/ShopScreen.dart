@@ -19,6 +19,7 @@ import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart'
 import 'package:shopzone/user/normalUser/itemsScreens/items_screen.dart';
 import 'package:shopzone/user/normalUser/push_notifications/push_notifications_system.dart';
 import 'package:shopzone/user/normalUser/searchScreen/search_screen.dart';
+
 import 'package:shopzone/user/normalUser/subCetogoryScreens/SubcategoryScreen.dart';
 import 'package:shopzone/user/normalUser/subCetogoryScreens/categoryScreen.dart';
 import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
@@ -28,7 +29,6 @@ import 'package:shopzone/user/splashScreen/my_splash_screen.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 import 'package:shopzone/user/userPreferences/user_preferences.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
-
 
 class ShopScreen extends StatefulWidget {
   @override
@@ -187,7 +187,8 @@ class _ShopScreenState extends State<ShopScreen> {
                       filled: true,
                       fillColor: Colors.blue[50],
                       contentPadding: EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20), // Adjust the padding here
+                          vertical: 10,
+                          horizontal: 20), // Adjust the padding here
                     ),
                     onSubmitted: (String query) {
                       Navigator.push(
@@ -595,380 +596,147 @@ class _ShopScreenState extends State<ShopScreen> {
               }
             },
           ),
-          //0000000000000000000000000000000000000000000
-//3image section
-          // StreamBuilder<List<Items>>(
-          //   stream: getItemStream(userID),
-          //   builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
-          //     if (dataSnapshot.connectionState == ConnectionState.waiting) {
-          //       return SliverFillRemaining(
-          //         child: Center(
-          //           child: CircularProgressIndicator(),
-          //         ),
-          //       );
-          //     } else if (dataSnapshot.hasData &&
-          //         dataSnapshot.data!.isNotEmpty) {
-          //       return SliverGrid(
-          //         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          //           crossAxisCount: 1,
-          //           childAspectRatio: 1.0, // Adjust aspect ratio
-          //           crossAxisSpacing: 10,
-          //           mainAxisSpacing: 10,
-          //         ),
-          //         delegate: SliverChildBuilderDelegate(
-          //           (context, index) {
-          //             // Assuming there are multiple items in dataSnapshot.data
-          //             Items model1 = dataSnapshot.data![index * 3];
-          //             Items model2 = dataSnapshot.data![index * 3 + 1];
-          //             Items model3 = dataSnapshot.data![index * 3 + 2];
 
-          //             return Container(
-          //               margin: EdgeInsets.all(5),
-          //               decoration: BoxDecoration(
-          //                 borderRadius: BorderRadius.circular(10),
-          //                 color: Colors.white,
-          //                 boxShadow: [
-          //                   BoxShadow(
-          //                     color: Color.fromARGB(255, 233, 230, 230),
-          //                     spreadRadius: 0.1,
-          //                     blurRadius: 5,
-          //                     offset: Offset(0, 4),
-          //                   ),
-          //                 ],
-          //               ),
-          //               child: Row(
-          //                 children: [
-          //                   Expanded(
-          //                     flex: 1,
-          //                     child: InkWell(
-          //                       onTap: () {
-          //                         Navigator.push(
-          //                           context,
-          //                           MaterialPageRoute(
-          //                             builder: (c) =>
-          //                                 ItemsDetailsScreen(model: model1),
-          //                           ),
-          //                         );
-          //                       },
-          //                       child: Column(
-          //                         mainAxisAlignment: MainAxisAlignment.start,
-          //                         children: [
-          //                           Container(
-          //                             width: double.infinity,
-          //                             height: 210,
-          //                             padding: EdgeInsets.all(8),
-          //                             child: Container(
-          //                               decoration: BoxDecoration(
-          //                                 borderRadius:
-          //                                     BorderRadius.circular(5),
-          //                                 image: DecorationImage(
-          //                                   image: NetworkImage(
-          //                                     API.getItemsImage +
-          //                                         (model1.thumbnailUrl ?? ''),
-          //                                   ),
-          //                                   fit: BoxFit.cover,
-          //                                 ),
-          //                               ),
-          //                             ),
-          //                           ),
-          //                           Padding(
-          //                             padding: const EdgeInsets.symmetric(
-          //                                 horizontal: 8.0),
-          //                             child: Column(
-          //                               crossAxisAlignment:
-          //                                   CrossAxisAlignment.start,
-          //                               children: [
-          //                                 Text(
-          //                                   model1.itemTitle.toString(),
-          //                                   style: TextStyle(
-          //                                     fontSize: 15,
-          //                                     fontWeight: FontWeight.bold,
-          //                                   ),
-          //                                   overflow: TextOverflow.ellipsis,
-          //                                   softWrap: false,
-          //                                   maxLines: 1,
-          //                                 ),
-          //                                 SizedBox(height: 4),
-          //                                 Text(
-          //                                   model1.itemInfo.toString(),
-          //                                   style: TextStyle(
-          //                                     fontSize: 12,
-          //                                     color: Colors.grey,
-          //                                   ),
-          //                                   overflow: TextOverflow.ellipsis,
-          //                                   softWrap: false,
-          //                                   maxLines: 1,
-          //                                 ),
-          //                                 SizedBox(height: 4),
-          //                                 Text(
-          //                                   "₹ ${model1.price.toString()}",
-          //                                   style: TextStyle(
-          //                                     fontSize: 15,
-          //                                     color: Colors.green,
-          //                                     fontWeight: FontWeight.bold,
-          //                                   ),
-          //                                   overflow: TextOverflow.ellipsis,
-          //                                   softWrap: false,
-          //                                   maxLines: 1,
-          //                                 ),
-          //                                 SizedBox(height: 4),
-          //                                 Text(
-          //                                   "EMI from ₹587/month",
-          //                                   style: TextStyle(
-          //                                     fontSize: 12,
-          //                                     color: Colors.grey,
-          //                                   ),
-          //                                   overflow: TextOverflow.ellipsis,
-          //                                   softWrap: false,
-          //                                   maxLines: 1,
-          //                                 ),
-          //                               ],
-          //                             ),
-          //                           ),
-          //                         ],
-          //                       ),
-          //                     ),
-          //                   ),
-          //                   Expanded(
-          //                     flex: 1,
-          //                     child: Column(
-          //                       children: [
-          //                         Expanded(
-          //                           child: InkWell(
-          //                             onTap: () {
-          //                               Navigator.push(
-          //                                 context,
-          //                                 MaterialPageRoute(
-          //                                   builder: (c) => ItemsDetailsScreen(
-          //                                       model: model2),
-          //                                 ),
-          //                               );
-          //                             },
-          //                             child: Column(
-          //                               children: [
-          //                                 Flexible(
-          //                                   flex: 3,
-          //                                   child: Container(
-          //                                     height: 105,
-          //                                     margin: EdgeInsets.all(5),
-          //                                     decoration: BoxDecoration(
-          //                                       borderRadius:
-          //                                           BorderRadius.circular(10),
-          //                                       color: Colors.white,
-          //                                       boxShadow: [
-          //                                         BoxShadow(
-          //                                           color: Color.fromARGB(
-          //                                               255, 233, 230, 230),
-          //                                           spreadRadius: 0.1,
-          //                                           blurRadius: 5,
-          //                                           offset: Offset(0, 4),
-          //                                         ),
-          //                                       ],
-          //                                       image: DecorationImage(
-          //                                         image: NetworkImage(
-          //                                           API.getItemsImage +
-          //                                               (model2.thumbnailUrl ??
-          //                                                   ''),
-          //                                         ),
-          //                                         fit: BoxFit.cover,
-          //                                       ),
-          //                                     ),
-          //                                   ),
-          //                                 ),
-          //                                 Flexible(
-          //                                   flex: 2,
-          //                                   child: Padding(
-          //                                     padding:
-          //                                         const EdgeInsets.symmetric(
-          //                                             horizontal: 8.0),
-          //                                     child: Column(
-          //                                       crossAxisAlignment:
-          //                                           CrossAxisAlignment.start,
-          //                                       children: [
-          //                                         Text(
-          //                                           model2.itemTitle.toString(),
-          //                                           style: TextStyle(
-          //                                             fontSize: 15,
-          //                                             fontWeight:
-          //                                                 FontWeight.bold,
-          //                                           ),
-          //                                           overflow:
-          //                                               TextOverflow.ellipsis,
-          //                                           softWrap: false,
-          //                                           maxLines: 1,
-          //                                         ),
-          //                                         Text(
-          //                                           model2.itemInfo.toString(),
-          //                                           style: TextStyle(
-          //                                             fontSize: 12,
-          //                                             color: Colors.grey,
-          //                                           ),
-          //                                           overflow:
-          //                                               TextOverflow.ellipsis,
-          //                                           softWrap: false,
-          //                                           maxLines: 1,
-          //                                         ),
-          //                                         Text(
-          //                                           "₹ ${model2.price.toString()}",
-          //                                           style: TextStyle(
-          //                                             fontSize: 15,
-          //                                             color: Colors.green,
-          //                                             fontWeight:
-          //                                                 FontWeight.bold,
-          //                                           ),
-          //                                           overflow:
-          //                                               TextOverflow.ellipsis,
-          //                                           softWrap: false,
-          //                                           maxLines: 1,
-          //                                         ),
-          //                                         Text(
-          //                                           "EMI from ₹587/month",
-          //                                           style: TextStyle(
-          //                                             fontSize: 12,
-          //                                             color: Colors.grey,
-          //                                           ),
-          //                                           overflow:
-          //                                               TextOverflow.ellipsis,
-          //                                           softWrap: false,
-          //                                           maxLines: 1,
-          //                                         ),
-          //                                       ],
-          //                                     ),
-          //                                   ),
-          //                                 ),
-          //                               ],
-          //                             ),
-          //                           ),
-          //                         ),
-          //                         Expanded(
-          //                           child: InkWell(
-          //                             onTap: () {
-          //                               Navigator.push(
-          //                                 context,
-          //                                 MaterialPageRoute(
-          //                                   builder: (c) => ItemsDetailsScreen(
-          //                                       model: model3),
-          //                                 ),
-          //                               );
-          //                             },
-          //                             child: Column(
-          //                               children: [
-          //                                 Flexible(
-          //                                   flex: 3,
-          //                                   child: Container(
-          //                                     height: 105,
-          //                                     margin: EdgeInsets.all(5),
-          //                                     decoration: BoxDecoration(
-          //                                       borderRadius:
-          //                                           BorderRadius.circular(10),
-          //                                       color: Colors.white,
-          //                                       boxShadow: [
-          //                                         BoxShadow(
-          //                                           color: Color.fromARGB(
-          //                                               255, 233, 230, 230),
-          //                                           spreadRadius: 0.1,
-          //                                           blurRadius: 5,
-          //                                           offset: Offset(0, 4),
-          //                                         ),
-          //                                       ],
-          //                                       image: DecorationImage(
-          //                                         image: NetworkImage(
-          //                                           API.getItemsImage +
-          //                                               (model3.thumbnailUrl ??
-          //                                                   ''),
-          //                                         ),
-          //                                         fit: BoxFit.cover,
-          //                                       ),
-          //                                     ),
-          //                                   ),
-          //                                 ),
-          //                                 Flexible(
-          //                                   flex: 2,
-          //                                   child: Padding(
-          //                                     padding:
-          //                                         const EdgeInsets.symmetric(
-          //                                             horizontal: 8.0),
-          //                                     child: Column(
-          //                                       crossAxisAlignment:
-          //                                           CrossAxisAlignment.start,
-          //                                       children: [
-          //                                         Text(
-          //                                           model3.itemTitle.toString(),
-          //                                           style: TextStyle(
-          //                                             fontSize: 15,
-          //                                             fontWeight:
-          //                                                 FontWeight.bold,
-          //                                           ),
-          //                                           overflow:
-          //                                               TextOverflow.ellipsis,
-          //                                           softWrap: false,
-          //                                           maxLines: 1,
-          //                                         ),
-          //                                         Text(
-          //                                           model3.itemInfo.toString(),
-          //                                           style: TextStyle(
-          //                                             fontSize: 12,
-          //                                             color: Colors.grey,
-          //                                           ),
-          //                                           overflow:
-          //                                               TextOverflow.ellipsis,
-          //                                           softWrap: false,
-          //                                           maxLines: 1,
-          //                                         ),
-          //                                         Text(
-          //                                           "₹ ${model3.price.toString()}",
-          //                                           style: TextStyle(
-          //                                             fontSize: 15,
-          //                                             color: Colors.green,
-          //                                             fontWeight:
-          //                                                 FontWeight.bold,
-          //                                           ),
-          //                                           overflow:
-          //                                               TextOverflow.ellipsis,
-          //                                           softWrap: false,
-          //                                           maxLines: 1,
-          //                                         ),
-          //                                         Text(
-          //                                           "EMI from ₹587/month",
-          //                                           style: TextStyle(
-          //                                             fontSize: 12,
-          //                                             color: Colors.grey,
-          //                                           ),
-          //                                           overflow:
-          //                                               TextOverflow.ellipsis,
-          //                                           softWrap: false,
-          //                                           maxLines: 1,
-          //                                         ),
-          //                                       ],
-          //                                     ),
-          //                                   ),
-          //                                 ),
-          //                               ],
-          //                             ),
-          //                           ),
-          //                         ),
-          //                       ],
-          //                     ),
-          //                   ),
-          //                 ],
-          //               ),
-          //             );
-          //           },
-          //           childCount: (dataSnapshot.data!.length / 3).ceil(),
-          //         ),
-          //       );
-          //     } else {
-          //       return SliverToBoxAdapter(
-          //         child: Center(
-          //           child: Text("No Items Data exists."),
-          //         ),
-          //       );
-          //     }
-          //   },
-          // ),
+          
 
-          //0000000000000000000000000000000000000000000
 
+// Wishlist Section
+ SliverPadding(
+            padding: EdgeInsets.all(8.0), // Increased padding for overall spacing
+            sliver: SliverToBoxAdapter(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Use min size to fit content
+                  children: <Widget>[
+                    Text(
+                      'Recently Shortlisted by You',
+                      style: TextStyle(
+                        fontSize: 20.0, // Larger font size for the header
+                        fontWeight: FontWeight.bold, // Bold font weight
+                        color: Color(0xFF757575), // Dark grey, equivalent to grey[600]
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Picked from your Wishlist',
+                          style: TextStyle(
+                            fontSize: 16.0, // Slightly smaller font size
+                            color: Color(0xFF9E9E9E), // Light grey, equivalent to grey[500]
+                          ),
+                        ),
+                        SizedBox(width: 8.0), // Add some spacing between text and icon
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => WishListScreen(userID: userID,)),
+                            );
+                          },
+                          child: CircleAvatar(
+                            radius: 12.0,
+                            backgroundColor: Colors.blue,
+                            child: Icon(
+                              Icons.arrow_forward,
+                              color: Colors.white,
+                              size: 16.0, // Adjust icon size as needed
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+StreamBuilder<List<Items>>(
+  stream: getWishListItemsStream(userID),
+  builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
+    if (dataSnapshot.connectionState == ConnectionState.waiting) {
+      return const SliverFillRemaining(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
+      // Pick 3 random items from the wishlist
+      List<Items> randomWishlistItems =
+          (dataSnapshot.data!..shuffle()).take(3).toList();
+
+      return SliverToBoxAdapter(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255,228,244,252), // Ash grey background color
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26, // Shadow color
+                blurRadius: 10.0, // Shadow blur radius
+                offset: Offset(0, 4), // Shadow offset
+              ),
+            ],
+            borderRadius: BorderRadius.circular(8.0), // Optional: Rounded corners
+          ),
+          padding: EdgeInsets.all(5),
+          child: Column(
+            children: randomWishlistItems.map((item) {
+              return ListTile(
+                leading: Image.network(
+                  API.getItemsImage + (item.thumbnailUrl ?? ''),
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                ),
+                title: Text(
+                  item.itemTitle ?? '',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.itemInfo ?? '',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    Text(
+                      "₹ ${item.price}",
+                      style: TextStyle(fontSize: 12, color: Colors.green),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (c) => ItemsDetailsScreen(model: item),
+                    ),
+                  );
+                },
+              );
+            }).toList(),
+          ),
+        ),
+      );
+    } else {
+      return const SliverToBoxAdapter(
+        child: Center(
+          child: Text("No Wishlist Items exist."),
+        ),
+      );
+    }
+  },
+),
+
+
+          // Items Section
           ///items---------------------------------------------------------------
           const SliverPadding(
             padding: EdgeInsets.all(1),
@@ -979,175 +747,158 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
           ),
 
-          StreamBuilder<List<Items>>(
-            stream: getItemStream(userID),
-            builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
-              if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                return SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
+        StreamBuilder<List<Items>>(
+  stream: getItemStream(userID),
+  builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
+    if (dataSnapshot.connectionState == ConnectionState.waiting) {
+      return SliverFillRemaining(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
+      return SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.75,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            Items model = dataSnapshot.data![index];
+            List<String?> imageUrls = [
+              model.thumbnailUrl,
+              model.secondImageUrl,
+              model.thirdImageUrl,
+              model.fourthImageUrl,
+              model.fifthImageUrl,
+            ];
+
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (c) => ItemsDetailsScreen(model: model),
                   ),
                 );
-              } else if (dataSnapshot.hasData &&
-                  dataSnapshot.data!.isNotEmpty) {
-                return SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      Items model = dataSnapshot.data![index];
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (c) => ItemsDetailsScreen(model: model),
-                            ),
-                          );
-                        },
-                        child: Stack(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color.fromARGB(255, 233, 230, 230),
-                                    spreadRadius: 0.1,
-                                    blurRadius: 5,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 170,
-                                    height: 160,
-                                    padding: EdgeInsets.all(8),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        image: DecorationImage(
-                                          image: NetworkImage(
-                                            API.getItemsImage +
-                                                (model.thumbnailUrl ?? ''),
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
+              },
+              child: Stack(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color.fromARGB(255, 233, 230, 230),
+                          spreadRadius: 0.1,
+                          blurRadius: 5,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 170,
+                          height: 160,
+                          padding: EdgeInsets.all(8),
+                          child: PageView.builder(
+                            itemCount: imageUrls.length,
+                            itemBuilder: (context, index) {
+                              if (imageUrls[index] != null) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    image: DecorationImage(
+                                      image: NetworkImage(
+                                        API.getItemsImage +
+                                            (imageUrls[index] ?? ''),
                                       ),
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    model.itemTitle.toString(),
-                                    style: TextStyle(fontSize: 15),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    maxLines: 1,
-                                  ),
-                                  Text(
-                                    model.itemInfo.toString(),
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    maxLines: 1,
-                                  ),
-                                  Text(
-                                    "₹ ${model.price.toString()}",
-                                    style: TextStyle(
-                                        fontSize: 15, color: Colors.green),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Heart-shaped wishlist icon
-                            Positioned(
+                                );
+                              } else {
+                                return Container();
+                              }
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          model.itemTitle.toString(),
+                          style: TextStyle(fontSize: 15),
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                          maxLines: 1,
+                        ),
+                        Text(
+                          model.itemInfo.toString(),
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.grey),
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                          maxLines: 1,
+                        ),
+                        Text(
+                          "₹ ${model.price.toString()}",
+                          style: TextStyle(
+                              fontSize: 15, color: Colors.green),
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Heart-shaped wishlist icon
+                  Positioned(
                     top: 0.7,
                     right: 7,
-                    // child: GestureDetector(
-                    //   onTap: () {
-                    //     showDialog(
-                    //       context: context,
-                    //       builder: (BuildContext context) {
-                    //         return AlertDialog(
-                    //           title: Text('Wishlist'),
-                    //           content: Text('Do you want to add this item to your wishlist?'),
-                    //           actions: <Widget>[
-                    //             TextButton(
-                    //               child: Text('No'),
-                    //               onPressed: () => Navigator.of(context).pop(),
-                    //             ),
-                    //             TextButton(
-                    //               child: Text('Yes'),
-                    //               onPressed: () {
-                    //                 Navigator.of(context).pop(); // Close the dialog
-                    //                 toggleWishlist(model, userID); // Change wishlist state
-                    //                 Navigator.of(context).pushNamed('/wishlistPage'); // Navigate to wishlist page
-                    //               },
-                    //             ),
-                    //           ],
-                    //         );
-                    //       },
-                    //     );
-                    //   },
-                    //   child: Container(
-                    //     child: Icon(
-                    //       model.isWishListed == "1" ? Icons.favorite : Icons.favorite_border,
-                    //       color: Colors.orange,
-                    //       size: 28,
-                    //     ),
-                    //   ),
-                    // ),
-                     child: GestureDetector(
-                    onTap: () {
-                      toggleWishlist(model, userID);
-                    },
-                    child: Container(
-                      child: Icon(
-                        model.isWishListed == "1"
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: model.isWishListed == "1"
-                            ? Colors.orange
-                            : Colors.grey,
-                        size: 28,
+                    child: GestureDetector(
+                      onTap: () {
+                        // Toggle the wishlist state
+                        print(model.isWishListed);
+                        toggleWishlist(model, userID);
+                      },
+                      child: Container(
+                        child: Icon(
+                          model.isWishListed == "1"
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: model.isWishListed == "1"
+                              ? Colors.orange
+                              : Colors.orange,
+                          size: 28,
+                        ),
                       ),
                     ),
                   ),
-                  ),
-                          ],
-                        ),
-                      );
-                    },
-                    childCount: dataSnapshot.data!.length,
-                  ),
-                );
-              } else {
-                return SliverToBoxAdapter(
-                  child: Center(
-                    child: Text("No Items Data exists."),
-                  ),
-                );
-              }
-            },
-          )
+                ],
+              ),
+            );
+          },
+          childCount: dataSnapshot.data!.length,
+        ),
+      );
+    } else {
+      return SliverToBoxAdapter(
+        child: Center(
+          child: Text("No Items Data exists."),
+        ),
+      );
+    }
+  },
+)
         ],
       ),
     );
   }
-  //...........................................
 
   Future<List<String>> fetchImages() async {
     final response = await http.get(Uri.parse(API.imageSlider));
@@ -1169,9 +920,6 @@ class _ShopScreenState extends State<ShopScreen> {
       final sellersObjects =
           sellersList.map((item) => Sellers.fromJson(item)).toList();
       yield sellersObjects;
-      // print("-----------------------------=======---------------------------");
-      // print(sellersList);
-      // print(sellersObjects);
     } else {
       throw Exception('Failed to load sellers');
     }
@@ -1190,42 +938,36 @@ class _ShopScreenState extends State<ShopScreen> {
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      print(data);
-
       yield data.map((itemData) => Items.fromJson(itemData)).toList();
     } else {
       throw Exception('Failed to load items');
     }
   }
 
-//displying 16 brand
+// Fetch wishlist items
+  Stream<List<Items>> getWishListItemsStream(String userId) async* {
+    final response =
+        await http.get(Uri.parse('${API.fetchWishListItems}?userID=$userId'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      yield data.map((item) => Items.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load wishlist items');
+    }
+  }
+
+  // Displaying 16 brands
   Stream<List<Brands>> getBrandStream() async* {
     final response = await http.get(Uri.parse(API.display16Brands));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-
       yield data.map((brandData) => Brands.fromJson(brandData)).toList();
     } else {
       throw Exception('Failed to load brands');
     }
   }
 
-  // Future<void> fetchCategories() async {
-  //   final response = await http.get(Uri.parse(API.fetchCategories));
-
-  //   if (response.statusCode == 200) {
-  //     setState(() {
-  //       categories = json.decode(response.body);
-  //     });
-  //     print(
-  //         '-----------------------------------------------------------------');
-  //     print(categories);
-  //   } else {
-  //     throw Exception('Failed to fetch categories');
-  //   }
-  // }
-
-  //category
   Stream<List<ShopCategory>> getCategoryStream() async* {
     final response = await http.get(Uri.parse(API.fetchCategories));
     print(API.fetchCategories);
@@ -1235,11 +977,8 @@ class _ShopScreenState extends State<ShopScreen> {
       final sellersObjects =
           sellersList.map((item) => ShopCategory.fromJson(item)).toList();
       yield sellersObjects;
-      // print("-----------------------------=======---------------------------");
-      // print(sellersList);
-      // print(sellersObjects);
     } else {
-      throw Exception('Failed to load sellers');
+      throw Exception('Failed to load categories');
     }
   }
 
@@ -1247,8 +986,9 @@ class _ShopScreenState extends State<ShopScreen> {
     setState(() {
       model.isWishListed = (model.isWishListed == "1" ? "0" : "1").toString();
     });
-
-    // You can update this in your backend or local database here
+     // Emit a new event to the stream
+  // _wishlistStreamController.add(wishListItems);
+  
     updateWishlistInBackend(model, userId);
   }
 
@@ -1260,7 +1000,7 @@ class _ShopScreenState extends State<ShopScreen> {
       body: jsonEncode({
         'user_id': userId,
         'item_id': model.itemID,
-           'is_wishlisted': model.isWishListed == "1" ? '1' : '0',
+        'is_wishlisted': model.isWishListed == "1" ? '1' : '0',
       }),
     );
 
@@ -1270,38 +1010,16 @@ class _ShopScreenState extends State<ShopScreen> {
         print('Error updating wishlist: ${result['message']}');
       } else {
         print('Wishlist status: ${result['status']}');
-           showWishlistMessage(model.isWishListed == '1');
+        showWishlistMessage(model.isWishListed == '1');
       }
     } else {
       print('Server error: ${response.statusCode}');
     }
   }
 
-  // Stream<List<Items>> getNewItemThreeStream(String userId) async* {
-  //   final response = await http.post(
-  //     Uri.parse(API.displyingThreeImages),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: json.encode({
-  //       'user_id': userId,
-  //     }),
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     List<dynamic> data = json.decode(response.body);
-  //     print(data);
-
-  //     yield data.map((itemData) => Items.fromJson(itemData)).toList();
-  //   } else {
-  //     throw Exception('Failed to load new items');
-  //   }
-  // }
-    void showWishlistMessage(bool isAdded) {
+  void showWishlistMessage(bool isAdded) {
     Fluttertoast.showToast(
-      msg: isAdded
-          ? 'Item added to wishlist!'
-          : 'Item removed from wishlist!',
+      msg: isAdded ? 'Item added to wishlist!' : 'Item removed from wishlist!',
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       backgroundColor: Colors.green,
