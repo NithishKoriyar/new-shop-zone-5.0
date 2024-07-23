@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/noConnectionPage.dart';
 import 'package:shopzone/user/models/items.dart';
@@ -21,12 +22,27 @@ class _SearchScreenState extends State<SearchScreen> {
   final ImagePicker _picker = ImagePicker();
   XFile? _selectedImage;
   late Future<Map<String, dynamic>> searchResults;
-   List<String> searchHistory = [];
+  List<String> searchHistory = [];
+  List<Items> searchItems = [];
+  List<Brands> searchBrands = [];
 
   @override
   void initState() {
     super.initState();
+    _loadSearchHistory();
     searchResults = initializeSearching(searchTerm);
+  }
+
+  Future<void> _loadSearchHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      searchHistory = prefs.getStringList('searchHistory') ?? [];
+    });
+  }
+
+  Future<void> _saveSearchHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('searchHistory', searchHistory);
   }
 
   Future<Map<String, dynamic>> initializeSearching(String searchTerm) async {
@@ -35,6 +51,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = json.decode(response.body);
+      setState(() {
+        searchItems = (data['items'] as List)
+            .map((item) => Items.fromJson(item))
+            .toList();
+        searchBrands = (data['brands'] as List)
+            .map((brand) => Brands.fromJson(brand))
+            .toList();
+      });
       return data;
     } else {
       throw Exception('Failed to load data.');
@@ -51,6 +75,14 @@ class _SearchScreenState extends State<SearchScreen> {
     if (response.statusCode == 200) {
       final respStr = await response.stream.bytesToString();
       Map<String, dynamic> data = json.decode(respStr);
+      setState(() {
+        searchItems = (data['items'] as List)
+            .map((item) => Items.fromJson(item))
+            .toList();
+        searchBrands = (data['brands'] as List)
+            .map((brand) => Brands.fromJson(brand))
+            .toList();
+      });
       return data;
     } else {
       throw Exception('Failed to load data.');
@@ -96,14 +128,25 @@ class _SearchScreenState extends State<SearchScreen> {
       });
     }
   }
+
   void _addSearchHistory(String term) {
     setState(() {
       if (searchHistory.length == 3) {
         searchHistory.removeAt(0);
       }
-      searchHistory.add(term);
+      if (!searchHistory.contains(term)) {
+        searchHistory.add(term);
+      }
+      _saveSearchHistory();
     });
   }
+
+  void _onSearchAgain() {
+    setState(() {
+      searchResults = initializeSearching(searchTerm);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,10 +158,10 @@ class _SearchScreenState extends State<SearchScreen> {
           onChanged: (textEntered) {
             setState(() {
               searchTerm = textEntered;
-                searchResults = initializeSearching(searchTerm);
+              searchResults = initializeSearching(searchTerm);
             });
           },
-              onSubmitted: (textEntered) {
+          onSubmitted: (textEntered) {
             _addSearchHistory(textEntered);
             setState(() {
               searchTerm = textEntered;
@@ -133,7 +176,7 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 IconButton(
                   onPressed: () {
-                     _addSearchHistory(searchTerm);
+                    _addSearchHistory(searchTerm);
                     setState(() {
                       searchResults = initializeSearching(searchTerm);
                     });
@@ -162,7 +205,33 @@ class _SearchScreenState extends State<SearchScreen> {
           } else if (snapshot.hasError) {
             return Center(child: NoConnectionPage());
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No record found."));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                   Image.asset(
+                      'images/no_results.png', // Your image asset path
+                      height: 150.0,
+                      width: 150.0,
+                    ), // Ensure you have this image in your assets
+                  SizedBox(height: 20),
+                  Text(
+                    "Sorry, no results found!",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Please check the spelling or try searching for something else",
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _onSearchAgain,
+                    child: Text("Search Again"),
+                  ),
+                ],
+              ),
+            );
           } else {
             List<Items> items = (snapshot.data!['items'] as List)
                 .map((item) => Items.fromJson(item))
@@ -171,47 +240,55 @@ class _SearchScreenState extends State<SearchScreen> {
                 .map((brand) => Brands.fromJson(brand))
                 .toList();
 
-            return Column(
-              children: [
-                if (_selectedImage != null)
-                  Container(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Image.file(File(_selectedImage!.path), height: 600),
-                  ),
-                    if (searchHistory.isNotEmpty)
-                  Column(
-                    children: [
-                      for (var term in searchHistory)
-                        ListTile(
-                          leading: Icon(Icons.history),
-                          title: Text(term),
-                          onTap: () {
-                            setState(() {
-                              searchTerm = term;
-                              searchResults = initializeSearching(searchTerm);
-                            });
-                          },
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_selectedImage != null)
+                    Container(
+                      padding: const EdgeInsets.all(8.0),
+                      child:
+                          Image.file(File(_selectedImage!.path), height: 600),
+                    ),
+                  if (searchHistory.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (var term in searchHistory)
+                          ListTile(
+                            leading: Icon(Icons.history),
+                            title: Text(term),
+                            onTap: () {
+                              setState(() {
+                                searchTerm = term;
+                                searchResults = initializeSearching(searchTerm);
+                              });
+                            },
+                          ),
+                      ],
+                    ),
+                  if (items.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Searched Items",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                    ],
-                  ),
-                // Horizontal list for brands
-                Container(
-                  height: 300,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: brands.length,
-                    itemBuilder: (context, index) {
-                      Brands model = brands[index];
-                      return BrandsUiDesignWidget(
-                        model: model,
-                      );
-                    },
-                  ),
-                ),
-                // Vertical list for items
-                Expanded(
-                  child: ListView.builder(
+                      ),
+                    ),
+                  GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, // 3 columns
+                      mainAxisSpacing: 10.0,
+                      crossAxisSpacing: 10.0,
+                      childAspectRatio:
+                          0.75, // Adjust the aspect ratio as needed
+                    ),
                     itemCount: items.length,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       Items itemsModel = items[index];
                       return ItemsUiDesignWidget(
@@ -219,8 +296,37 @@ class _SearchScreenState extends State<SearchScreen> {
                       );
                     },
                   ),
-                ),
-              ],
+                  if (brands.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Popular Products",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, // 3 columns
+                      mainAxisSpacing: 10.0,
+                      crossAxisSpacing: 10.0,
+                      childAspectRatio:
+                          0.75, // Adjust the aspect ratio as needed
+                    ),
+                    itemCount: brands.length,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      Brands brandsModel = brands[index];
+                      return BrandsUiDesignWidget(
+                        model: brandsModel,
+                      );
+                    },
+                  ),
+                ],
+              ),
             );
           }
         },

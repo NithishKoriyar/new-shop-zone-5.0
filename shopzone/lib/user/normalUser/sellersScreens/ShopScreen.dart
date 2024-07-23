@@ -19,6 +19,7 @@ import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart'
 import 'package:shopzone/user/normalUser/itemsScreens/items_screen.dart';
 import 'package:shopzone/user/normalUser/push_notifications/push_notifications_system.dart';
 import 'package:shopzone/user/normalUser/searchScreen/search_screen.dart';
+
 import 'package:shopzone/user/normalUser/subCetogoryScreens/SubcategoryScreen.dart';
 import 'package:shopzone/user/normalUser/subCetogoryScreens/categoryScreen.dart';
 import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
@@ -133,13 +134,13 @@ class _ShopScreenState extends State<ShopScreen> {
         ),
         centerTitle: true,
         actions: [
-          // IconButton(
-          //   icon: Icon(Icons.search),
-          //   onPressed: () {
-          //     Navigator.push(
-          //         context, MaterialPageRoute(builder: (c) => SearchScreen()));
-          //   },
-          // ),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (c) => SearchScreen()));
+            },
+          ),
           IconButton(
             icon: Icon(Icons.favorite),
             color: Colors.red,

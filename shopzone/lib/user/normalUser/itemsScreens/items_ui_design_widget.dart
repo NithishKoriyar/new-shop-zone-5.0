@@ -63,7 +63,7 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
                   child: Hero(
                     tag: API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
                     child: Container(
-                      height: 220,
+                      height: 80,
                       child: PageView.builder(
                         itemCount: imageUrls.length,
                         itemBuilder: (context, index) {
@@ -88,20 +88,20 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
                   style: const TextStyle(
                     color: Colors.deepPurple,
                     fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    letterSpacing: 3,
+                    fontSize: 12,
+                    letterSpacing: 2,
                   ),
                 ),
                 const SizedBox(
                   height: 1,
                 ),
-                Text(
-                  widget.model!.itemInfo.toString(),
-                  style: const TextStyle(
-                    color: Colors.black87,
-                    fontSize: 14,
-                  ),
-                ),
+                // Text(
+                //   widget.model!.itemInfo.toString(),
+                //   style: const TextStyle(
+                //     color: Colors.black87,
+                //     fontSize: 14,
+                //   ),
+                // ),
                 const SizedBox(height: 10),
               ],
             ),
