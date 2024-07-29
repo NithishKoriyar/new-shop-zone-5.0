@@ -1,52 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/models/items.dart';
 import 'items_details_screen.dart';
-import 'package:http/http.dart' as http;
+
+
+
 
 // ignore: must_be_immutable
-class ItemsUiDesignWidget extends StatefulWidget {
+class ItemsUiDesignWidget extends StatefulWidget
+{
   Items? model;
 
-  ItemsUiDesignWidget({
-    this.model,
-  });
+  ItemsUiDesignWidget({this.model,});
 
   @override
   State<ItemsUiDesignWidget> createState() => _ItemsUiDesignWidgetState();
 }
 
-class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
-  bool isInWishlist = false;
+
+
+
+class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget>
+{
   @override
-  void initState() {
-    super.initState();
-  }
-
-
-
-
-  @override
-  Widget build(BuildContext context) {
-    List<String?> imageUrls = [
-      widget.model!.thumbnailUrl,
-      widget.model!.secondImageUrl,
-      widget.model!.thirdImageUrl,
-      widget.model!.fourthImageUrl,
-      widget.model!.fifthImageUrl,
-    ];
-    
+  Widget build(BuildContext context)
+  {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (c) => ItemsDetailsScreen(
-              model: widget.model,
-            ),
-          ),
-        );
+      onTap: ()
+      {
+        Navigator.push(context, MaterialPageRoute(builder: (c)=> ItemsDetailsScreen(
+          model: widget.model,
+        )));
       },
       child: Card(
         color: Colors.white,
@@ -58,43 +42,34 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
             width: MediaQuery.of(context).size.width,
             child: Column(
               children: [
+
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Hero(
                     tag: API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-                    child: Container(
-                      height: 80,
-                      child: PageView.builder(
-                        itemCount: imageUrls.length,
-                        itemBuilder: (context, index) {
-                          if (imageUrls[index] != null) {
-                            return Image.network(
-                              API.getItemsImage + (imageUrls[index] ?? ''),
-                              fit: BoxFit.cover,
-                            );
-                          } else {
-                            return Container();
-                          }
-                        },
-                      ),
+                    child: Image.network(
+                      API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+                      //widget.model!.thumbnailUrl.toString(),
+                      height: 220,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 1,
-                ),
+
+                const SizedBox(height: 1,),
+
                 Text(
                   widget.model!.itemTitle.toString(),
                   style: const TextStyle(
                     color: Colors.deepPurple,
                     fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                    letterSpacing: 2,
+                    fontSize: 20,
+                    letterSpacing: 1,
                   ),
                 ),
-                const SizedBox(
-                  height: 1,
-                ),
+
+                const SizedBox(height: 1,),
+
                 // Text(
                 //   widget.model!.itemInfo.toString(),
                 //   style: const TextStyle(
@@ -102,13 +77,12 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
                 //     fontSize: 14,
                 //   ),
                 // ),
-                const SizedBox(height: 10),
+
               ],
             ),
           ),
         ),
       ),
     );
-    
   }
 }

@@ -121,7 +121,7 @@ class _ShopScreenState extends State<ShopScreen> {
     // Set the user information
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white10,
       drawer: MyDrawer(),
       appBar: AppBar(
         elevation: 20,
@@ -204,47 +204,88 @@ class _ShopScreenState extends State<ShopScreen> {
 
           //..........................
           //image slider
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.2,
+      SliverToBoxAdapter(
+  child: Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.white, Colors.blueAccent.withOpacity(0.3)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.2,
+        width: MediaQuery.of(context).size.width,
+        child: CarouselSlider(
+          options: CarouselOptions(
+            height: MediaQuery.of(context).size.height * .9,
+            aspectRatio: 16 / 8,
+            viewportFraction: 0.44,
+            initialPage: 0,
+            enableInfiniteScroll: true,
+            reverse: false,
+            autoPlay: true,
+            autoPlayInterval: const Duration(seconds: 2),
+            autoPlayAnimationDuration: const Duration(milliseconds: 800),
+            autoPlayCurve: Curves.fastOutSlowIn,
+            enlargeCenterPage: true,
+            scrollDirection: Axis.horizontal,
+          ),
+          items: itemsImagesList.map((index) {
+            return Builder(builder: (BuildContext c) {
+              return Container(
                 width: MediaQuery.of(context).size.width,
-                child: CarouselSlider(
-                  options: CarouselOptions(
-                    height: MediaQuery.of(context).size.height * .9,
-                    aspectRatio: 16 / 8,
-                    viewportFraction: 0.8,
-                    initialPage: 0,
-                    enableInfiniteScroll: true,
-                    reverse: false,
-                    autoPlay: true,
-                    autoPlayInterval: const Duration(seconds: 2),
-                    autoPlayAnimationDuration:
-                        const Duration(milliseconds: 800),
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: true,
-                    scrollDirection: Axis.horizontal,
-                  ),
-                  items: itemsImagesList.map((index) {
-                    return Builder(builder: (BuildContext c) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.symmetric(horizontal: 1.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(5),
-                          child: Image.asset(
-                            index,
-                            fit: BoxFit.fill,
+                margin: const EdgeInsets.symmetric(horizontal: 6.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 5,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(
+                        index,
+                        fit: BoxFit.cover,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.black45, Colors.transparent],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
                           ),
                         ),
-                      );
-                    });
-                  }).toList(),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          ),
+              );
+            });
+          }).toList(),
+        ),
+      ),
+    ),
+  ),
+),
+
+
 
           SliverPadding(
             padding: EdgeInsets.all(1),
@@ -255,8 +296,8 @@ class _ShopScreenState extends State<ShopScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Category',
-                      style: TextStyle(color: Colors.black),
+                       'Category',
+                      style: TextStyle(color: Colors.grey),
                     ),
                     InkWell(
                       onTap: () {
@@ -872,8 +913,8 @@ StreamBuilder<List<Items>>(
                               ? Icons.favorite
                               : Icons.favorite_border,
                           color: model.isWishListed == "1"
-                              ? Colors.orange
-                              : Colors.orange,
+                              ? Colors.red
+                              : Colors.red,
                           size: 28,
                         ),
                       ),

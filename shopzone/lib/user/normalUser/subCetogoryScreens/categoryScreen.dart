@@ -30,143 +30,82 @@ class CategoryScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Categories'),
       ),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverPadding(
-            padding: EdgeInsets.all(1),
-            sliver: SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Category',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    InkWell(
-                      onTap: () {
-                      // Navigator.push(
-                      //         context,
-                      //         MaterialPageRoute(
-                      //           builder: (context) => SubCategoryScreen(
-                      //             categoryId: model.category_id.toString(),
-                      //             categoryName: model.name.toString(),
-                      //             categoryImg: model.file_path.toString(),
-                      //           ),
-                      //         ),
-                      //       );
-                      },
-                      child: Text(
-                        'See All',
-                        style: TextStyle(color: Colors.blue),
+      body: StreamBuilder<List<ShopCategory>>(
+        stream: getCategoryStream(),
+        builder: (context, AsyncSnapshot<List<ShopCategory>> dataSnapshot) {
+          if (dataSnapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
+            return ListView.builder(
+              padding: const EdgeInsets.all(8.0),
+              itemCount: dataSnapshot.data!.length,
+              itemBuilder: (context, index) {
+                ShopCategory model = dataSnapshot.data![index];
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SubCategoryScreen(
+                          categoryId: model.category_id.toString(),
+                          categoryName: model.name.toString(),
+                          categoryImg: model.file_path.toString(),
+                        ),
                       ),
+                    );
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-         StreamBuilder<List<ShopCategory>>(
-           stream: getCategoryStream(),
-            builder: (context, AsyncSnapshot<List<ShopCategory>> dataSnapshot) {
-              if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                return SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              } else if (dataSnapshot.hasData &&
-                  dataSnapshot.data!.isNotEmpty) {
-                return SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      ShopCategory model = dataSnapshot.data![index];
-                      return InkWell(
-                        onTap: () {
-                         Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SubCategoryScreen(
-                                  categoryId: model.category_id.toString(),
-                                  categoryName: model.name.toString(),
-                                  categoryImg: model.file_path.toString(),
-                                ),
-                              ),
-                            );
-                        },
-                        child: Stack(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color.fromARGB(255, 233, 230, 230),
-                                    spreadRadius: 0.1,
-                                    blurRadius: 5,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 170,
-                                    height: 160,
-                                    padding: EdgeInsets.all(8),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        image: DecorationImage(
-                                        image: NetworkImage(API.normalImage +
-                                            model.file_path.toString()),
-                                        fit: BoxFit.cover,
-                                      ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                                            Text(
-                                  model.name.toString(),
-                                  style: TextStyle(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                  softWrap: false,
-                                  maxLines: 1,
-                                ),
-                                 
-                                 
-                                ],
+                    elevation: 3,
+                    shadowColor: Colors.black.withOpacity(0.1),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              API.normalImage + model.file_path.toString(),
+                              height: 50,
+                              width: 50,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Image.asset(
+                                'assets/images/placeholder.png', // Placeholder image
+                                height: 50,
+                                width: 50,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                           
-                            
-                          ],
-                        ),
-                      );
-                    },
-                    childCount: dataSnapshot.data!.length,
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              model.name.toString(),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                        ],
+                      ),
+                    ),
                   ),
                 );
-              } else {
-                return SliverToBoxAdapter(
-                  child: Center(
-                    child: Text("No Items Data exists."),
-                  ),
-                );
-              }
-            },
-          )
-        ],
+              },
+            );
+          } else {
+            return Center(
+              child: Text("No Items Data exists."),
+            );
+          }
+        },
       ),
     );
   }

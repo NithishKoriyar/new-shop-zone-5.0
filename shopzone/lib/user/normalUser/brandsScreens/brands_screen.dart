@@ -44,7 +44,7 @@ Stream<List<Brands>> _getBrands(String uid) async* {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      drawer: MyDrawer(),
+      // drawer: MyDrawer(),
       appBar: AppBar(
          elevation: 20,
         title: const Text(
