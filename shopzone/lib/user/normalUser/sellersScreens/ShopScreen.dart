@@ -204,88 +204,90 @@ class _ShopScreenState extends State<ShopScreen> {
 
           //..........................
           //image slider
-      SliverToBoxAdapter(
-  child: Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white, Colors.blueAccent.withOpacity(0.3)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            offset: Offset(0, 5),
-          ),
-        ],
-      ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.2,
-        width: MediaQuery.of(context).size.width,
-        child: CarouselSlider(
-          options: CarouselOptions(
-            height: MediaQuery.of(context).size.height * .9,
-            aspectRatio: 16 / 8,
-            viewportFraction: 0.44,
-            initialPage: 0,
-            enableInfiniteScroll: true,
-            reverse: false,
-            autoPlay: true,
-            autoPlayInterval: const Duration(seconds: 2),
-            autoPlayAnimationDuration: const Duration(milliseconds: 800),
-            autoPlayCurve: Curves.fastOutSlowIn,
-            enlargeCenterPage: true,
-            scrollDirection: Axis.horizontal,
-          ),
-          items: itemsImagesList.map((index) {
-            return Builder(builder: (BuildContext c) {
-              return Container(
-                width: MediaQuery.of(context).size.width,
-                margin: const EdgeInsets.symmetric(horizontal: 6.0),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
+                  gradient: LinearGradient(
+                    colors: [Colors.white, Colors.blueAccent.withOpacity(0.3)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black26,
-                      blurRadius: 5,
+                      blurRadius: 10,
                       offset: Offset(0, 5),
                     ),
                   ],
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.asset(
-                        index,
-                        fit: BoxFit.cover,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.black45, Colors.transparent],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.2,
+                  width: MediaQuery.of(context).size.width,
+                  child: CarouselSlider(
+                    options: CarouselOptions(
+                      height: MediaQuery.of(context).size.height * .9,
+                      aspectRatio: 16 / 8,
+                      viewportFraction: 0.44,
+                      initialPage: 0,
+                      enableInfiniteScroll: true,
+                      reverse: false,
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 2),
+                      autoPlayAnimationDuration:
+                          const Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      enlargeCenterPage: true,
+                      scrollDirection: Axis.horizontal,
+                    ),
+                    items: itemsImagesList.map((index) {
+                      return Builder(builder: (BuildContext c) {
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          margin: const EdgeInsets.symmetric(horizontal: 6.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 5,
+                                offset: Offset(0, 5),
+                              ),
+                            ],
                           ),
-                        ),
-                      ),
-                    ],
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.asset(
+                                  index,
+                                  fit: BoxFit.cover,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.black45,
+                                        Colors.transparent
+                                      ],
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      });
+                    }).toList(),
                   ),
                 ),
-              );
-            });
-          }).toList(),
-        ),
-      ),
-    ),
-  ),
-),
-
-
+              ),
+            ),
+          ),
 
           SliverPadding(
             padding: EdgeInsets.all(1),
@@ -296,7 +298,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                       'Category',
+                      'Category',
                       style: TextStyle(color: Colors.grey),
                     ),
                     InkWell(
@@ -638,12 +640,10 @@ class _ShopScreenState extends State<ShopScreen> {
             },
           ),
 
-          
-
-
 // Wishlist Section
- SliverPadding(
-            padding: EdgeInsets.all(8.0), // Increased padding for overall spacing
+          SliverPadding(
+            padding:
+                EdgeInsets.all(8.0), // Increased padding for overall spacing
             sliver: SliverToBoxAdapter(
               child: Center(
                 child: Column(
@@ -654,7 +654,8 @@ class _ShopScreenState extends State<ShopScreen> {
                       style: TextStyle(
                         fontSize: 20.0, // Larger font size for the header
                         fontWeight: FontWeight.bold, // Bold font weight
-                        color: Color(0xFF757575), // Dark grey, equivalent to grey[600]
+                        color: Color(
+                            0xFF757575), // Dark grey, equivalent to grey[600]
                       ),
                     ),
                     Row(
@@ -664,15 +665,21 @@ class _ShopScreenState extends State<ShopScreen> {
                           'Picked from your Wishlist',
                           style: TextStyle(
                             fontSize: 16.0, // Slightly smaller font size
-                            color: Color(0xFF9E9E9E), // Light grey, equivalent to grey[500]
+                            color: Color(
+                                0xFF9E9E9E), // Light grey, equivalent to grey[500]
                           ),
                         ),
-                        SizedBox(width: 8.0), // Add some spacing between text and icon
+                        SizedBox(
+                            width:
+                                8.0), // Add some spacing between text and icon
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => WishListScreen(userID: userID,)),
+                              MaterialPageRoute(
+                                  builder: (context) => WishListScreen(
+                                        userID: userID,
+                                      )),
                             );
                           },
                           child: CircleAvatar(
@@ -693,89 +700,94 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
           ),
 
-StreamBuilder<List<Items>>(
-  stream: getWishListItemsStream(userID),
-  builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
-    if (dataSnapshot.connectionState == ConnectionState.waiting) {
-      return const SliverFillRemaining(
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
-      // Pick 3 random items from the wishlist
-      List<Items> randomWishlistItems =
-          (dataSnapshot.data!..shuffle()).take(3).toList();
+          StreamBuilder<List<Items>>(
+            stream: getWishListItemsStream(userID),
+            builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
+              if (dataSnapshot.connectionState == ConnectionState.waiting) {
+                return const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              } else if (dataSnapshot.hasData &&
+                  dataSnapshot.data!.isNotEmpty) {
+                // Pick 3 random items from the wishlist
+                List<Items> randomWishlistItems =
+                    (dataSnapshot.data!..shuffle()).take(3).toList();
 
-      return SliverToBoxAdapter(
-        child: Container(
-          decoration: BoxDecoration(
-            color: Color.fromARGB(255,228,244,252), // Ash grey background color
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26, // Shadow color
-                blurRadius: 10.0, // Shadow blur radius
-                offset: Offset(0, 4), // Shadow offset
-              ),
-            ],
-            borderRadius: BorderRadius.circular(8.0), // Optional: Rounded corners
+                return SliverToBoxAdapter(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(
+                          255, 228, 244, 252), // Ash grey background color
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26, // Shadow color
+                          blurRadius: 10.0, // Shadow blur radius
+                          offset: Offset(0, 4), // Shadow offset
+                        ),
+                      ],
+                      borderRadius: BorderRadius.circular(
+                          8.0), // Optional: Rounded corners
+                    ),
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                      children: randomWishlistItems.map((item) {
+                        return ListTile(
+                          leading: Image.network(
+                            API.getItemsImage + (item.thumbnailUrl ?? ''),
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                          title: Text(
+                            item.itemTitle ?? '',
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.itemInfo ?? '',
+                                style:
+                                    TextStyle(fontSize: 12, color: Colors.grey),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                              Text(
+                                "₹ ${item.price}",
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.green),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (c) => ItemsDetailsScreen(model: item),
+                              ),
+                            );
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                );
+              } else {
+                return const SliverToBoxAdapter(
+                  child: Center(
+                    child: Text("No Wishlist Items exist."),
+                  ),
+                );
+              }
+            },
           ),
-          padding: EdgeInsets.all(5),
-          child: Column(
-            children: randomWishlistItems.map((item) {
-              return ListTile(
-                leading: Image.network(
-                  API.getItemsImage + (item.thumbnailUrl ?? ''),
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                ),
-                title: Text(
-                  item.itemTitle ?? '',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.itemInfo ?? '',
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    Text(
-                      "₹ ${item.price}",
-                      style: TextStyle(fontSize: 12, color: Colors.green),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (c) => ItemsDetailsScreen(model: item),
-                    ),
-                  );
-                },
-              );
-            }).toList(),
-          ),
-        ),
-      );
-    } else {
-      return const SliverToBoxAdapter(
-        child: Center(
-          child: Text("No Wishlist Items exist."),
-        ),
-      );
-    }
-  },
-),
-
 
           // Items Section
           ///items---------------------------------------------------------------
@@ -808,13 +820,7 @@ StreamBuilder<List<Items>>(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             Items model = dataSnapshot.data![index];
-            List<String?> imageUrls = [
-              model.thumbnailUrl,
-              model.secondImageUrl,
-              model.thirdImageUrl,
-              model.fourthImageUrl,
-              model.fifthImageUrl,
-            ];
+            String? thumbnailUrl = model.thumbnailUrl;
 
             return InkWell(
               onTap: () {
@@ -848,27 +854,19 @@ StreamBuilder<List<Items>>(
                           width: 170,
                           height: 160,
                           padding: EdgeInsets.all(8),
-                          child: PageView.builder(
-                            itemCount: imageUrls.length,
-                            itemBuilder: (context, index) {
-                              if (imageUrls[index] != null) {
-                                return Container(
+                          child: thumbnailUrl != null
+                              ? Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
                                     image: DecorationImage(
                                       image: NetworkImage(
-                                        API.getItemsImage +
-                                            (imageUrls[index] ?? ''),
+                                        API.getItemsImage + thumbnailUrl,
                                       ),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
-                                );
-                              } else {
-                                return Container();
-                              }
-                            },
-                          ),
+                                )
+                              : Container(),
                         ),
                         SizedBox(height: 5),
                         Text(
@@ -880,16 +878,14 @@ StreamBuilder<List<Items>>(
                         ),
                         Text(
                           model.itemInfo.toString(),
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.grey),
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
                           overflow: TextOverflow.ellipsis,
                           softWrap: false,
                           maxLines: 1,
                         ),
                         Text(
                           "₹ ${model.price.toString()}",
-                          style: TextStyle(
-                              fontSize: 15, color: Colors.green),
+                          style: TextStyle(fontSize: 15, color: Colors.green),
                           overflow: TextOverflow.ellipsis,
                           softWrap: false,
                           maxLines: 1,
@@ -936,6 +932,7 @@ StreamBuilder<List<Items>>(
     }
   },
 )
+
         ],
       ),
     );
@@ -1027,9 +1024,9 @@ StreamBuilder<List<Items>>(
     setState(() {
       model.isWishListed = (model.isWishListed == "1" ? "0" : "1").toString();
     });
-     // Emit a new event to the stream
-  // _wishlistStreamController.add(wishListItems);
-  
+    // Emit a new event to the stream
+    // _wishlistStreamController.add(wishListItems);
+
     updateWishlistInBackend(model, userId);
   }
 

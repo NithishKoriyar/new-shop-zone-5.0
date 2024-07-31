@@ -124,7 +124,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        elevation: 20,
+        elevation:0,
         title: const Text(
           "Shop Zone",
           style: TextStyle(
@@ -184,6 +184,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         ],
       ),
       body: SingleChildScrollView(
+       
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

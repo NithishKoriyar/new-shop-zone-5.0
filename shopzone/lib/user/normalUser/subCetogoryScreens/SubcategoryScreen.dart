@@ -27,6 +27,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
   late List<Items> categoryItem = [];
   bool isLoadingSubcategories = true;
   bool isLoadingItems = true;
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -92,168 +93,178 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
         iconTheme: IconThemeData(color: Colors.black),
         elevation: 1.0,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
-                child: Image.network(
-                  API.normalImage + widget.categoryImg,
-                  fit: BoxFit.cover,
-                  height: 200,
-                  width: double.infinity,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.error, size: 100),
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Search Subcategories...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
                 ),
               ),
-              const SizedBox(height: 20),
-              Text(
-                "Subcategories",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              isLoadingSubcategories
-                  ? Center(child: CircularProgressIndicator())
-                  : GridView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        childAspectRatio: 0.75,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                      ),
-                      itemCount: subcategories.length,
-                      itemBuilder: (context, index) {
-                        final subcategory = subcategories[index];
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SubcategoryItemsScreen(
-                                    subcategoryId: subcategory.subcategory_id.toString()),
-                              ),
-                            );
-                          },
-                          child: Column(
-                            children: <Widget>[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Image.network(
-                                  API.normalImage + subcategory.img_path.toString(),
-                                  width: double.infinity,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(Icons.error),
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                subcategory.name ?? 'Unnamed Subcategory',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Subcategories",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                "Items",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              isLoadingItems
-                  ? Center(child: CircularProgressIndicator())
-                  : GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.75,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                      ),
-                      itemCount: categoryItem.length,
-                      itemBuilder: (context, index) {
-                        final item = categoryItem[index];
-                        return Padding(
-                          padding: const EdgeInsets.all(0),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ItemsDetailsScreen(model: item),
-                                ),
-                              );
-                            },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              elevation: 4.0,
-                              child: Column(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: ClipRRect(
+                    isLoadingSubcategories
+                        ? Center(child: CircularProgressIndicator())
+                        : GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              childAspectRatio: 0.75,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: subcategories.length,
+                            itemBuilder: (context, index) {
+                              final subcategory = subcategories[index];
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SubcategoryItemsScreen(
+                                          subcategoryId: subcategory.subcategory_id.toString()),
+                                    ),
+                                  );
+                                },
+                                child: Column(
+                                  children: <Widget>[
+                                    ClipRRect(
                                       borderRadius: BorderRadius.circular(8.0),
                                       child: Image.network(
-                                        API.getItemsImage + (item.thumbnailUrl ?? ''),
+                                        API.normalImage + subcategory.img_path.toString(),
                                         width: double.infinity,
+                                        height: 100,
                                         fit: BoxFit.cover,
                                         errorBuilder: (context, error, stackTrace) =>
                                             const Icon(Icons.error),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text(
-                                      item.itemTitle ?? 'Unnamed Item',
+                                    SizedBox(height: 5),
+                                    Text(
+                                      subcategory.name ?? 'Unnamed Subcategory',
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          overflow: TextOverflow.ellipsis),
-                                      maxLines: 1,
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
-                                  ),
-                                  Text(
-                                    "₹ ${item.price}",
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                        color: Colors.blueAccent),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      item.itemInfo ?? 'Unnamed Item',
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    )
-            ],
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "Items",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    isLoadingItems
+                        ? Center(child: CircularProgressIndicator())
+                        : GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.75,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: categoryItem.length,
+                            itemBuilder: (context, index) {
+                              final item = categoryItem[index];
+                              return Padding(
+                                padding: const EdgeInsets.all(0),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ItemsDetailsScreen(model: item),
+                                      ),
+                                    );
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 4.0,
+                                    child: Column(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(8.0),
+                                            child: Image.network(
+                                              API.getItemsImage + (item.thumbnailUrl ?? ''),
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) =>
+                                                  const Icon(Icons.error),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                          child: Text(
+                                            item.itemTitle ?? 'Unnamed Item',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                overflow: TextOverflow.ellipsis),
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        Text(
+                                          "₹ ${item.price}",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(color: Colors.blueAccent),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Text(
+                                            item.itemInfo ?? 'Unnamed Item',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -61,7 +61,7 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget>
                 Text(
                   widget.model!.itemTitle.toString(),
                   style: const TextStyle(
-                    color: Colors.deepPurple,
+                    color: Color.fromARGB(255, 187, 208, 48),
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                     letterSpacing: 1,
