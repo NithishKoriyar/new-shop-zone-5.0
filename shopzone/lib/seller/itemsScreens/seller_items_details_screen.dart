@@ -100,6 +100,7 @@ elevation: 20,
         children: [
           Image.network(
             API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+            height: 400,
           ),
           Center(
             child: Padding(
@@ -138,6 +139,30 @@ elevation: 20,
                   fontWeight: FontWeight.bold,
                   fontSize: 30,
                   color: Colors.green,
+                ),
+              ),
+            ),
+          ),
+            Center(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                "Size Name: ${widget.model!.SizeName ?? ''}",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ),
+           Center(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                "Colour Name: ${widget.model!.ColourName ?? ''}",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
             ),

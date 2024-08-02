@@ -177,6 +177,10 @@ static const wishListRemoveAll = "$hostConnectUser/wishListRemoveAll.php";
   static const itemUploadFetchCategory =
       "$hostConnectSeller/itemUploadFetchCategory.php"; // get User Device Token In Seller App
 
+static const fetchSizes =
+      "$hostConnectSeller/fetchSizes.php";
+      static const fetchColors  =
+      "$hostConnectSeller/fetchColors.php";
   //!------------------------------ FOOD SELLERS API CONNECTIONS --------------------------------
 
   static const hostConnectFoodSeller = "$hostConnect/foodSeller";

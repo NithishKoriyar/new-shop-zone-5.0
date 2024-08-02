@@ -60,7 +60,7 @@ class _ItemsUiDesignWidgetState extends State<ItemsUiDesignWidget> {
                 Image.network(
                   API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
                   // widget.model!.thumbnailUrl.toString(),
-                  height: 220,
+                  height: 200,
                   fit: BoxFit.cover,
                 ),
 

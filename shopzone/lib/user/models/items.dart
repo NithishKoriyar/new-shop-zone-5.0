@@ -15,6 +15,10 @@ class Items {
   String? thirdImageUrl;
   String? fourthImageUrl;
   String? fifthImageUrl;
+  String? SizeId;
+  String? ColourId;
+  String? SizeName;  // corrected naming convention
+  String? ColourName;  // corrected naming convention
 
   Items({
     this.brandID,
@@ -33,6 +37,10 @@ class Items {
     this.thirdImageUrl,
     this.fourthImageUrl,
     this.fifthImageUrl,
+    this.SizeId,
+    this.ColourId,
+    this.SizeName,  // corrected naming convention
+    this.ColourName,  // corrected naming convention
   });
 
   Items.fromJson(Map<String, dynamic> json)
@@ -42,21 +50,22 @@ class Items {
         itemTitle = json["itemTitle"],
         longDescription = json["longDescription"],
         price = json["price"],
-        publishedDate = json["publishedDate"] is DateTime
-            ? json["publishedDate"] as DateTime
+        publishedDate = json["publishedDate"] != null
+            ? DateTime.parse(json["publishedDate"])
             : null,
         sellerName = json["sellerName"],
         sellerUID = json["sellerUID"],
         status = json["status"],
         thumbnailUrl = json["thumbnailUrl"],
-          secondImageUrl = json["secondImageUrl"],
-            thirdImageUrl = json["thirdImageUrl"],
-              fourthImageUrl = json["fourthImageUrl"],
-                fifthImageUrl = json["fifthImageUrl"],
-
-        isWishListed = json["IsWishlisted"];
-
-  get discount => null;
+        isWishListed = json["isWishListed"],  // ensure correct key case
+        secondImageUrl = json["secondImageUrl"],
+        thirdImageUrl = json["thirdImageUrl"],
+        fourthImageUrl = json["fourthImageUrl"],
+        fifthImageUrl = json["fifthImageUrl"],
+        SizeId = json["SizeId"],
+        ColourId = json["ColourId"],
+        SizeName = json["SizeName"],  // corrected naming convention
+        ColourName = json["ColourName"];  // corrected naming convention
 
   Map<String, dynamic> toJson() {
     return {
@@ -66,7 +75,7 @@ class Items {
       "itemTitle": itemTitle,
       "longDescription": longDescription,
       "price": price,
-      "publishedDate": publishedDate,
+      "publishedDate": publishedDate?.toIso8601String(),
       "sellerName": sellerName,
       "sellerUID": sellerUID,
       "status": status,
@@ -75,7 +84,11 @@ class Items {
       "thirdImageUrl": thirdImageUrl,
       "fourthImageUrl": fourthImageUrl,
       "fifthImageUrl": fifthImageUrl,
-      "IsWishlisted": isWishListed,
+      "isWishListed": isWishListed,  // ensure correct key case
+      "SizeId": SizeId,
+      "ColourId": ColourId,
+      "SizeName": SizeName,  // corrected naming convention
+      "ColourName": ColourName,  // corrected naming convention
     };
   }
 }
