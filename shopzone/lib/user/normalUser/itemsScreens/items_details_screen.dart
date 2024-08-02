@@ -30,6 +30,9 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   late String userImg;
   int counterLimit = 1;
 
+  String? selectedSize;
+  String? selectedColor;
+
   @override
   void initState() {
     super.initState();
@@ -342,28 +345,91 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 color: Colors.green,
               ),
             ),
-             Padding(
+            Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
               child: Text(
-                widget.model!.SizeName.toString(),
+                'Select Size',
                 textAlign: TextAlign.justify,
                 style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  color: Colors.grey,
-                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.black,
                 ),
               ),
             ),
-              Padding(
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: widget.model!.SizeName?.map((size) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedSize = size;
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      padding: const EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                        color: selectedSize == size ? Colors.blue : Colors.white,
+                        border: Border.all(
+                          color: Colors.blue,
+                        ),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      child: Text(
+                        size,
+                        style: TextStyle(
+                          color: selectedSize == size ? Colors.white : Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList() ?? [],
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
               child: Text(
-                widget.model!.ColourName.toString(),
+                'Select Color',
                 textAlign: TextAlign.justify,
                 style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  color: Colors.grey,
-                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.black,
                 ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: widget.model!.ColourName?.map((color) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedColor = color;
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      padding: const EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                        color: selectedColor == color ? Colors.blue : Colors.white,
+                        border: Border.all(
+                          color: Colors.blue,
+                        ),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      child: CircleAvatar(
+                        backgroundColor: colorFromName(color),
+                        radius: 20,
+                      ),
+                    ),
+                  );
+                }).toList() ?? [],
               ),
             ),
             Padding(
@@ -382,5 +448,46 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         ),
       ),
     );
+  }
+
+  Color colorFromName(String colorName) {
+    switch (colorName.toLowerCase()) {
+      case 'electric blue':
+        return Colors.blue;
+      case 'ochre':
+        return Colors.brown;
+      case 'red':
+        return Colors.red;
+      case 'blue':
+        return Colors.blue;
+      case 'green':
+        return Colors.green;
+      case 'yellow':
+        return Colors.yellow;
+      case 'black':
+        return Colors.black;
+      case 'white':
+        return Colors.white;
+      case 'purple':
+        return Colors.purple;
+      case 'orange':
+        return Colors.orange;
+      case 'pink':
+        return Colors.pink;
+      case 'brown':
+        return Colors.brown;
+      case 'gray':
+        return Colors.grey;
+      case 'cyan':
+        return Colors.cyan;
+      case 'magenta':
+        return Colors.pinkAccent;
+      case 'lime':
+        return Colors.lime;
+      case 'indigo':
+        return Colors.indigo;
+      default:
+        return Colors.grey;
+    }
   }
 }

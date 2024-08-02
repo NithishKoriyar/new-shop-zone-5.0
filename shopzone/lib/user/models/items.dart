@@ -17,8 +17,8 @@ class Items {
   String? fifthImageUrl;
   String? SizeId;
   String? ColourId;
-  String? SizeName;  // corrected naming convention
-  String? ColourName;  // corrected naming convention
+  List<String>? SizeName;  // changed to list
+  List<String>? ColourName;  // changed to list
 
   Items({
     this.brandID,
@@ -39,8 +39,8 @@ class Items {
     this.fifthImageUrl,
     this.SizeId,
     this.ColourId,
-    this.SizeName,  // corrected naming convention
-    this.ColourName,  // corrected naming convention
+    this.SizeName,  // changed to list
+    this.ColourName,  // changed to list
   });
 
   Items.fromJson(Map<String, dynamic> json)
@@ -64,8 +64,8 @@ class Items {
         fifthImageUrl = json["fifthImageUrl"],
         SizeId = json["SizeId"],
         ColourId = json["ColourId"],
-        SizeName = json["SizeName"],  // corrected naming convention
-        ColourName = json["ColourName"];  // corrected naming convention
+        SizeName = (json["SizeName"] as String?)?.split(',').map((e) => e.trim()).toList(),  // parse to list
+        ColourName = (json["ColourName"] as String?)?.split(',').map((e) => e.trim()).toList();  // parse to list
 
   Map<String, dynamic> toJson() {
     return {
@@ -87,8 +87,8 @@ class Items {
       "isWishListed": isWishListed,  // ensure correct key case
       "SizeId": SizeId,
       "ColourId": ColourId,
-      "SizeName": SizeName,  // corrected naming convention
-      "ColourName": ColourName,  // corrected naming convention
+      "SizeName": SizeName?.join(','),  // convert list to comma-separated string
+      "ColourName": ColourName?.join(','),  // convert list to comma-separated string
     };
   }
 }
