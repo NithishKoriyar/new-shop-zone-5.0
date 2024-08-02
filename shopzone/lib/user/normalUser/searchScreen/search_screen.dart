@@ -11,6 +11,7 @@ import 'package:shopzone/user/normalUser/brandsScreens/brands_ui_design_widget.d
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
+import 'package:shopzone/user/normalUser/searchScreen/searchitem_ui_design_widget.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -291,7 +292,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       Items itemsModel = items[index];
-                      return ItemsUiDesignWidget(
+                      return SearchItemsUiDesignWidget(
                         model: itemsModel,
                       );
                     },

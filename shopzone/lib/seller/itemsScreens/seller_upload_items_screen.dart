@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart'; // Import the multi-select package
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/seller/brandsScreens/seller_home_screen.dart';
 import 'package:shopzone/seller/models/seller_brands.dart';
@@ -30,16 +31,17 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
   final ImagePicker imagePicker = ImagePicker();
   String? selectedCategory;
   String? selectedSubcategory;
+  List<String> selectedSizeName = []; // Updated to List<String>
+  List<String> selectedColorName = []; // Updated to List<String>
   List categories = [];
   List subcategories = [];
+  List sizes = [];
+  List colors = [];
 
   TextEditingController itemInfoTextEditingController = TextEditingController();
-  TextEditingController itemTitleTextEditingController =
-      TextEditingController();
-  TextEditingController itemDescriptionTextEditingController =
-      TextEditingController();
-  TextEditingController itemPriceTextEditingController =
-      TextEditingController();
+  TextEditingController itemTitleTextEditingController = TextEditingController();
+  TextEditingController itemDescriptionTextEditingController = TextEditingController();
+  TextEditingController itemPriceTextEditingController = TextEditingController();
 
   bool uploading = false;
   String itemUniqueId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -62,7 +64,9 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
           itemDescriptionTextEditingController.text.isNotEmpty &&
           itemPriceTextEditingController.text.isNotEmpty &&
           selectedCategory != null &&
-          selectedSubcategory != null) {
+          selectedSubcategory != null &&
+          selectedSizeName.isNotEmpty &&
+          selectedColorName.isNotEmpty) {
         var thumbnailBytes = await thumbnail!.readAsBytes();
         var secondImageBytes = await secondImage!.readAsBytes();
         var thirdImageBytes = await thirdImage!.readAsBytes();
@@ -85,8 +89,10 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
           'fifthImage': base64Encode(fifthImageBytes),
           'category_id': selectedCategory,
           'sub_category_id': selectedSubcategory,
+          'SizeName': selectedSizeName.join(','), // Convert list to comma-separated string
+          'ColourName': selectedColorName.join(','), // Convert list to comma-separated string
         };
-
+        print(body);
         var response = await http.post(
           Uri.parse(API.uploadItem),
           body: json.encode(body),
@@ -100,8 +106,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
 
           if (responseJson['success']) {
             Fluttertoast.showToast(msg: responseJson['message']);
-            Navigator.push(
-                context, MaterialPageRoute(builder: (c) => HomeScreen()));
+            Navigator.push(context, MaterialPageRoute(builder: (c) => HomeScreen()));
           } else {
             Fluttertoast.showToast(msg: "Error: " + responseJson['message']);
           }
@@ -116,9 +121,20 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
     }
   }
 
+  // @override
+  // Widget build(BuildContext context) {
   uploadFormScreen() {
     return Scaffold(
-      appBar: AppBar(
+      // appBar: AppBar(
+      //   title: const Text('Upload New Item'),
+      //   actions: [
+      //     IconButton(
+      //       icon: const Icon(Icons.cloud_upload),
+      //       onPressed: uploading ? null : validateUploadForm,
+      //     ),
+      //   ],
+      // ),
+       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_rounded,
@@ -148,108 +164,54 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
       ),
       body: ListView(
         children: [
-          uploading == true ? linearProgressBar() : Container(),
+          uploading ? LinearProgressIndicator() : Container(),
           // Display selected images
           imagePreview(thumbnail, "Main Image", () => pickImage('main')),
           imagePreview(secondImage, "Second Image", () => pickImage('second')),
           imagePreview(thirdImage, "Third Image", () => pickImage('third')),
           imagePreview(fourthImage, "Fourth Image", () => pickImage('fourth')),
           imagePreview(fifthImage, "Fifth Image", () => pickImage('fifth')),
-          const Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
+          const Divider(color: Colors.black, thickness: 1),
           // Item title
           ListTile(
-            leading: const Icon(
-              Icons.title,
-              color: Colors.black,
-            ),
-            title: SizedBox(
-              width: 250,
-              child: TextField(
-                controller: itemTitleTextEditingController,
-                decoration: const InputDecoration(
-                  hintText: "item title",
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: InputBorder.none,
-                ),
-              ),
+            leading: const Icon(Icons.title, color: Colors.black),
+            title: TextField(
+              controller: itemTitleTextEditingController,
+              decoration: const InputDecoration(hintText: "item title", border: InputBorder.none),
             ),
           ),
-          const Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
+          const Divider(color: Colors.black, thickness: 1),
           // Item info
           ListTile(
-            leading: const Icon(
-              Icons.perm_device_information,
-              color: Colors.black,
-            ),
-            title: SizedBox(
-              width: 250,
-              child: TextField(
-                controller: itemInfoTextEditingController,
-                decoration: const InputDecoration(
-                  hintText: "item info",
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: InputBorder.none,
-                ),
-              ),
+            leading: const Icon(Icons.perm_device_information, color: Colors.black),
+            title: TextField(
+              controller: itemInfoTextEditingController,
+              decoration: const InputDecoration(hintText: "item info", border: InputBorder.none),
             ),
           ),
-          const Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
+          const Divider(color: Colors.black, thickness: 1),
           // Item description
           ListTile(
-            leading: const Icon(
-              Icons.description,
-              color: Colors.black,
-            ),
-            title: SizedBox(
-              width: 250,
-              child: TextField(
-                controller: itemDescriptionTextEditingController,
-                decoration: const InputDecoration(
-                  hintText: "item description",
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: InputBorder.none,
-                ),
-              ),
+            leading: const Icon(Icons.description, color: Colors.black),
+            title: TextField(
+              controller: itemDescriptionTextEditingController,
+              decoration: const InputDecoration(hintText: "item description", border: InputBorder.none),
             ),
           ),
-          const Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
+          const Divider(color: Colors.black, thickness: 1),
           // Item price
           ListTile(
-            leading: const Icon(
-              Icons.currency_rupee,
-              color: Colors.black,
-            ),
-            title: SizedBox(
-              width: 250,
-              child: TextField(
-                controller: itemPriceTextEditingController,
-                decoration: const InputDecoration(
-                  hintText: "item price",
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: InputBorder.none,
-                ),
-              ),
+            leading: const Icon(Icons.currency_rupee, color: Colors.black),
+            title: TextField(
+              controller: itemPriceTextEditingController,
+              decoration: const InputDecoration(hintText: "item price", border: InputBorder.none),
             ),
           ),
-          const Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
+          const Divider(color: Colors.black, thickness: 1),
+          // Category dropdown
           DropdownButton<String>(
             value: selectedCategory,
-            hint: Text("Select Category"),
+            hint: const Text("Select Category"),
             items: categories.map<DropdownMenuItem<String>>((category) {
               return DropdownMenuItem<String>(
                 value: category['category_id'].toString(),
@@ -257,25 +219,19 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
               );
             }).toList(),
             onChanged: (newValue) {
-              print(newValue);
               setState(() {
                 selectedCategory = newValue;
-                selectedSubcategory =
-                    null; // Reset subcategory on category change
+                selectedSubcategory = null;
                 fetchSubcategories(newValue!);
               });
             },
           ),
-          const Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
-          if (selectedCategory != null && subcategories.isNotEmpty) ...[
+          const Divider(color: Colors.black, thickness: 1),
+          // Subcategory dropdown
+          if (selectedCategory != null && subcategories.isNotEmpty)
             DropdownButton<String>(
-              value: selectedCategory != null && subcategories.isNotEmpty
-                  ? selectedSubcategory
-                  : null,
-              hint: Text("Select Subcategory"),
+              value: selectedSubcategory,
+              hint: const Text("Select Subcategory"),
               items: subcategories.map<DropdownMenuItem<String>>((subcategory) {
                 return DropdownMenuItem<String>(
                   value: subcategory['subcategory_id'].toString(),
@@ -285,14 +241,86 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
               onChanged: (newValue) {
                 setState(() {
                   selectedSubcategory = newValue;
+                  fetchSizesAndColors(newValue!);
                 });
               },
             ),
-          ],
-          const Divider(
-            color: Colors.black,
-            thickness: 1,
-          ),
+          const Divider(color: Colors.black, thickness: 1),
+          // Size multiselect
+          if (sizes.isNotEmpty)
+            MultiSelectDialogField(
+              items: sizes.map((size) => MultiSelectItem<String>(size['SizeName'], size['SizeName'])).toList(),
+              title: const Text("Select Size"),
+              selectedColor: Colors.black,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(30)),
+                border: Border.all(
+                  color: Colors.black,
+                  width: 2,
+                ),
+              ),
+              buttonIcon: const Icon(
+                Icons.arrow_drop_down,
+                color: Colors.black,
+              ),
+              buttonText: const Text(
+                "Select Size",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+              ),
+              onConfirm: (results) {
+                setState(() {
+                  selectedSizeName = results.cast<String>();
+                });
+              },
+              chipDisplay: MultiSelectChipDisplay(
+                onTap: (value) {
+                  setState(() {
+                    selectedSizeName.remove(value);
+                  });
+                },
+              ),
+            ),
+          const Divider(color: Colors.black, thickness: 1),
+          // Color multiselect
+          if (colors.isNotEmpty)
+            MultiSelectDialogField(
+              items: colors.map((color) => MultiSelectItem<String>(color['ColourName'], color['ColourName'])).toList(),
+              title: const Text("Select Color"),
+              selectedColor: Colors.black,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(30)),
+                border: Border.all(
+                  color: Colors.black,
+                  width: 2,
+                ),
+              ),
+              buttonIcon: const Icon(
+                Icons.arrow_drop_down,
+                color: Colors.black,
+              ),
+              buttonText: const Text(
+                "Select Color",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+              ),
+              onConfirm: (results) {
+                setState(() {
+                  selectedColorName = results.cast<String>();
+                });
+              },
+              chipDisplay: MultiSelectChipDisplay(
+                onTap: (value) {
+                  setState(() {
+                    selectedColorName.remove(value);
+                  });
+                },
+              ),
+            ),
         ],
       ),
     );
@@ -344,8 +372,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
   }
 
   Future<void> fetchSubcategories(String categoryId) async {
-    var url =
-        Uri.parse('${API.itemUploadFetchCategory}?categoryId=$categoryId');
+    var url = Uri.parse('${API.itemUploadFetchCategory}?categoryId=$categoryId');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body) as List;
@@ -358,11 +385,33 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
     }
   }
 
+  Future<void> fetchSizesAndColors(String subCategoryId) async {
+    // Fetch sizes and colors based on the selected subcategory
+    // Assume you have APIs to fetch sizes and colors
+    var sizeUrl = Uri.parse('${API.fetchSizes}?subCategoryId=$subCategoryId');
+    var colorUrl = Uri.parse('${API.fetchColors}?subCategoryId=$subCategoryId');
+
+    var sizeResponse = await http.get(sizeUrl);
+    var colorResponse = await http.get(colorUrl);
+
+    if (sizeResponse.statusCode == 200 && colorResponse.statusCode == 200) {
+      var sizeData = json.decode(sizeResponse.body) as List;
+      var colorData = json.decode(colorResponse.body) as List;
+
+      setState(() {
+        sizes = sizeData;
+        colors = colorData;
+      });
+    } else {
+      // Handle error or show a message
+      print('Failed to load sizes and colors');
+    }
+  }
+
   //!seller information--------------------------------------
   Widget build(BuildContext context) {
     return thumbnail == null ? defaultScreen() : uploadFormScreen();
   }
-
   defaultScreen() {
     return Scaffold(
       appBar: AppBar(
@@ -454,8 +503,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
               ),
               SimpleDialogOption(
                 onPressed: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (c) => HomeScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (c) => HomeScreen()));
                 },
                 child: const Center(
                   child: Text(
@@ -495,29 +543,28 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
           break;
         }
       case 'webp':
-      {
-        format = CompressFormat.webp;
-        break;
-      }
-      default: {
-        format = CompressFormat.jpeg;
-      }
+        {
+          format = CompressFormat.webp;
+          break;
+        }
+      default:
+        {
+          format = CompressFormat.jpeg;
+        }
     }
     final targetPath = Directory.systemTemp.path + "/$fileName";
 
-    var result =
-        await FlutterImageCompress.compressAndGetFile(filePath, targetPath,
-            quality: 88, // Adjust the quality as needed
-            minWidth: 800, // Adjust the width as needed
-            minHeight: 600, // Adjust the height as needed
-            format: format);
+    var result = await FlutterImageCompress.compressAndGetFile(filePath, targetPath,
+        quality: 88, // Adjust the quality as needed
+        minWidth: 800, // Adjust the width as needed
+        minHeight: 600, // Adjust the height as needed
+        format: format);
 
     return result != null ? XFile(result.path) : null;
   }
 
   pickImage(String imageType) async {
-    var originalImage =
-        await imagePicker.pickImage(source: ImageSource.gallery);
+    var originalImage = await imagePicker.pickImage(source: ImageSource.gallery);
     var compressedImage = await compressImage(originalImage);
 
     setState(() {
@@ -564,10 +611,7 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
                 height: 150,
                 width: 150,
               ),
-        Divider(
-          color: Colors.black,
-          thickness: 1,
-        ),
+        const Divider(color: Colors.black, thickness: 1),
       ],
     );
   }

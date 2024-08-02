@@ -123,8 +123,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
               } else {
                 return const SliverToBoxAdapter(
                   child: Center(
-                    child: Text(
-                        "No items exist "),
+                    child: Text("No items exist "),
                   ),
                 );
               }

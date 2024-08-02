@@ -124,7 +124,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        elevation: 20,
+        elevation:0,
         title: const Text(
           "Shop Zone",
           style: TextStyle(
@@ -184,6 +184,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         ],
       ),
       body: SingleChildScrollView(
+       
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -339,6 +340,30 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 height: 1,
                 thickness: 2,
                 color: Colors.green,
+              ),
+            ),
+             Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
+              child: Text(
+                widget.model!.SizeName.toString(),
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  color: Colors.grey,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+              Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
+              child: Text(
+                widget.model!.ColourName.toString(),
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  color: Colors.grey,
+                  fontSize: 15,
+                ),
               ),
             ),
             Padding(

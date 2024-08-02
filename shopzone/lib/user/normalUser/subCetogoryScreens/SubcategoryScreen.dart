@@ -5,15 +5,13 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/models/items.dart';
 import 'package:shopzone/user/models/subcettogry.dart';
 import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart';
-import 'package:shopzone/user/normalUser/itemsScreens/items_screen.dart';
 import 'package:shopzone/user/normalUser/subCetogoryScreens/SubcategoryItemsScreen.dart';
 
 class SubCategoryScreen extends StatefulWidget {
-  final String categoryId; // Field for category_id
-  final String categoryName; // Field for category_name
-  final String categoryImg; // Field for category_img
+  final String categoryId;
+  final String categoryName;
+  final String categoryImg;
 
-  // Updated constructor to accept both categoryId and categoryName
   SubCategoryScreen({
     required this.categoryId,
     required this.categoryName,
@@ -27,6 +25,9 @@ class SubCategoryScreen extends StatefulWidget {
 class _SubCategoryScreenState extends State<SubCategoryScreen> {
   late List<Subcategory> subcategories = [];
   late List<Items> categoryItem = [];
+  bool isLoadingSubcategories = true;
+  bool isLoadingItems = true;
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -45,12 +46,16 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
         setState(() {
           subcategories =
               data.map((item) => Subcategory.fromJson(item)).toList();
+          isLoadingSubcategories = false;
         });
       } else {
         throw Exception('Failed to load subcategories');
       }
     } catch (e) {
       print('Error fetching subcategories: $e');
+      setState(() {
+        isLoadingSubcategories = false;
+      });
     }
   }
 
@@ -61,16 +66,18 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
       );
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        print(data);
-
         setState(() {
           categoryItem = data.map((item) => Items.fromJson(item)).toList();
+          isLoadingItems = false;
         });
       } else {
         throw Exception('Failed to load categoryItem');
       }
     } catch (e) {
       print('Error fetching categoryItem: $e');
+      setState(() {
+        isLoadingItems = false;
+      });
     }
   }
 
@@ -78,165 +85,186 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.categoryName),
+        title: Text(
+          widget.categoryName,
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.black),
+        elevation: 1.0,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: <Widget>[
-              Image.network(API.normalImage + widget.categoryImg),
-              const Divider(
-                color: Colors.grey,
-                height: 20,
-                thickness: 2,
-              ),
-              GridView.builder(
-                shrinkWrap: true,
-                physics:
-                    const NeverScrollableScrollPhysics(), // to disable GridView's scrolling
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // Adjust number of columns
-                  childAspectRatio: 1, // Adjust the aspect ratio
-                  crossAxisSpacing: 10, // Horizontal space between items
-                  mainAxisSpacing: 10, // Vertical space between items
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Search Subcategories...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
                 ),
-                itemCount: subcategories.length,
-                itemBuilder: (context, index) {
-                  final subcategory = subcategories[index];
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SubcategoryItemsScreen(
-                              subcategoryId:
-                                  subcategory.subcategory_id.toString()),
-                        ),
-                      );
-                    },
-                    child: GridTile(
-                      child: Column(
-                        children: <Widget>[
-                          Expanded(
-                            child: ClipRRect(
-                              
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                API.normalImage +
-                                    subcategory.img_path.toString(),
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(Icons.error),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                              height: 8), // Spacing between image and text
-                          Text(subcategory.name ?? 'Unnamed Subcategory',
-                              textAlign: TextAlign.center),
-                        ],
-                      ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Subcategories",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                  );
-                },
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              const Text("I T M S"),
-              const SizedBox(
-                height: 20,
-              ),
-              //!================================================================================================================================
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.9,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemCount: categoryItem.length,
-                itemBuilder: (context, index) {
-                  final item =
-                      categoryItem[index]; // Correctly reference the item
-                  return Padding(
-                    padding:
-                        const EdgeInsets.all(0), // Adjust padding as needed
-                    child: InkWell(
-                      onTap: () {
-                        // Navigate to the ItemsDetailsScreen and pass the selected item model
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ItemsDetailsScreen(model: item),
+                    isLoadingSubcategories
+                        ? Center(child: CircularProgressIndicator())
+                        : GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              childAspectRatio: 0.75,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: subcategories.length,
+                            itemBuilder: (context, index) {
+                              final subcategory = subcategories[index];
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SubcategoryItemsScreen(
+                                          subcategoryId: subcategory.subcategory_id.toString()),
+                                    ),
+                                  );
+                                },
+                                child: Column(
+                                  children: <Widget>[
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.network(
+                                        API.normalImage + subcategory.img_path.toString(),
+                                        width: double.infinity,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) =>
+                                            const Icon(Icons.error),
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      subcategory.name ?? 'Unnamed Subcategory',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                      child: Card(
-                        color: Color.fromARGB(255, 223, 212, 173),
-                        elevation: 4.0, // Adjust elevation as needed
-                        child: GridTile(
-                          child: Column(
-                            children: <Widget>[
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      8.0), // Adjust padding as needed
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                        8.0), // Set the border radius as needed
-                                    child: Image.network(
-                                      API.getItemsImage +
-                                          (item.thumbnailUrl ??
-                                              ''), // Correctly handle possible null
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              const Icon(Icons.error),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "Items",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    isLoadingItems
+                        ? Center(child: CircularProgressIndicator())
+                        : GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.75,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: categoryItem.length,
+                            itemBuilder: (context, index) {
+                              final item = categoryItem[index];
+                              return Padding(
+                                padding: const EdgeInsets.all(0),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ItemsDetailsScreen(model: item),
+                                      ),
+                                    );
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 4.0,
+                                    child: Column(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(8.0),
+                                            child: Image.network(
+                                              API.getItemsImage + (item.thumbnailUrl ?? ''),
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) =>
+                                                  const Icon(Icons.error),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                          child: Text(
+                                            item.itemTitle ?? 'Unnamed Item',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                overflow: TextOverflow.ellipsis),
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        Text(
+                                          "₹ ${item.price}",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(color: Colors.blueAccent),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Text(
+                                            item.itemInfo ?? 'Unnamed Item',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                item.itemTitle ?? 'Unnamed Item',
-                                textAlign: TextAlign.start,
-                              ),
-                              Text(
-                                "₹ ${item.price}",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    color: Color.fromARGB(255, 21, 0, 255)),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Text(
-                                  item.itemInfo ?? 'Unnamed Item',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    color: Color.fromARGB(255, 82, 82, 82),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              )
-            ],
+                              );
+                            },
+                          )
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
