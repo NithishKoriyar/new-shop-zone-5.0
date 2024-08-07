@@ -1,6 +1,7 @@
 class Items {
   String? brandID;
   String? itemID;
+  String? variantID;
   String? itemInfo;
   String? itemTitle;
   String? longDescription;
@@ -15,10 +16,14 @@ class Items {
   String? ColourId;
   String? ColourName;
   String? SizeName;
+  String? category_id;
+  String? sub_category_id;
+
 
   Items({
     this.brandID,
     this.itemID,
+    this.variantID,
     this.itemInfo,
     this.itemTitle,
     this.longDescription,
@@ -33,11 +38,14 @@ class Items {
     this.ColourId,
     this.ColourName,
     this.SizeName,
+    this.category_id,
+    this.sub_category_id,
   });
 
   Items.fromJson(Map<String, dynamic> json) {
     brandID = json["brandID"];
     itemID = json["itemID"];
+    variantID = json["variantID"];
     itemInfo = json["itemInfo"];
     itemTitle = json["itemTitle"];
     longDescription = json["longDescription"];
@@ -54,12 +62,15 @@ class Items {
     ColourId = json["ColourId"];
     ColourName = json["ColourName"];
     SizeName = json["SizeName"];
+    category_id = json["category_id"];
+    sub_category_id = json["sub_category_id"];
   }
 
   Map<String, dynamic> toJson() {
     return {
       "brandID": brandID,
       "itemID": itemID,
+      "variantID": variantID,
       "itemInfo": itemInfo,
       "itemTitle": itemTitle,
       "longDescription": longDescription,
@@ -74,6 +85,8 @@ class Items {
       "ColourId": ColourId,
       "ColourName": ColourName,
       "SizeName": SizeName,
+      "category_id": category_id,
+      "sub_category_id": sub_category_id,
     };
   }
 }

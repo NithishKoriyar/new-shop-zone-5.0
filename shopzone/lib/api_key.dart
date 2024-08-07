@@ -181,6 +181,12 @@ static const fetchSizes =
       "$hostConnectSeller/fetchSizes.php";
       static const fetchColors  =
       "$hostConnectSeller/fetchColors.php";
+      static const uploadSimilarItem =
+      "$hostConnectSeller/upload_similar_product.php";
+       static const fetchSimilarProducts =
+      "$hostConnectSeller/fetch_similar_products.php";
+
+
   //!------------------------------ FOOD SELLERS API CONNECTIONS --------------------------------
 
   static const hostConnectFoodSeller = "$hostConnect/foodSeller";

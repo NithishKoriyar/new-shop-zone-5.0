@@ -23,6 +23,7 @@ class ItemsDetailsScreen extends StatefulWidget {
 
 class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   final CurrentUser currentUserController = Get.put(CurrentUser());
+  List<Items> similarProducts = [];
 
   late String userName;
   late String userEmail;
@@ -39,6 +40,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     currentUserController.getUserInfo().then((_) {
       setUserInfo();
       printUserInfo();
+      fetchSimilarProducts(widget.model!.variantID.toString());
       setState(() {});
     });
   }
@@ -55,6 +57,30 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     print('user Email: $userEmail');
     print('user ID: $userID');
     print('user image: $userImg');
+  }
+
+  Future<void> fetchSimilarProducts(String variantID) async {
+    print('OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO');
+    print(variantID);
+    var url = Uri.parse("${API.fetchSimilarProducts}?variantID=$variantID");
+    print(url);
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      if (jsonResponse["success"]) {
+        setState(() {
+          similarProducts = (jsonResponse["data"] as List)
+              .map((item) => Items.fromJson(item))
+              .toList();
+        });
+      } else {
+        Fluttertoast.showToast(msg: jsonResponse["message"]);
+      }
+    } else {
+      Fluttertoast.showToast(msg: "Network error.");
+    }
   }
 
   void toggleWishlist(Items model, String userId) {
@@ -91,9 +117,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
 
   void showWishlistMessage(bool isAdded) {
     Fluttertoast.showToast(
-      msg: isAdded
-          ? 'Item added to wishlist!'
-          : 'Item removed from wishlist!',
+      msg: isAdded ? 'Item added to wishlist!' : 'Item removed from wishlist!',
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       backgroundColor: Colors.green,
@@ -127,7 +151,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        elevation:0,
+        elevation: 0,
         title: const Text(
           "Shop Zone",
           style: TextStyle(
@@ -187,7 +211,6 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         ],
       ),
       body: SingleChildScrollView(
-       
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -207,9 +230,12 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                           itemCount: imageUrls.length,
                           itemBuilder: (context, index) {
                             if (imageUrls[index] != null) {
-                              return Image.network(
-                                API.getItemsImage + (imageUrls[index] ?? ''),
-                                fit: BoxFit.contain,
+                              return Hero(
+                                tag: 'hero-${widget.model!.itemID}-$index',
+                                child: Image.network(
+                                  API.getItemsImage + (imageUrls[index] ?? ''),
+                                  fit: BoxFit.contain,
+                                ),
                               );
                             } else {
                               return Container();
@@ -443,7 +469,73 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 80),
+            const SizedBox(height: 20),
+            // Scrollable section for similar products
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                "Similar Products",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.green,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 200, // Adjust height as needed
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: similarProducts.length,
+                itemBuilder: (context, index) {
+                  final item = similarProducts[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ItemsDetailsScreen(model: item),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Hero(
+                            tag: 'hero-${item.itemID}',
+                            child: Image.network(
+                              API.getItemsImage + (item.thumbnailUrl ?? ''),
+                              height: 100,
+                              width: 100,
+                              fit: BoxFit.cover,
+                              errorBuilder: (BuildContext context,
+                                  Object exception, StackTrace? stackTrace) {
+                                return const Text('Image not available');
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              item.itemTitle ?? '',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              "₹ ${item.price}",
+                              style: TextStyle(fontSize: 14, color: Colors.green),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
