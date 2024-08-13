@@ -800,139 +800,143 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
           ),
 
-        StreamBuilder<List<Items>>(
-  stream: getItemStream(userID),
-  builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
-    if (dataSnapshot.connectionState == ConnectionState.waiting) {
-      return SliverFillRemaining(
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
-      return SliverGrid(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.75,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            Items model = dataSnapshot.data![index];
-            String? thumbnailUrl = model.thumbnailUrl;
-
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (c) => ItemsDetailsScreen(model: model),
+          StreamBuilder<List<Items>>(
+            stream: getItemStream(userID),
+            builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
+              if (dataSnapshot.connectionState == ConnectionState.waiting) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
                   ),
                 );
-              },
-              child: Stack(
-                children: [
-                  Container(
-                    margin: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromARGB(255, 233, 230, 230),
-                          spreadRadius: 0.1,
-                          blurRadius: 5,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 170,
-                          height: 160,
-                          padding: EdgeInsets.all(8),
-                          child: thumbnailUrl != null
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    image: DecorationImage(
-                                      image: NetworkImage(
-                                        API.getItemsImage + thumbnailUrl,
-                                      ),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                )
-                              : Container(),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          model.itemTitle.toString(),
-                          style: TextStyle(fontSize: 15),
-                          overflow: TextOverflow.ellipsis,
-                          softWrap: false,
-                          maxLines: 1,
-                        ),
-                        Text(
-                          model.itemInfo.toString(),
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                          overflow: TextOverflow.ellipsis,
-                          softWrap: false,
-                          maxLines: 1,
-                        ),
-                        Text(
-                          "₹ ${model.price.toString()}",
-                          style: TextStyle(fontSize: 15, color: Colors.green),
-                          overflow: TextOverflow.ellipsis,
-                          softWrap: false,
-                          maxLines: 1,
-                        ),
-                      ],
-                    ),
+              } else if (dataSnapshot.hasData &&
+                  dataSnapshot.data!.isNotEmpty) {
+                return SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.75,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
                   ),
-                  // Heart-shaped wishlist icon
-                  Positioned(
-                    top: 0.7,
-                    right: 7,
-                    child: GestureDetector(
-                      onTap: () {
-                        // Toggle the wishlist state
-                        print(model.isWishListed);
-                        toggleWishlist(model, userID);
-                      },
-                      child: Container(
-                        child: Icon(
-                          model.isWishListed == "1"
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          color: model.isWishListed == "1"
-                              ? Colors.red
-                              : Colors.red,
-                          size: 28,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-          childCount: dataSnapshot.data!.length,
-        ),
-      );
-    } else {
-      return SliverToBoxAdapter(
-        child: Center(
-          child: Text("No Items Data exists."),
-        ),
-      );
-    }
-  },
-)
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      Items model = dataSnapshot.data![index];
+                      String? thumbnailUrl = model.thumbnailUrl;
 
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (c) => ItemsDetailsScreen(model: model),
+                            ),
+                          );
+                        },
+                        child: Stack(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color.fromARGB(255, 233, 230, 230),
+                                    spreadRadius: 0.1,
+                                    blurRadius: 5,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 170,
+                                    height: 160,
+                                    padding: EdgeInsets.all(8),
+                                    child: thumbnailUrl != null
+                                        ? Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                  API.getItemsImage +
+                                                      thumbnailUrl,
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          )
+                                        : Container(),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    model.itemTitle.toString(),
+                                    style: TextStyle(fontSize: 15),
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: false,
+                                    maxLines: 1,
+                                  ),
+                                  Text(
+                                    model.itemInfo.toString(),
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: false,
+                                    maxLines: 1,
+                                  ),
+                                  Text(
+                                    "₹ ${model.price.toString()}",
+                                    style: TextStyle(
+                                        fontSize: 15, color: Colors.green),
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: false,
+                                    maxLines: 1,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Heart-shaped wishlist icon
+                            Positioned(
+                              top: 0.7,
+                              right: 7,
+                              child: GestureDetector(
+                                onTap: () {
+                                  // Toggle the wishlist state
+                                  print(model.isWishListed);
+                                  toggleWishlist(model, userID);
+                                },
+                                child: Container(
+                                  child: Icon(
+                                    model.isWishListed == "1"
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: model.isWishListed == "1"
+                                        ? Colors.red
+                                        : Colors.red,
+                                    size: 28,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    childCount: dataSnapshot.data!.length,
+                  ),
+                );
+              } else {
+                return SliverToBoxAdapter(
+                  child: Center(
+                    child: Text("No Items Data exists."),
+                  ),
+                );
+              }
+            },
+          )
         ],
       ),
     );

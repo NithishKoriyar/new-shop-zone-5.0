@@ -7,6 +7,7 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/normalUser/global/global.dart';
 import 'package:shopzone/user/models/items.dart';
+import 'package:shopzone/user/normalUser/itemsScreens/seller_products_screen.dart';
 import 'package:shopzone/user/normalUser/searchScreen/search_screen.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 import 'package:share_plus/share_plus.dart';
@@ -667,63 +668,84 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             ),
             Divider(thickness: 1, color: Colors.grey),
             // Seller Information Section
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+        // Seller Information Section
+// Seller Information Section
+Padding(
+  padding: const EdgeInsets.all(8.0),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Sold by',
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.blueGrey,
+        ),
+      ),
+      SizedBox(height: 10), // Adds some space between the heading and the profile section
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundImage: NetworkImage(
+              API.sellerImage + sellerProfile,
+            ),
+          ),
+          SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                sellerName,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Row(
                 children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage(
-                      API.sellerImage + sellerProfile,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        sellerName,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                       
-                          SizedBox(width: 5),
-                          SmoothStarRating(
-                            // ignore: unnecessary_null_comparison
-                            rating: sellerRating == null
-                                ? 0.0
-                                : double.parse(sellerRating.toString()),
-                            starCount: 5,
-                            color: Colors.pinkAccent,
-                            borderColor: Colors.pinkAccent,
-                            size: 12,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Spacer(),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Navigate to seller shop
-                      
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                    child: Text('View Shop'),
+                  SizedBox(width: 5),
+                  SmoothStarRating(
+                    rating: sellerRating == null
+                        ? 0.0
+                        : double.parse(sellerRating.toString()),
+                    starCount: 5,
+                    color: Colors.pinkAccent,
+                    borderColor: Colors.pinkAccent,
+                    size: 12,
                   ),
                 ],
               ),
-            ),
+            ],
+          ),
+          Spacer(),
+         ElevatedButton(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SellerProductsScreen(sellerID: widget.model!.sellerUID.toString(),  userID: userID,),
+      ),
+    );
+  },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.purple,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8.0),
+    ),
+  ),
+  child: Text('View Shop'),
+),
+
+        ],
+      ),
+    ],
+  ),
+),
+
+
           ],
         ),
       ),

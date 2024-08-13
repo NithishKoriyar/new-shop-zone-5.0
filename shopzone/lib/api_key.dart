@@ -81,6 +81,10 @@ class API {
 static const wishListRemoveAll = "$hostConnectUser/wishListRemoveAll.php";
 
   static const fetchSellerInfo = "$hostConnectUser/fetchSellerInfoitem.php";
+    // static const fetchSellerProducts = "$hostConnectUser/fetchSellerProducts.php";
+    static const displayItemss = "$hostConnectUser/displayItemss.php";
+  
+
 
   //! food user api ------------------------------------------------------
   static const hostConnectFoodUser = "$userFolder/foodUser";
