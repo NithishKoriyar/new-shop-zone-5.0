@@ -12,6 +12,7 @@ import 'package:shopzone/user/userPreferences/current_user.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 class ItemsDetailsScreen extends StatefulWidget {
   final Items? model;
@@ -25,7 +26,7 @@ class ItemsDetailsScreen extends StatefulWidget {
 class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   final CurrentUser currentUserController = Get.put(CurrentUser());
   List<Items> similarProducts = [];
-    // Add a boolean to track if the item is added to cart
+  // Add a boolean to track if the item is added to cart
   bool isAddedToCart = false;
 
   late String userName;
@@ -36,6 +37,10 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
 
   String? selectedSize;
   String? selectedColor;
+  // Placeholder for seller information
+  String sellerName = '';
+  String sellerProfile = '';
+  double sellerRating = 0.0;
 
   @override
   void initState() {
@@ -44,6 +49,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
       setUserInfo();
       printUserInfo();
       fetchSimilarProducts(widget.model!.variantID.toString());
+      fetchSellerInfo(widget.model!.sellerUID.toString());
+      // Fetch seller info here
       setState(() {});
     });
     // Initialize the selected size and color based on the initial item's attributes
@@ -85,6 +92,28 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
       }
     } else {
       Fluttertoast.showToast(msg: "Network error.");
+    }
+  }
+
+  Future<void> fetchSellerInfo(String? sellerID) async {
+    if (sellerID == null) return;
+
+    final url = Uri.parse("${API.fetchSellerInfo}?sellerID=$sellerID");
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+
+      if (jsonResponse['success']) {
+        setState(() {
+          sellerName = jsonResponse['data']['seller_name'];
+          sellerProfile = jsonResponse['data']['seller_profile'];
+          sellerRating = jsonResponse['data']['rating'].toDouble();
+        });
+      }
+    } else {
+      Fluttertoast.showToast(msg: "Failed to load seller information.");
     }
   }
 
@@ -219,7 +248,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                                     ),
                                     Positioned(
                                       top: 10,
-                                      left: 10,
+                                      right: 10,
                                       child: GestureDetector(
                                         onTap: () {
                                           toggleWishlist(widget.model!, userID);
@@ -300,10 +329,72 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
 //     ),
 //   ),
 // ),
+//...
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Color: ',
+                    style: const TextStyle(
+                      fontSize: 17,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    '$selectedColor',
+                    style: const TextStyle(
+                      fontSize: 17,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: widget.model!.ColourName
+                                ?.toSet() // Remove duplicates
+                                .map((color) {
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedColor = color;
+                                  });
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 5.0),
+                                  padding: const EdgeInsets.all(1.0),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    border: Border.all(
+                                      color: selectedColor == color
+                                          ? Colors.black
+                                          : Colors.transparent,
+                                      width: 0.1,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    backgroundColor: colorFromName(color),
+                                    radius: 15, // Adjust size as needed
+                                  ),
+                                ),
+                              );
+                            }).toList() ??
+                            [],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
             Container(
               child: SizedBox(
-                height: 200, // Adjust height as needed
+                height: 150, // Adjust height as needed
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: similarProducts.length,
@@ -363,6 +454,25 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
               ),
             ),
             Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 1),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      "${widget.model!.itemTitle}",
+                      textAlign: TextAlign.justify,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
                 "₹ ${widget.model!.price}",
@@ -382,52 +492,52 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 color: Colors.green,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
-              child: Text(
-                'Color: $selectedColor',
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: widget.model!.ColourName?.map((color) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedColor = color;
-                            });
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                            padding: const EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: selectedColor == color
-                                    ? Colors.black
-                                    : Colors.transparent,
-                                width: 2,
-                              ),
-                            ),
-                            child: CircleAvatar(
-                              backgroundColor: colorFromName(color),
-                              radius: 20,
-                            ),
-                          ),
-                        );
-                      }).toList() ??
-                      [],
-                ),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
+            //   child: Text(
+            //     'Color: $selectedColor',
+            //     textAlign: TextAlign.justify,
+            //     style: const TextStyle(
+            //       fontSize: 18,
+            //       color: Colors.black,
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: SingleChildScrollView(
+            //     scrollDirection: Axis.horizontal,
+            //     child: Row(
+            //       children: widget.model!.ColourName?.map((color) {
+            //             return GestureDetector(
+            //               onTap: () {
+            //                 setState(() {
+            //                   selectedColor = color;
+            //                 });
+            //               },
+            //               child: Container(
+            //                 margin: const EdgeInsets.symmetric(horizontal: 5.0),
+            //                 padding: const EdgeInsets.all(10.0),
+            //                 decoration: BoxDecoration(
+            //                   shape: BoxShape.circle,
+            //                   border: Border.all(
+            //                     color: selectedColor == color
+            //                         ? Colors.black
+            //                         : Colors.transparent,
+            //                     width: 2,
+            //                   ),
+            //                 ),
+            //                 child: CircleAvatar(
+            //                   backgroundColor: colorFromName(color),
+            //                   radius: 20,
+            //                 ),
+            //               ),
+            //             );
+            //           }).toList() ??
+            //           [],
+            //     ),
+            //   ),
+            // ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
               child: Text(
@@ -468,7 +578,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                               style: TextStyle(
                                 color: selectedSize == size
                                     ? Colors.white
-                                    : Colors.black,
+                                    : Colors.blueGrey,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -479,27 +589,42 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
+            // Padding(
+            //   padding: const EdgeInsets.all(10.0),
+            //   child: Text(
+            //     "Total Price: ₹ ${counterLimit * (double.tryParse(widget.model?.price ?? '0') ?? 0)}",
+            //     textAlign: TextAlign.justify,
+            //     style: const TextStyle(
+            //       fontWeight: FontWeight.bold,
+            //       fontSize: 20,
+            //     ),
+            //   ),
+            // ),
             Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                "Total Price: ₹ ${counterLimit * (double.tryParse(widget.model?.price ?? '0') ?? 0)}",
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(width: 10),
-                    CartStepperInt(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start, // Align to the left
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color:
+                          Colors.blueGrey, // Background color for the container
+                      borderRadius:
+                          BorderRadius.circular(8.0), // Rounded corners
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey
+                              .withOpacity(0.3), // Light shadow color
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 3), // Changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: CartStepperInt(
                       count: counterLimit,
-                      size: 50,
+                      size: 40, // Smaller size for a more compact look
                       didChangeCount: (value) {
                         if (value < 1) {
                           Fluttertoast.showToast(
@@ -511,30 +636,11 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                         });
                       },
                     ),
-                    const SizedBox(width: 20), // Adjust the width as needed
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, top: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      "${widget.model!.itemTitle}",
-                      textAlign: TextAlign.justify,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Colors.black,
-                      ),
-                    ),
                   ),
                 ],
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
               child: Text(
@@ -542,8 +648,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 textAlign: TextAlign.justify,
                 style: const TextStyle(
                   fontWeight: FontWeight.normal,
-                  color: Colors.grey,
-                  fontSize: 15,
+                  color: Colors.blueGrey,
+                  fontSize: 25,
                 ),
               ),
             ),
@@ -559,10 +665,69 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
+            Divider(thickness: 1, color: Colors.grey),
+            // Seller Information Section
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage(
+                      API.sellerImage + sellerProfile,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        sellerName,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                       
+                          SizedBox(width: 5),
+                          SmoothStarRating(
+                            // ignore: unnecessary_null_comparison
+                            rating: sellerRating == null
+                                ? 0.0
+                                : double.parse(sellerRating.toString()),
+                            starCount: 5,
+                            color: Colors.pinkAccent,
+                            borderColor: Colors.pinkAccent,
+                            size: 12,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Spacer(),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Navigate to seller shop
+                      
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: Text('View Shop'),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
-   bottomNavigationBar: Container(
+      bottomNavigationBar: Container(
         color: Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -581,8 +746,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                       isAddedToCart = true;
                     });
                   } else {
-                    Navigator.push(
-                        context, MaterialPageRoute(builder: (c) => CartScreenUser()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (c) => CartScreenUser()));
                   }
                 },
                 child: Container(
@@ -609,8 +774,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                     itemCounter,
                     userID,
                   );
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (c) => CartScreenUser()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (c) => CartScreenUser()));
                 },
                 child: Container(
                   height: 50,

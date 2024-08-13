@@ -80,6 +80,8 @@ class API {
 
 static const wishListRemoveAll = "$hostConnectUser/wishListRemoveAll.php";
 
+  static const fetchSellerInfo = "$hostConnectUser/fetchSellerInfoitem.php";
+
   //! food user api ------------------------------------------------------
   static const hostConnectFoodUser = "$userFolder/foodUser";
   //!-
@@ -267,3 +269,4 @@ static const fetchSizes =
   static const getEarningsRDR = "$hostRider/earnings.php";
   static const getSellerAddressRDR = "$hostRider/get_seller_address.php";
 }
+
