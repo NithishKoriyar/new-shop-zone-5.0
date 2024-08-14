@@ -3,7 +3,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/seller/models/seller_items.dart';
-import 'package:shopzone/user/models/items.dart';
 import 'dart:convert';
 import 'items_details_screen.dart'; // Replace with your item details screen
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart'; // Add the necessary import
@@ -11,44 +10,26 @@ import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart'; // Add the ne
 class SellerProductsScreen extends StatefulWidget {
   final String sellerID;
   final String userID;
+  final String sellerProfile;
+  final String sellerRating;
+  final String sellerName;
 
-  SellerProductsScreen({required this.sellerID, required this.userID});
+  SellerProductsScreen(
+      {required this.sellerID,
+      required this.userID,
+      required this.sellerRating,
+      required this.sellerProfile,
+      required this.sellerName});
 
   @override
   _SellerProductsScreenState createState() => _SellerProductsScreenState();
 }
 
 class _SellerProductsScreenState extends State<SellerProductsScreen> {
-  String sellerName = "";
-  String sellerProfile = "";
-  double sellerRating = 0.0;
-
   @override
   void initState() {
     super.initState();
-  fetchSellerInfo(widget.model!.sellerUID.toString());
-  }
-
-  Future<void> fetchSellerInfo(String? sellerID) async {
-    if (sellerID == null) return;
-
-    final url = Uri.parse("${API.fetchSellerInfo}?sellerID=$sellerID");
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      print(jsonResponse);
-
-      if (jsonResponse['success']) {
-        setState(() {
-          sellerName = jsonResponse['data']['seller_name'];
-          sellerProfile = jsonResponse['data']['seller_profile'];
-          sellerRating = jsonResponse['data']['rating'].toDouble();
-        });
-      }
-    } else {
-      Fluttertoast.showToast(msg: "Failed to load seller information.");
-    }
+    // fetchSellerInfo(widget.model!.sellerUID.toString());
   }
 
   @override
@@ -66,7 +47,7 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
                 CircleAvatar(
                   radius: 30,
                   backgroundImage: NetworkImage(
-                    API.sellerImage + sellerProfile,
+                    API.sellerImage + widget.sellerProfile,
                   ),
                 ),
                 SizedBox(width: 10),
@@ -74,19 +55,29 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      sellerName,
+                      widget.sellerName,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+
                     SmoothStarRating(
-                      rating: sellerRating,
+                      rating: double.tryParse(widget.sellerRating) ??
+                          0.0, // Convert String to double
                       starCount: 5,
                       color: Colors.pinkAccent,
                       borderColor: Colors.pinkAccent,
                       size: 12,
                     ),
+
+                    // SmoothStarRating(
+                    //   rating: widget.sellerRating,
+                    //   starCount: 5,
+                    //   color: Colors.pinkAccent,
+                    //   borderColor: Colors.pinkAccent,
+                    //   size: 12,
+                    // ),
                   ],
                 ),
               ],
@@ -100,7 +91,8 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
                   return Center(
                     child: CircularProgressIndicator(),
                   );
-                } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
+                } else if (dataSnapshot.hasData &&
+                    dataSnapshot.data!.isNotEmpty) {
                   return GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
@@ -148,10 +140,12 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
                                     child: thumbnailUrl != null
                                         ? Container(
                                             decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(5),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
                                               image: DecorationImage(
                                                 image: NetworkImage(
-                                                  API.getItemsImage + thumbnailUrl,
+                                                  API.getItemsImage +
+                                                      thumbnailUrl,
                                                 ),
                                                 fit: BoxFit.cover,
                                               ),
