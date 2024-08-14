@@ -7,10 +7,13 @@ import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/normalUser/global/global.dart';
 import 'package:shopzone/user/models/items.dart';
+import 'package:shopzone/user/normalUser/itemsScreens/seller_products_screen.dart';
+import 'package:shopzone/user/normalUser/searchScreen/search_screen.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 class ItemsDetailsScreen extends StatefulWidget {
   final Items? model;
@@ -23,6 +26,9 @@ class ItemsDetailsScreen extends StatefulWidget {
 
 class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   final CurrentUser currentUserController = Get.put(CurrentUser());
+  List<Items> similarProducts = [];
+  // Add a boolean to track if the item is added to cart
+  bool isAddedToCart = false;
 
   late String userName;
   late String userEmail;
@@ -30,14 +36,27 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   late String userImg;
   int counterLimit = 1;
 
+  String? selectedSize;
+  String? selectedColor;
+  // Placeholder for seller information
+  String sellerName = '';
+  String sellerProfile = '';
+  double sellerRating = 0.0;
+
   @override
   void initState() {
     super.initState();
     currentUserController.getUserInfo().then((_) {
       setUserInfo();
       printUserInfo();
+      fetchSimilarProducts(widget.model!.variantID.toString());
+      fetchSellerInfo(widget.model!.sellerUID.toString());
+      // Fetch seller info here
       setState(() {});
     });
+    // Initialize the selected size and color based on the initial item's attributes
+    selectedSize = widget.model!.SizeName?.first;
+    selectedColor = widget.model!.ColourName?.first;
   }
 
   void setUserInfo() {
@@ -52,6 +71,51 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     print('user Email: $userEmail');
     print('user ID: $userID');
     print('user image: $userImg');
+  }
+
+  Future<void> fetchSimilarProducts(String variantID) async {
+    print('Fetching similar products...');
+    var url = Uri.parse("${API.fetchSimilarProducts}?variantID=$variantID");
+    print(url);
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      if (jsonResponse["success"]) {
+        setState(() {
+          similarProducts = (jsonResponse["data"] as List)
+              .map((item) => Items.fromJson(item))
+              .toList();
+        });
+      } else {
+        Fluttertoast.showToast(msg: jsonResponse["message"]);
+      }
+    } else {
+      Fluttertoast.showToast(msg: "Network error.");
+    }
+  }
+
+  Future<void> fetchSellerInfo(String? sellerID) async {
+    if (sellerID == null) return;
+
+    final url = Uri.parse("${API.fetchSellerInfo}?sellerID=$sellerID");
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+
+      if (jsonResponse['success']) {
+        setState(() {
+          sellerName = jsonResponse['data']['seller_name'];
+          sellerProfile = jsonResponse['data']['seller_profile'];
+          sellerRating = jsonResponse['data']['rating'].toDouble();
+        });
+      }
+    } else {
+      Fluttertoast.showToast(msg: "Failed to load seller information.");
+    }
   }
 
   void toggleWishlist(Items model, String userId) {
@@ -88,9 +152,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
 
   void showWishlistMessage(bool isAdded) {
     Fluttertoast.showToast(
-      msg: isAdded
-          ? 'Item added to wishlist!'
-          : 'Item removed from wishlist!',
+      msg: isAdded ? 'Item added to wishlist!' : 'Item removed from wishlist!',
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       backgroundColor: Colors.green,
@@ -122,15 +184,25 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     final PageController pageController = PageController();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 232, 230, 235),
       appBar: AppBar(
-        elevation:0,
-        title: const Text(
-          "Shop Zone",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+        elevation: 0,
+        title: TextField(
+          decoration: InputDecoration(
+            hintText: 'Search for products',
+            prefixIcon: Icon(Icons.search),
+            border: InputBorder.none,
+            filled: true,
+            fillColor: Color.fromARGB(255, 231, 227, 227),
+            contentPadding: EdgeInsets.symmetric(vertical: 8.0),
           ),
+          onTap: () {
+            // Navigate immediately to the SearchScreen without buffering
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SearchScreen()),
+            );
+          },
         ),
         actions: [
           IconButton(
@@ -140,51 +212,11 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             },
             icon: Icon(Icons.shopping_cart),
           ),
-          IconButton(
-            onPressed: () {
-              shareItem(widget.model!);
-            },
-            icon: Icon(Icons.share),
-          ),
         ],
         centerTitle: true,
         automaticallyImplyLeading: true,
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          SizedBox(width: 10),
-          FloatingActionButton.extended(
-            onPressed: () {
-              int itemCounter = counterLimit;
-              cartMethods.addItemToCart(
-                widget.model!.itemID.toString(),
-                itemCounter,
-                userID,
-              );
-            },
-            label: const Text("Add to Cart"),
-            icon: const Icon(Icons.add_shopping_cart_rounded),
-          ),
-          FloatingActionButton.extended(
-            backgroundColor: Colors.green,
-            onPressed: () {
-              int itemCounter = counterLimit;
-              cartMethods.addItemToCart(
-                widget.model!.itemID.toString(),
-                itemCounter,
-                userID,
-              );
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (c) => CartScreenUser()));
-            },
-            label: const Text("Buy Now"),
-            icon: const Icon(Icons.credit_score_rounded),
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
-       
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -196,7 +228,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Container(
-                    height: 300, // Adjust height as needed
+                    height: 480, // Adjust height as needed
                     child: Stack(
                       children: [
                         PageView.builder(
@@ -204,9 +236,38 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                           itemCount: imageUrls.length,
                           itemBuilder: (context, index) {
                             if (imageUrls[index] != null) {
-                              return Image.network(
-                                API.getItemsImage + (imageUrls[index] ?? ''),
-                                fit: BoxFit.contain,
+                              return Hero(
+                                tag: 'hero-${widget.model!.itemID}-$index',
+                                child: Stack(
+                                  children: [
+                                    Image.network(
+                                      API.getItemsImage +
+                                          (imageUrls[index] ?? ''),
+                                      fit: BoxFit.contain,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                    // Positioned(
+                                    //   top: 10,
+                                    //   right: 10,
+                                    //   child: GestureDetector(
+                                    //     onTap: () {
+                                    //       toggleWishlist(widget.model!, userID);
+                                    //     },
+                                    //     child: Icon(
+                                    //       widget.model!.isWishListed == "1"
+                                    //           ? Icons.favorite
+                                    //           : Icons.favorite_border,
+                                    //       color:
+                                    //           widget.model!.isWishListed == "1"
+                                    //               ? Colors.orange
+                                    //               : Colors.grey,
+                                    //       size: 28,
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                  ],
+                                ),
                               );
                             } else {
                               return Container();
@@ -237,16 +298,363 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
+//           Padding(
+//   padding: const EdgeInsets.all(10.0),
+//   child: Container(
+//     decoration: BoxDecoration(
+//       color: Colors.blueGrey.shade50,
+//       borderRadius: BorderRadius.circular(10),
+//       boxShadow: [
+//         BoxShadow(
+//           color: Colors.grey.withOpacity(0.5),
+//           spreadRadius: 2,
+//           blurRadius: 5,
+//           offset: Offset(0, 3),
+//         ),
+//       ],
+//     ),
+//     padding: const EdgeInsets.all(8.0),
+//     child: Row(
+//       children: [
+//         Icon(Icons.trending_up, color: Colors.blueGrey),
+//         SizedBox(width: 8),
+//         Text(
+//           "Similar Products",
+//           style: const TextStyle(
+//             fontWeight: FontWeight.bold,
+//             fontSize: 20,
+//             color: Colors.blueGrey,
+//           ),
+//         ),
+//       ],
+//     ),
+//   ),
+// ),
+//...
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Center(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Color: ',
+                    style: const TextStyle(
+                      fontSize: 17,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    '$selectedColor',
+                    style: const TextStyle(
+                      fontSize: 17,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: widget.model!.ColourName
+                                ?.toSet() // Remove duplicates
+                                .map((color) {
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedColor = color;
+                                  });
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 5.0),
+                                  padding: const EdgeInsets.all(1.0),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    border: Border.all(
+                                      color: selectedColor == color
+                                          ? Colors.black
+                                          : Colors.transparent,
+                                      width: 0.1,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    backgroundColor: colorFromName(color),
+                                    radius: 15, // Adjust size as needed
+                                  ),
+                                ),
+                              );
+                            }).toList() ??
+                            [],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Container(
+              child: SizedBox(
+                height: 150, // Adjust height as needed
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: similarProducts.length,
+                  itemBuilder: (context, index) {
+                    final item = similarProducts[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ItemsDetailsScreen(model: item),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 100,
+                        margin: const EdgeInsets.symmetric(horizontal: 1.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ClipOval(
+                              child: Container(
+                                color: Colors.transparent,
+                                child: Image.network(
+                                  API.getItemsImage + (item.thumbnailUrl ?? ''),
+                                  fit: BoxFit.cover,
+                                  width: 80,
+                                  height: 80,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                item.itemTitle ?? '',
+                                style: TextStyle(fontSize: 16),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              child: Text(
+                                "₹ ${item.price}",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.green),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 1),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      "${widget.model!.itemTitle}",
+                      textAlign: TextAlign.justify,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+           Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                children: [
+                  Text(
+                    "₹ ${widget.model!.price}",
+                    textAlign: TextAlign.justify,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30,
+                      color: Colors.green,
+                    ),
+                  ),
+                  Spacer(),
+                  IconButton(
+                    icon: Icon(
+                      widget.model!.isWishListed == "1"
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: widget.model!.isWishListed == "1"
+                          ? Color.fromARGB(255, 213, 9, 9)
+                          : Colors.grey,
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      toggleWishlist(widget.model!, userID);
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.share,
+                      color: Colors.blueGrey,
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      shareItem(widget.model!);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 8.0, right: 320.0),
+              child: Divider(
+                height: 1,
+                thickness: 2,
+                color: Colors.green,
+              ),
+            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
+            //   child: Text(
+            //     'Color: $selectedColor',
+            //     textAlign: TextAlign.justify,
+            //     style: const TextStyle(
+            //       fontSize: 18,
+            //       color: Colors.black,
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: SingleChildScrollView(
+            //     scrollDirection: Axis.horizontal,
+            //     child: Row(
+            //       children: widget.model!.ColourName?.map((color) {
+            //             return GestureDetector(
+            //               onTap: () {
+            //                 setState(() {
+            //                   selectedColor = color;
+            //                 });
+            //               },
+            //               child: Container(
+            //                 margin: const EdgeInsets.symmetric(horizontal: 5.0),
+            //                 padding: const EdgeInsets.all(10.0),
+            //                 decoration: BoxDecoration(
+            //                   shape: BoxShape.circle,
+            //                   border: Border.all(
+            //                     color: selectedColor == color
+            //                         ? Colors.black
+            //                         : Colors.transparent,
+            //                     width: 2,
+            //                   ),
+            //                 ),
+            //                 child: CircleAvatar(
+            //                   backgroundColor: colorFromName(color),
+            //                   radius: 20,
+            //                 ),
+            //               ),
+            //             );
+            //           }).toList() ??
+            //           [],
+            //     ),
+            //   ),
+            // ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
+              child: Text(
+                'Size: $selectedSize',
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(width: 10),
-                    CartStepperInt(
+                  children: widget.model!.SizeName?.map((size) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedSize = size;
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                            padding: const EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              color: selectedSize == size
+                                  ? Colors.black
+                                  : Colors.white,
+                              border: Border.all(
+                                color: Colors.black,
+                              ),
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: Text(
+                              size,
+                              style: TextStyle(
+                                color: selectedSize == size
+                                    ? Colors.white
+                                    : Colors.blueGrey,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList() ??
+                      [],
+                ),
+              ),
+            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(10.0),
+            //   child: Text(
+            //     "Total Price: ₹ ${counterLimit * (double.tryParse(widget.model?.price ?? '0') ?? 0)}",
+            //     textAlign: TextAlign.justify,
+            //     style: const TextStyle(
+            //       fontWeight: FontWeight.bold,
+            //       fontSize: 20,
+            //     ),
+            //   ),
+            // ),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start, // Align to the left
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color:
+                          Colors.blueGrey, // Background color for the container
+                      borderRadius:
+                          BorderRadius.circular(8.0), // Rounded corners
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey
+                              .withOpacity(0.3), // Light shadow color
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 3), // Changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: CartStepperInt(
                       count: counterLimit,
-                      size: 50,
+                      size: 40, // Smaller size for a more compact look
                       didChangeCount: (value) {
                         if (value < 1) {
                           Fluttertoast.showToast(
@@ -258,128 +666,302 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                         });
                       },
                     ),
-                    const SizedBox(width: 20), // Adjust the width as needed
-                    GestureDetector(
-                      onTap: () {
-                        toggleWishlist(widget.model!, userID);
-                      },
-                      child: Container(
-                        child: Icon(
-                          widget.model!.isWishListed == "1"
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          color: widget.model!.isWishListed == "1"
-                              ? Colors.orange
-                              : Colors.grey,
-                          size: 28,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, top: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      "${widget.model!.itemTitle}",
-                      textAlign: TextAlign.justify,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Colors.black,
-                      ),
-                    ),
                   ),
                 ],
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
-              child: Text(
-                widget.model!.itemInfo.toString(),
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  color: Colors.grey,
-                  fontSize: 15,
-                ),
+              child: ExpandableText(
+                text: widget.model!.itemInfo ?? '',
+                maxLines: 2, // Limit to 2 lines initially
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
-              child: Text(
-                widget.model!.longDescription.toString(),
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  color: Colors.grey,
-                  fontSize: 15,
-                ),
+              child: ExpandableText(
+                text: widget.model!.longDescription ?? '',
+                maxLines: 2, // Limit to 2 lines initially
               ),
             ),
+            Divider(thickness: 1, color: Colors.grey),
+            // Seller Information Section
+            // Seller Information Section
+// Seller Information Section
             Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                "₹ ${widget.model!.price}",
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                  color: Colors.green,
-                ),
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sold by',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                  SizedBox(
+                      height:
+                          10), // Adds some space between the heading and the profile section
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundImage: NetworkImage(
+                          API.sellerImage + sellerProfile,
+                          
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            sellerName,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                                color: Colors.pinkAccent,
+                              
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(width: 5),
+                              SmoothStarRating(
+                                rating: sellerRating == null
+                                    ? 0.0
+                                    : double.parse(sellerRating.toString()),
+                                starCount: 5,
+                                color: Colors.pinkAccent,
+                                borderColor: Colors.pinkAccent,
+                                size: 12,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SellerProductsScreen(
+                                sellerID: widget.model!.sellerUID.toString(),
+                                userID: userID,
+                                 sellerName : sellerName,
+                                 sellerProfile:sellerProfile,
+                                 sellerRating:sellerRating.toString(),
+                                
+                              ),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(255, 218, 157, 228),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        child: Text('View Shop'),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(left: 8.0, right: 320.0),
-              child: Divider(
-                height: 1,
-                thickness: 2,
-                color: Colors.green,
-              ),
-            ),
-             Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
-              child: Text(
-                widget.model!.SizeName.toString(),
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  color: Colors.grey,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-              Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
-              child: Text(
-                widget.model!.ColourName.toString(),
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  color: Colors.grey,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                "Total Price: ₹ ${counterLimit * (double.tryParse(widget.model?.price ?? '0') ?? 0)}",
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-            ),
-            const SizedBox(height: 80),
           ],
         ),
+      ),
+      bottomNavigationBar: Container(
+        color: Colors.white,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  if (!isAddedToCart) {
+                    int itemCounter = counterLimit;
+                    cartMethods.addItemToCart(
+                      widget.model!.itemID.toString(),
+                      itemCounter,
+                      userID,
+                    );
+                    setState(() {
+                      isAddedToCart = true;
+                    });
+                  } else {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (c) => CartScreenUser()));
+                  }
+                },
+                child: Container(
+                  height: 50,
+                  color: Colors.white,
+                  alignment: Alignment.center,
+                  child: Text(
+                    isAddedToCart ? "Go to cart" : "Add to cart",
+                    style: TextStyle(
+                      color: isAddedToCart ? Colors.black : Colors.green,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  int itemCounter = counterLimit;
+                  cartMethods.addItemToCart(
+                    widget.model!.itemID.toString(),
+                    itemCounter,
+                    userID,
+                  );
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (c) => CartScreenUser()));
+                },
+                child: Container(
+                  height: 50,
+                  color: Color.fromARGB(255, 148, 134, 5),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Buy now",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color colorFromName(String colorName) {
+    switch (colorName.toLowerCase()) {
+      case 'electric blue':
+        return Colors.blue;
+      case 'ochre':
+        return Colors.brown;
+      case 'red':
+        return Colors.red;
+      case 'blue':
+        return Colors.blue;
+      case 'green':
+        return Colors.green;
+      case 'yellow':
+        return Colors.yellow;
+      case 'black':
+        return Colors.black;
+      case 'white':
+        return Colors.white;
+      case 'purple':
+        return Colors.purple;
+      case 'orange':
+        return Colors.orange;
+      case 'pink':
+        return Colors.pink;
+      case 'brown':
+        return Colors.brown;
+      case 'gray':
+        return Colors.grey;
+      case 'cyan':
+        return Colors.cyan;
+      case 'magenta':
+        return Colors.pinkAccent;
+      case 'lime':
+        return Colors.lime;
+      case 'indigo':
+        return Colors.indigo;
+      default:
+        return Colors.grey;
+    }
+  }
+}
+
+class ExpandableText extends StatefulWidget {
+  final String text;
+  final int maxLines;
+
+  ExpandableText({required this.text, this.maxLines = 2});
+
+  @override
+  _ExpandableTextState createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<ExpandableText> {
+  bool _isExpanded = false;
+
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _toggleExpanded,
+      child: LayoutBuilder(
+        builder: (context, size) {
+          final span = TextSpan(
+            text: widget.text,
+            style: const TextStyle(
+              fontSize: 15,
+              color: Colors.black,
+            ),
+          );
+
+          final tp = TextPainter(
+            text: span,
+            maxLines: widget.maxLines,
+            textAlign: TextAlign.left,
+            textDirection: TextDirection.ltr,
+          );
+
+          tp.layout(maxWidth: size.maxWidth);
+
+          if (tp.didExceedMaxLines) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _isExpanded ? widget.text : widget.text.substring(0, tp.getPositionForOffset(Offset(size.maxWidth, tp.height * widget.maxLines)).offset) + '...',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Colors.black,
+                  ),
+                ),
+                Text(
+                  _isExpanded ? "Show less" : "Show more",
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Color.fromARGB(255, 202, 218, 232),
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return Text(
+              widget.text,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.black,
+              ),
+            );
+          }
+        },
       ),
     );
   }
