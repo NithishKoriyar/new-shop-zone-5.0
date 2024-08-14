@@ -4,8 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/seller/models/seller_items.dart';
 import 'dart:convert';
-import 'items_details_screen.dart'; // Replace with your item details screen
-import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart'; // Add the necessary import
+import 'items_details_screen.dart';
+import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 class SellerProductsScreen extends StatefulWidget {
   final String sellerID;
@@ -17,8 +17,8 @@ class SellerProductsScreen extends StatefulWidget {
   SellerProductsScreen(
       {required this.sellerID,
       required this.userID,
-      required this.sellerRating,
       required this.sellerProfile,
+      required this.sellerRating,
       required this.sellerName});
 
   @override
@@ -26,10 +26,35 @@ class SellerProductsScreen extends StatefulWidget {
 }
 
 class _SellerProductsScreenState extends State<SellerProductsScreen> {
+  String sellerName = "";
+  String sellerProfile = "";
+  double sellerRating = 0.0;
+
   @override
   void initState() {
     super.initState();
-    // fetchSellerInfo(widget.model!.sellerUID.toString());
+  }
+
+  Future<void> fetchSellerInfo(String? sellerID) async {
+    if (sellerID == null) return;
+
+    final url = Uri.parse("${API.fetchSellerInfo}?sellerID=$sellerID");
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+
+      if (jsonResponse['success']) {
+        setState(() {
+          sellerName = jsonResponse['data']['seller_name'];
+          sellerProfile = jsonResponse['data']['seller_profile'];
+          sellerRating = jsonResponse['data']['rating'].toDouble();
+        });
+      }
+    } else {
+      Fluttertoast.showToast(msg: "Failed to load seller information.");
+    }
   }
 
   @override
@@ -40,48 +65,74 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
       ),
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(
-                    API.sellerImage + widget.sellerProfile,
+          Stack(
+            children: [
+              // Background image
+              Container(
+                height: 220,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('images/b.png'), // Ensure the path matches the one in pubspec.yaml
+                    fit: BoxFit.cover,
+                  ),
+                 
+                ),
+              ),
+              // Overlay with gradient
+              Container(
+                height: 220,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.3),
+                      Colors.black.withOpacity(0.7),
+                    ],
+                  ),
+                
+                ),
+              ),
+              // Overlay with seller's profile and information
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          radius: 42,
+                          backgroundImage: NetworkImage(
+                            API.sellerImage + widget.sellerProfile,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      Text(
+                        widget.sellerName,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      SmoothStarRating(
+                        rating: double.tryParse(widget.sellerRating) ?? 0.0,
+                        starCount: 5,
+                        color: Colors.amber,
+                        borderColor: Colors.white,
+                        size: 25,
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.sellerName,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SmoothStarRating(
-                      rating: double.tryParse(widget.sellerRating) ??
-                          0.0, // Convert String to double
-                      starCount: 5,
-                      color: Colors.pinkAccent,
-                      borderColor: Colors.pinkAccent,
-                      size: 12,
-                    ),
-
-                    // SmoothStarRating(
-                    //   rating: widget.sellerRating,
-                    //   starCount: 5,
-                    //   color: Colors.pinkAccent,
-                    //   borderColor: Colors.pinkAccent,
-                    //   size: 12,
-                    // ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
           Expanded(
             child: StreamBuilder<List<Items>>(
@@ -106,20 +157,20 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
                       String? thumbnailUrl = model.thumbnailUrl;
 
                       return InkWell(
-                        // onTap: () {
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (c) => ItemsDetailsScreen(model: model),
-                        //     ),
-                        //   );
-                        // },
+                        onTap: () {
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (c) => ItemsDetailsScreen(model:model),
+                          //   ),
+                          // );
+                        },
                         child: Stack(
                           children: [
                             Container(
                               margin: EdgeInsets.all(5),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(15),
                                 color: Colors.white,
                                 boxShadow: [
                                   BoxShadow(
@@ -206,7 +257,7 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
       },
       body: json.encode({
         'user_id': userId,
-        'seller_id': sellerId, // Send seller ID to filter items
+        'seller_id': sellerId,
       }),
     );
 

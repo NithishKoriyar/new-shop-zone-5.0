@@ -247,25 +247,25 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                                       width: double.infinity,
                                       height: double.infinity,
                                     ),
-                                    Positioned(
-                                      top: 10,
-                                      right: 10,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          toggleWishlist(widget.model!, userID);
-                                        },
-                                        child: Icon(
-                                          widget.model!.isWishListed == "1"
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          color:
-                                              widget.model!.isWishListed == "1"
-                                                  ? Colors.orange
-                                                  : Colors.grey,
-                                          size: 28,
-                                        ),
-                                      ),
-                                    ),
+                                    // Positioned(
+                                    //   top: 10,
+                                    //   right: 10,
+                                    //   child: GestureDetector(
+                                    //     onTap: () {
+                                    //       toggleWishlist(widget.model!, userID);
+                                    //     },
+                                    //     child: Icon(
+                                    //       widget.model!.isWishListed == "1"
+                                    //           ? Icons.favorite
+                                    //           : Icons.favorite_border,
+                                    //       color:
+                                    //           widget.model!.isWishListed == "1"
+                                    //               ? Colors.orange
+                                    //               : Colors.grey,
+                                    //       size: 28,
+                                    //     ),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               );
@@ -473,16 +473,45 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ],
               ),
             ),
-            Padding(
+           Padding(
               padding: const EdgeInsets.all(10.0),
-              child: Text(
-                "₹ ${widget.model!.price}",
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                  color: Colors.green,
-                ),
+              child: Row(
+                children: [
+                  Text(
+                    "₹ ${widget.model!.price}",
+                    textAlign: TextAlign.justify,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30,
+                      color: Colors.green,
+                    ),
+                  ),
+                  Spacer(),
+                  IconButton(
+                    icon: Icon(
+                      widget.model!.isWishListed == "1"
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: widget.model!.isWishListed == "1"
+                          ? Color.fromARGB(255, 213, 9, 9)
+                          : Colors.grey,
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      toggleWishlist(widget.model!, userID);
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.share,
+                      color: Colors.blueGrey,
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      shareItem(widget.model!);
+                    },
+                  ),
+                ],
               ),
             ),
             const Padding(
@@ -644,26 +673,16 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
 
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
-              child: Text(
-                widget.model!.itemInfo.toString(),
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  color: Colors.blueGrey,
-                  fontSize: 25,
-                ),
+              child: ExpandableText(
+                text: widget.model!.itemInfo ?? '',
+                maxLines: 2, // Limit to 2 lines initially
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 6.0),
-              child: Text(
-                widget.model!.longDescription.toString(),
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  color: Colors.grey,
-                  fontSize: 15,
-                ),
+              child: ExpandableText(
+                text: widget.model!.longDescription ?? '',
+                maxLines: 2, // Limit to 2 lines initially
               ),
             ),
             Divider(thickness: 1, color: Colors.grey),
@@ -693,6 +712,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                         radius: 30,
                         backgroundImage: NetworkImage(
                           API.sellerImage + sellerProfile,
+                          
                         ),
                       ),
                       SizedBox(width: 10),
@@ -704,6 +724,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                                color: Colors.pinkAccent,
+                              
                             ),
                           ),
                           Row(
@@ -740,7 +762,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
+                          backgroundColor: const Color.fromARGB(255, 218, 157, 228),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
@@ -865,5 +887,82 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
       default:
         return Colors.grey;
     }
+  }
+}
+
+class ExpandableText extends StatefulWidget {
+  final String text;
+  final int maxLines;
+
+  ExpandableText({required this.text, this.maxLines = 2});
+
+  @override
+  _ExpandableTextState createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<ExpandableText> {
+  bool _isExpanded = false;
+
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _toggleExpanded,
+      child: LayoutBuilder(
+        builder: (context, size) {
+          final span = TextSpan(
+            text: widget.text,
+            style: const TextStyle(
+              fontSize: 15,
+              color: Colors.black,
+            ),
+          );
+
+          final tp = TextPainter(
+            text: span,
+            maxLines: widget.maxLines,
+            textAlign: TextAlign.left,
+            textDirection: TextDirection.ltr,
+          );
+
+          tp.layout(maxWidth: size.maxWidth);
+
+          if (tp.didExceedMaxLines) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _isExpanded ? widget.text : widget.text.substring(0, tp.getPositionForOffset(Offset(size.maxWidth, tp.height * widget.maxLines)).offset) + '...',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Colors.black,
+                  ),
+                ),
+                Text(
+                  _isExpanded ? "Show less" : "Show more",
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Color.fromARGB(255, 202, 218, 232),
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return Text(
+              widget.text,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.black,
+              ),
+            );
+          }
+        },
+      ),
+    );
   }
 }
