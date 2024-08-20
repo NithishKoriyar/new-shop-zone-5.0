@@ -95,36 +95,35 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
     }
   }
 
-Future<void> fetchSellerProducts() async {
-  var url = Uri.parse("${API.displayItemss}");
+  Future<void> fetchSellerProducts() async {
+    var url = Uri.parse("${API.displayItemss}");
 
-  final response = await http.post(
-    url,
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'user_id': userID,
-      'seller_id': widget.model!.sellerUID,
-    }),
-  );
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'user_id': userID,
+        'seller_id': widget.model!.sellerUID,
+      }),
+    );
 
-  if (response.statusCode == 200) {
-    var jsonResponse = json.decode(response.body);
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
 
-    List<Items> allSellerProducts =
-        (jsonResponse as List).map((item) => Items.fromJson(item)).toList();
+      List<Items> allSellerProducts =
+          (jsonResponse as List).map((item) => Items.fromJson(item)).toList();
 
-    // Shuffle the items to get a random selection
-    allSellerProducts.shuffle();
+      // Shuffle the items to get a random selection
+      allSellerProducts.shuffle();
 
-    setState(() {
-      // Display up to 6 random items
-      sellerProducts = allSellerProducts.take(6).toList();
-    });
-  } else {
-    Fluttertoast.showToast(msg: "Failed to load seller's products.");
+      setState(() {
+        // Display up to 6 random items
+        sellerProducts = allSellerProducts.take(6).toList();
+      });
+    } else {
+      Fluttertoast.showToast(msg: "Failed to load seller's products.");
+    }
   }
-}
-
 
   Future<void> fetchSellerInfo(String? sellerID) async {
     if (sellerID == null) return;
@@ -559,6 +558,8 @@ Future<void> fetchSellerProducts() async {
                         fontSize: 25,
                         color: Colors.black,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -752,6 +753,8 @@ Future<void> fetchSellerProducts() async {
                               fontWeight: FontWeight.bold,
                               color: Colors.pinkAccent,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           Row(
                             children: [
@@ -803,44 +806,45 @@ Future<void> fetchSellerProducts() async {
             // Divider after seller info
             Divider(thickness: 4, color: Colors.grey),
 
-          // "You May Also Like" section
-Padding(
-  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(
-        'You May Also Like',
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
-      ),
-      GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SellerItemsScreen(
-                sellerID: widget.model!.sellerUID.toString(),
-                userID: userID,
+            // "You May Also Like" section
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'You May Also Like',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SellerItemsScreen(
+                            sellerID: widget.model!.sellerUID.toString(),
+                            userID: userID,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Icon(
+                      Icons.arrow_forward,
+                      size: 24,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
               ),
             ),
-          );
-        },
-        child: Icon(
-          Icons.arrow_forward,
-          size: 24,
-          color: Colors.black,
-        ),
-      ),
-    ],
-  ),
-),
 
-// Display up to 6 seller's random items
-Padding(
+            // Display up to 6 seller's random items
+           Padding(
   padding: const EdgeInsets.all(8.0),
   child: SizedBox(
     height: 220, // Adjust the height according to your design
@@ -855,13 +859,15 @@ Padding(
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ItemsDetailsScreen(model: item),
+                      builder: (context) =>
+                          ItemsDetailsScreen(model: item),
                     ),
                   );
                 },
                 child: Card(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero, // Sharp edges
+                    borderRadius:
+                        BorderRadius.zero, // Sharp edges
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -873,29 +879,32 @@ Padding(
                         fit: BoxFit.cover,
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text(
-                          item.itemTitle.toString(),
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0,
+                          vertical: 5.0,
+                        ),
+                        child: Container(
+                          width: 100, // Constrain the width of the title
+                          child: Text(
+                            item.itemTitle.toString(),
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text(
                           "₹${item.price}",
                           style: TextStyle(
                             fontSize: 14.0,
                             color: Colors.grey,
                           ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Row(
-                          // If you want to add additional details like discount or rating
                         ),
                       ),
                     ],
@@ -909,7 +918,6 @@ Padding(
           ),
   ),
 )
-
 
           ],
         ),
@@ -1017,6 +1025,8 @@ Padding(
               item.itemTitle ?? '',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
+              maxLines: 1, // Limit to one line
+              overflow: TextOverflow.ellipsis, // Add ellipsis if text overflows
             ),
           ),
           Padding(
