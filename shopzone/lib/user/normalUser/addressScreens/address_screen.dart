@@ -14,7 +14,6 @@ import 'package:shopzone/user/userPreferences/current_user.dart';
 // ignore: must_be_immutable
 class AddressScreen extends StatefulWidget {
   Carts? model;
-    // Wishlist? model;
 
   AddressScreen({this.model});
 
@@ -58,7 +57,7 @@ class _AddressScreenState extends State<AddressScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-elevation: 20,
+        elevation: 20,
         title: const Text(
           "Shop Zone",
           style: TextStyle(
@@ -69,21 +68,11 @@ elevation: 20,
         centerTitle: true,
         automaticallyImplyLeading: true,
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (c) => SaveNewAddressScreen()));
-        },
-        label: const Text("Add New Address"),
-        icon: const Icon(
-          Icons.add_location,
-        ),
-      ),
       body: Column(
         children: [
-          Consumer<NormalUserAddressChanger>(builder: (context, address, c) {
-            return Flexible(
-              child: StreamBuilder<List<dynamic>>(
+          Expanded(
+            child: Consumer<NormalUserAddressChanger>(builder: (context, address, c) {
+              return StreamBuilder<List<dynamic>>(
                 stream: fetchAddressStream(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.active) {
@@ -91,17 +80,14 @@ elevation: 20,
                       return ListView.builder(
                         itemBuilder: (context, index) {
                           return AddressDesignWidget(
-                            addressModel:
-                                Address.fromJson(snapshot.data![index]),
+                            addressModel: Address.fromJson(snapshot.data![index]),
                             index: address.count,
                             value: index,
                             addressID: snapshot.data![index]['id'],
-                            sellerUID: widget.model
-                                ?.sellerUID, // assuming you have a sellerUID property in the Carts model
+                            sellerUID: widget.model?.sellerUID,
                             totalPrice: widget.model?.totalPrice,
                             cartId: widget.model?.cartId,
-                            model: widget
-                                .model, // assuming you have a totalPrice property in the Carts model
+                            model: widget.model,
                           );
                         },
                         itemCount: snapshot.data!.length,
@@ -119,9 +105,89 @@ elevation: 20,
                     );
                   }
                 },
+              );
+            }),
+          ),
+          Divider(thickness: 1, color: Colors.grey[300]),
+          // Display Buy Now Item
+          if (widget.model != null)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Image.network(
+                        API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.cover,
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.model!.itemTitle ?? '',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Size: ${widget.model!.sizeName ?? ''}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Qty: ${widget.model!.itemCounter}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    '₹${widget.model!.price}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
               ),
-            );
-          }),
+            ),
+          // Add New Address Button
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (c) => SaveNewAddressScreen()));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange, // Button background color
+                padding: EdgeInsets.symmetric(vertical: 16), // Button height
+              ),
+              child: Text(
+                "Add New Address",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
         ],
       ),
     );
