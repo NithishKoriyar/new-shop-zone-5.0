@@ -9,16 +9,15 @@ import 'package:shopzone/user/models/cart.dart';
 import 'package:shopzone/user/normalUser/placeOrderScreen/place_order_screen.dart';
 import 'package:http/http.dart' as http;
 
-// ignore: must_be_immutable
 class AddressDesignWidget extends StatefulWidget {
-  Address? addressModel;
-  Carts? model;
-  int? index;
-  int? value;
-  String? addressID;
-  String? sellerUID;
-  String? cartId;
-  int? totalPrice;
+  final Address? addressModel;
+  final Carts? model;
+  final int? index;
+  final int? value;
+  final String? addressID;
+  final String? sellerUID;
+  final String? cartId;
+  final int? totalPrice;
 
   AddressDesignWidget({
     this.addressModel,
@@ -40,7 +39,6 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
     final url = Uri.parse(API.deleteAddress);
     final response =
         await http.post(url, body: {'address_id': addressID.toString()});
-    print(API.deleteAddress);
 
     if (response.statusCode == 200) {
       Navigator.push(
@@ -49,12 +47,7 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
               builder: (c) => AddressScreen(
                     model: widget.model,
                   )));
-
-      // Refresh the page
-      setState(() {
-        // Any state changes that should trigger a UI rebuild go here
-        // For example, if you have a list of addresses, you would remove the address here.
-      });
+      setState(() {});
     } else {
       print('Failed to delete address');
     }
@@ -63,176 +56,118 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white24,
-      child: Column(
-        children: [
-          //address info
-          Row(
-            children: [
-              Radio(
-                groupValue: widget.index,
-                value: widget.value!,
-                activeColor: Colors.pink,
-                onChanged: (val) {
-                  //provider
-                  Provider.of<NormalUserAddressChanger>(context, listen: false)
-                      .showSelectedAddress(val);
-                },
-              ),
-              Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    child: Table(
-                      children: [
-                        TableRow(
-                          children: [
-                            const Text(
-                              "Name: ",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              widget.addressModel!.name.toString(),
-                            ),
-                          ],
-                        ),
-                        const TableRow(
-                          children: [
-                            SizedBox(
-                              height: 10,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        ),
-                        TableRow(
-                          children: [
-                            const Text(
-                              "Phone Number: ",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              widget.addressModel!.phoneNumber.toString(),
-                            ),
-                          ],
-                        ),
-                        const TableRow(
-                          children: [
-                            SizedBox(
-                              height: 10,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        ),
-                        TableRow(
-                          children: [
-                            const Text(
-                              "Full Address: ",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              widget.addressModel!.completeAddress.toString(),
-                            ),
-                          ],
-                        ),
-                        const TableRow(
-                          children: [
-                            SizedBox(
-                              height: 10,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          //button
-          widget.value == Provider.of<NormalUserAddressChanger>(context).count
-              ? Padding(
-                  padding: const EdgeInsets.all(0.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment
-                        .center, // Center the buttons horizontally
+      color: Colors.white,
+      elevation: 3.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Address Info
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Radio(
+                  groupValue: widget.index,
+                  value: widget.value!,
+                  activeColor: Colors.pink,
+                  onChanged: (val) {
+                    Provider.of<NormalUserAddressChanger>(context, listen: false)
+                        .showSelectedAddress(val);
+                  },
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Colors.red, // Red color for delete button
+                      Text(
+                        widget.addressModel!.name.toString(),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
-                        onPressed: () {
-                          // Implement delete functionality here
-                          int? addressIdInt;
-                          try {
-                            addressIdInt = int.parse(widget.addressID!);
-                            _deleteAddress(addressIdInt);
-                          } catch (e) {
-                            print("Error converting addressID to int: $e");
-                          }
-// Pass the address ID to delete
-                        },
-                        child: const Text("Delete"),
                       ),
-                      const SizedBox(
-                        width: 50,
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purpleAccent,
-                          padding: const EdgeInsets.all(8.0),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Phone: ${widget.addressModel!.phoneNumber.toString()}",
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
                         ),
-                        onPressed: () {
-                          // Print the values of addressID, sellerUID, and totalAmount
-                          print("addressID: ${widget.addressID}");
-                          print("totalAmount: ${widget.totalPrice}");
-                          print("cartId: ${widget.cartId}");
-
-                          //Send the user to Place Order Screen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (c) => PlaceOrderScreen(
-                                sellerUID :widget.sellerUID,
-                                addressID: widget.addressID,
-                                totalAmount: widget.totalPrice,
-                                cartId: widget.cartId,
-                                model: widget.model,
-                              ),
-                            ),
-                          );
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (c) => PaymentMethodScreen(),
-                          //   ),
-                          // );
-                        },
-                        child: const Text("Proceed"),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.addressModel!.completeAddress.toString(),
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
-                )
-              : Container(),
-        ],
+                ),
+              ],
+            ),
+
+            // Buttons
+            if (widget.value == Provider.of<NormalUserAddressChanger>(context).count)
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 205, 156, 152), // Red color for delete button
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        int? addressIdInt;
+                        try {
+                          addressIdInt = int.parse(widget.addressID!);
+                          _deleteAddress(addressIdInt);
+                        } catch (e) {
+                          print("Error converting addressID to int: $e");
+                        }
+                      },
+                      icon: const Icon(Icons.delete),
+                      label: const Text("Delete"),
+                    ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 165, 212, 167), // Green color for proceed button
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (c) => PlaceOrderScreen(
+                              sellerUID: widget.sellerUID,
+                              addressID: widget.addressID,
+                              totalAmount: widget.totalPrice,
+                              cartId: widget.cartId,
+                              model: widget.model,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text("Proceed"),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

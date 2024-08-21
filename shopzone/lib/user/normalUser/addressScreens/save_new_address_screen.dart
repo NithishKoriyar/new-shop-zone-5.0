@@ -1,19 +1,16 @@
 import 'dart:convert';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shopzone/api_key.dart';
-
 import 'package:shopzone/user/normalUser/addressScreens/text_field_address_widget.dart';
 import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 
-// ignore: must_be_immutable
 class SaveNewAddressScreen extends StatefulWidget {
-  String? sellerUID;
-  double? totalAmount;
-
   SaveNewAddressScreen();
 
   @override
@@ -42,8 +39,6 @@ class _SaveNewAddressScreenState extends State<SaveNewAddressScreen> {
     super.initState();
     currentUserController.getUserInfo().then((_) {
       setUserInfo();
-      printUserInfo();
-      // Once the seller info is set, call setState to trigger a rebuild.
       setState(() {});
     });
   }
@@ -55,18 +50,35 @@ class _SaveNewAddressScreenState extends State<SaveNewAddressScreen> {
     userImg = currentUserController.user.user_profile;
   }
 
-  void printUserInfo() {
-    print('user Name: $userName');
-    print('user Email: $userEmail');
-    print('user ID: $userID'); // Corrected variable name
-    print('user image: $userImg');
+  Future<void> useCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude, position.longitude);
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+
+        setState(() {
+          streetNumber.text = place.street ?? '';
+          flatHouseNumber.text = place.subLocality ?? '';
+          city.text = place.locality ?? '';
+          stateCountry.text = "${place.administrativeArea}, ${place.country}";
+        });
+
+        Fluttertoast.showToast(msg: "Location retrieved successfully");
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Failed to get location: $e");
+    }
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-elevation: 20,
+        elevation: 20,
         title: const Text(
           "Shop Zone",
           style: TextStyle(
@@ -76,53 +88,6 @@ elevation: 20,
         ),
         centerTitle: true,
         automaticallyImplyLeading: true,
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          if (formKey.currentState!.validate()) {
-            if (phoneNumber.text.length == 10) {
-              completeAddress = streetNumber.text.trim() +
-                  ", " +
-                  flatHouseNumber.text.trim() +
-                  ", " +
-                  city.text.trim() +
-                  ", " +
-                  stateCountry.text.trim() +
-                  ".";
-
-              var response = await http.post(
-                Uri.parse(API.addNewAddress),
-                body: jsonEncode({
-                  "uid": userID,
-                  "name": name.text.trim(),
-                  "phoneNumber": phoneNumber.text.trim(),
-                  "streetNumber": streetNumber.text.trim(),
-                  "flatHouseNumber": flatHouseNumber.text.trim(),
-                  "city": city.text.trim(),
-                  "stateCountry": stateCountry.text.trim(),
-                  "completeAddress": completeAddress,
-                }),
-              );
-
-              if (response.statusCode == 200) {
-                var responseData = jsonDecode(response.body);
-                Fluttertoast.showToast(msg: responseData['message']);
-                formKey.currentState!.reset();
-                // ignore: use_build_context_synchronously
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (c) => CartScreenUser()));
-              } else {
-                Fluttertoast.showToast(msg: "Error saving address.");
-              }
-            } else {
-              Fluttertoast.showToast(msg: "please enter valid phone number.");
-            }
-          }
-        },
-        label: const Text("Save Now"),
-        icon: const Icon(
-          Icons.save,
-        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -145,32 +110,43 @@ elevation: 20,
                   TextFieldAddressWidget(
                     hint: "Name",
                     controller: name,
-                     keyboardType: TextInputType.name,
+                    keyboardType: TextInputType.name,
                   ),
                   TextFieldAddressWidget(
                     hint: "Phone Number",
                     controller: phoneNumber,
-                     keyboardType: TextInputType.phone,
+                    keyboardType: TextInputType.phone,
                   ),
                   TextFieldAddressWidget(
                     hint: "Street Number",
                     controller: streetNumber,
-                     keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.text,
                   ),
                   TextFieldAddressWidget(
                     hint: "Flat / House Number",
                     controller: flatHouseNumber,
-                     keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.text,
                   ),
                   TextFieldAddressWidget(
                     hint: "City",
                     controller: city,
-                     keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.text,
                   ),
                   TextFieldAddressWidget(
                     hint: "State / Country",
                     controller: stateCountry,
-                     keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.text,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: useCurrentLocation,
+                    icon: Icon(Icons.location_on),
+                    label: Text("Use My Location"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 9, 66, 165), // Button color
+                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      textStyle: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ],
               ),
@@ -178,7 +154,58 @@ elevation: 20,
           ],
         ),
       ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton.icon(
+          onPressed: () async {
+            if (formKey.currentState!.validate()) {
+              if (phoneNumber.text.length == 10) {
+                completeAddress = streetNumber.text.trim() +
+                    ", " +
+                    flatHouseNumber.text.trim() +
+                    ", " +
+                    city.text.trim() +
+                    ", " +
+                    stateCountry.text.trim() +
+                    ".";
+
+                var response = await http.post(
+                  Uri.parse(API.addNewAddress),
+                  body: jsonEncode({
+                    "uid": userID,
+                    "name": name.text.trim(),
+                    "phoneNumber": phoneNumber.text.trim(),
+                    "streetNumber": streetNumber.text.trim(),
+                    "flatHouseNumber": flatHouseNumber.text.trim(),
+                    "city": city.text.trim(),
+                    "stateCountry": stateCountry.text.trim(),
+                    "completeAddress": completeAddress,
+                  }),
+                );
+
+                if (response.statusCode == 200) {
+                  var responseData = jsonDecode(response.body);
+                  Fluttertoast.showToast(msg: responseData['message']);
+                  formKey.currentState!.reset();
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (c) => CartScreenUser()));
+                } else {
+                  Fluttertoast.showToast(msg: "Error saving address.");
+                }
+              } else {
+                Fluttertoast.showToast(msg: "Please enter a valid phone number.");
+              }
+            }
+          },
+          icon: Icon(Icons.save),
+          label: Text("Save Now"),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange, // Button color
+            padding: EdgeInsets.symmetric(vertical: 16), // Button height
+            textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
     );
   }
 }
-//
