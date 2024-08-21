@@ -6,6 +6,7 @@ class Items {
   String? itemTitle;
   String? longDescription;
   String? price;
+  String? sellingPrice; // Added sellingPrice field
   DateTime? publishedDate;
   String? sellerName;
   String? sellerUID;
@@ -19,7 +20,6 @@ class Items {
   String? category_id;
   String? sub_category_id;
 
-
   Items({
     this.brandID,
     this.itemID,
@@ -28,6 +28,7 @@ class Items {
     this.itemTitle,
     this.longDescription,
     this.price,
+    this.sellingPrice, // Added sellingPrice field
     this.publishedDate,
     this.sellerName,
     this.sellerUID,
@@ -50,6 +51,7 @@ class Items {
     itemTitle = json["itemTitle"];
     longDescription = json["longDescription"];
     price = json["price"];
+    sellingPrice = json["sellingPrice"]; // Added sellingPrice field
     if (json["publishedDate"] != null && json["publishedDate"] is String) {
       publishedDate = DateTime.parse(json["publishedDate"]);
     }
@@ -75,6 +77,7 @@ class Items {
       "itemTitle": itemTitle,
       "longDescription": longDescription,
       "price": price,
+      "sellingPrice": sellingPrice, // Added sellingPrice field
       "publishedDate": publishedDate?.toIso8601String(),
       "sellerName": sellerName,
       "sellerUID": sellerUID,

@@ -6,6 +6,8 @@ import 'package:shopzone/user/normalUser/cart/cart_item_details.dart';
 import 'package:shopzone/user/models/cart.dart';
 import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
+import 'package:shopzone/user/userPreferences/current_user.dart';
 // ignore: must_be_immutable
 class CartItemDesignWidget extends StatefulWidget {
   Carts? model;
@@ -22,6 +24,7 @@ class CartItemDesignWidget extends StatefulWidget {
 }
 
 class _CartItemDesignWidgetState extends State<CartItemDesignWidget> {
+   final CurrentUser currentUserController = Get.put(CurrentUser());
   int _quantity = 1;
 
   @override
@@ -34,6 +37,28 @@ class _CartItemDesignWidgetState extends State<CartItemDesignWidget> {
     setState(() {
       widget.model!.totalPrice = _quantity * int.parse(widget.model!.price ?? '0');
     });
+  }
+
+
+  Future<void> removeItemFromCart(String userID, String itemID) async {
+    final response = await http.post(
+      Uri.parse(API.deleteItemFromCart),
+      body: {
+        'userId': userID,
+        'itemId': itemID,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Fluttertoast.showToast(msg: 'Item removed successfully!');
+      setState(() {
+        // Remove the item from the cart or perform any other necessary updates
+        // This example assumes that the cart item is being removed from a list in the parent widget
+        Navigator.pop(context);
+      });
+    } else {
+      Fluttertoast.showToast(msg: 'Failed to remove item. Please try again.');
+    }
   }
 
   @override
@@ -238,6 +263,7 @@ class _CartItemDesignWidgetState extends State<CartItemDesignWidget> {
                       TextButton.icon(
                         onPressed: () {
                           // Logic to remove item from cart
+                            removeItemFromCart(currentUserController.user.user_id.toString(), widget.model!.itemID.toString());
                         },
                         icon: Icon(Icons.delete, color: Colors.red),
                         label: Text("Remove", style: TextStyle(color: Colors.red)),
@@ -276,19 +302,5 @@ class _CartItemDesignWidgetState extends State<CartItemDesignWidget> {
       ),
     );
   }
-   Future<void> removeItemFromCart(String userID, String itemID) async {
-    final response = await http.post(
-      Uri.parse(API.deleteItemFromCart),
-      body: {
-        'userId': userID,
-        'itemId': itemID,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: 'Item removed successfully!');
-    } else {
-      Fluttertoast.showToast(msg: 'Failed to remove item. Please try again.');
-    }
-  }
+  
 }

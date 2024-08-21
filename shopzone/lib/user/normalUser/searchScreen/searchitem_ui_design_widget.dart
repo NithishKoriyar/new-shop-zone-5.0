@@ -3,7 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/models/items.dart';
 import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart';
-
+import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
 
 // ignore: must_be_immutable
@@ -15,18 +15,17 @@ class SearchItemsUiDesignWidget extends StatefulWidget {
   });
 
   @override
-  State<SearchItemsUiDesignWidget> createState() => _SearchItemsUiDesignWidgetState();
+  State<SearchItemsUiDesignWidget> createState() =>
+      _SearchItemsUiDesignWidgetState();
 }
 
 class _SearchItemsUiDesignWidgetState extends State<SearchItemsUiDesignWidget> {
   bool isInWishlist = false;
+
   @override
   void initState() {
     super.initState();
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,7 @@ class _SearchItemsUiDesignWidgetState extends State<SearchItemsUiDesignWidget> {
       widget.model!.fourthImageUrl,
       widget.model!.fifthImageUrl,
     ];
-    
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -72,9 +71,41 @@ class _SearchItemsUiDesignWidgetState extends State<SearchItemsUiDesignWidget> {
                             return Image.network(
                               API.getItemsImage + (imageUrls[index] ?? ''),
                               fit: BoxFit.cover,
+                              loadingBuilder: (BuildContext context,
+                                  Widget child,
+                                  ImageChunkEvent? loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Shimmer.fromColors(
+                                  baseColor: Colors.grey[300]!,
+                                  highlightColor: Colors.grey[100]!,
+                                  child: Container(
+                                    width: double.infinity,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (BuildContext context, Object error,
+                                  StackTrace? stackTrace) {
+                                return Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                );
+                              },
                             );
                           } else {
-                            return Container();
+                            return Container(
+                              height: 80,
+                              color: Colors.grey[300],
+                              child: Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: Container(
+                                  color: Colors.white,
+                                  height: 80,
+                                  width: double.infinity,
+                                ),
+                              ),
+                            );
                           }
                         },
                       ),
@@ -96,13 +127,6 @@ class _SearchItemsUiDesignWidgetState extends State<SearchItemsUiDesignWidget> {
                 const SizedBox(
                   height: 1,
                 ),
-                // Text(
-                //   widget.model!.itemInfo.toString(),
-                //   style: const TextStyle(
-                //     color: Colors.black87,
-                //     fontSize: 14,
-                //   ),
-                // ),
                 const SizedBox(height: 10),
               ],
             ),
@@ -110,6 +134,5 @@ class _SearchItemsUiDesignWidgetState extends State<SearchItemsUiDesignWidget> {
         ),
       ),
     );
-    
   }
 }

@@ -42,6 +42,8 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
   TextEditingController itemTitleTextEditingController = TextEditingController();
   TextEditingController itemDescriptionTextEditingController = TextEditingController();
   TextEditingController itemPriceTextEditingController = TextEditingController();
+  TextEditingController sellingPriceTextEditingController = TextEditingController();
+
 
   bool uploading = false;
   String itemUniqueId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -53,73 +55,75 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
   XFile? fourthImage;
   XFile? fifthImage;
 
-  Future<void> validateUploadForm() async {
-    if (thumbnail != null &&
-        secondImage != null &&
-        thirdImage != null &&
-        fourthImage != null &&
-        fifthImage != null) {
-      if (itemInfoTextEditingController.text.isNotEmpty &&
-          itemTitleTextEditingController.text.isNotEmpty &&
-          itemDescriptionTextEditingController.text.isNotEmpty &&
-          itemPriceTextEditingController.text.isNotEmpty &&
-          selectedCategory != null &&
-          selectedSubcategory != null &&
-          selectedSizeName.isNotEmpty &&
-          selectedColorName.isNotEmpty) {
-        var thumbnailBytes = await thumbnail!.readAsBytes();
-        var secondImageBytes = await secondImage!.readAsBytes();
-        var thirdImageBytes = await thirdImage!.readAsBytes();
-        var fourthImageBytes = await fourthImage!.readAsBytes();
-        var fifthImageBytes = await fifthImage!.readAsBytes();
+Future<void> validateUploadForm() async {
+  if (thumbnail != null &&
+      secondImage != null &&
+      thirdImage != null &&
+      fourthImage != null &&
+      fifthImage != null) {
+    if (itemInfoTextEditingController.text.isNotEmpty &&
+        itemTitleTextEditingController.text.isNotEmpty &&
+        itemDescriptionTextEditingController.text.isNotEmpty &&
+        itemPriceTextEditingController.text.isNotEmpty &&
+        sellingPriceTextEditingController.text.isNotEmpty &&
+        selectedCategory != null &&
+        selectedSubcategory != null &&
+        selectedSizeName.isNotEmpty &&
+        selectedColorName.isNotEmpty) {
+      var thumbnailBytes = await thumbnail!.readAsBytes();
+      var secondImageBytes = await secondImage!.readAsBytes();
+      var thirdImageBytes = await thirdImage!.readAsBytes();
+      var fourthImageBytes = await fourthImage!.readAsBytes();
+      var fifthImageBytes = await fifthImage!.readAsBytes();
 
-        var body = {
-          'itemInfo': itemInfoTextEditingController.text.trim(),
-          'itemTitle': itemTitleTextEditingController.text.trim(),
-          'itemID': itemUniqueId,
-          'itemDescription': itemDescriptionTextEditingController.text.trim(),
-          'itemPrice': itemPriceTextEditingController.text.trim(),
-          'brandID': widget.model!.brandID.toString(),
-          'sellerUID': sellerID,
-          'sellerName': sellerName,
-          'thumbnail': base64Encode(thumbnailBytes),
-          'secondImage': base64Encode(secondImageBytes),
-          'thirdImage': base64Encode(thirdImageBytes),
-          'fourthImage': base64Encode(fourthImageBytes),
-          'fifthImage': base64Encode(fifthImageBytes),
-          'category_id': selectedCategory,
-          'sub_category_id': selectedSubcategory,
-          'SizeName': selectedSizeName.join(','), // Convert list to comma-separated string
-          'ColourName': selectedColorName.join(','), // Convert list to comma-separated string
-        };
-        print(body);
-        var response = await http.post(
-          Uri.parse(API.uploadItem),
-          body: json.encode(body),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        );
+      var body = {
+        'itemInfo': itemInfoTextEditingController.text.trim(),
+        'itemTitle': itemTitleTextEditingController.text.trim(),
+        'itemID': itemUniqueId,
+        'itemDescription': itemDescriptionTextEditingController.text.trim(),
+        'itemPrice': itemPriceTextEditingController.text.trim(),
+        'sellingPrice': sellingPriceTextEditingController.text.trim(), // Added sellingPrice
+        'brandID': widget.model!.brandID.toString(),
+        'sellerUID': sellerID,
+        'sellerName': sellerName,
+        'thumbnail': base64Encode(thumbnailBytes),
+        'secondImage': base64Encode(secondImageBytes),
+        'thirdImage': base64Encode(thirdImageBytes),
+        'fourthImage': base64Encode(fourthImageBytes),
+        'fifthImage': base64Encode(fifthImageBytes),
+        'category_id': selectedCategory,
+        'sub_category_id': selectedSubcategory,
+        'SizeName': selectedSizeName.join(','), // Convert list to comma-separated string
+        'ColourName': selectedColorName.join(','), // Convert list to comma-separated string
+      };
+      print(body);
+      var response = await http.post(
+        Uri.parse(API.uploadItem),
+        body: json.encode(body),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
 
-        if (response.statusCode == 200) {
-          var responseJson = json.decode(response.body);
+      if (response.statusCode == 200) {
+        var responseJson = json.decode(response.body);
 
-          if (responseJson['success']) {
-            Fluttertoast.showToast(msg: responseJson['message']);
-            Navigator.push(context, MaterialPageRoute(builder: (c) => HomeScreen()));
-          } else {
-            Fluttertoast.showToast(msg: "Error: " + responseJson['message']);
-          }
+        if (responseJson['success']) {
+          Fluttertoast.showToast(msg: responseJson['message']);
+          Navigator.push(context, MaterialPageRoute(builder: (c) => HomeScreen()));
         } else {
-          Fluttertoast.showToast(msg: "Network error: Unable to upload.");
+          Fluttertoast.showToast(msg: "Error: " + responseJson['message']);
         }
       } else {
-        Fluttertoast.showToast(msg: "Please fill complete form.");
+        Fluttertoast.showToast(msg: "Network error: Unable to upload.");
       }
     } else {
-      Fluttertoast.showToast(msg: "Please choose all images.");
+      Fluttertoast.showToast(msg: "Please fill complete form.");
     }
+  } else {
+    Fluttertoast.showToast(msg: "Please choose all images.");
   }
+}
 
   // @override
   // Widget build(BuildContext context) {
@@ -208,6 +212,16 @@ class _UploadItemsScreenState extends State<UploadItemsScreen> {
             ),
           ),
           const Divider(color: Colors.black, thickness: 1),
+          ListTile(
+  leading: const Icon(Icons.price_check, color: Colors.black),
+  title: TextField(
+    controller: sellingPriceTextEditingController,
+    decoration: const InputDecoration(hintText: "Selling Price", border: InputBorder.none),
+    keyboardType: TextInputType.number,
+  ),
+),
+const Divider(color: Colors.black, thickness: 1),
+
           // Category dropdown
           DropdownButton<String>(
             value: selectedCategory,

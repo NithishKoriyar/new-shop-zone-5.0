@@ -5,6 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shimmer/shimmer.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/normalUser/cart/cart_item_design_widget.dart';
 import 'package:shopzone/user/models/cart.dart';
@@ -25,6 +26,7 @@ class _CartScreenUserState extends State<CartScreenUser> {
   late String userImg;
 
   Address? userAddress;
+  bool isLoadingAddress = true; // Track loading state for address
 
   @override
   void initState() {
@@ -56,12 +58,15 @@ class _CartScreenUserState extends State<CartScreenUser> {
       if (decodedData is List && decodedData.isNotEmpty) {
         setState(() {
           userAddress = Address.fromJson(decodedData[0]);
+          isLoadingAddress = false; // Stop loading address
         });
       } else {
         print("No address found.");
+        isLoadingAddress = false;
       }
     } else {
       print("Failed to load address.");
+      isLoadingAddress = false;
     }
   }
 
@@ -81,8 +86,8 @@ class _CartScreenUserState extends State<CartScreenUser> {
     }
   }
 
-  //current location
-    Future<void> getCurrentLocationAndFill() async {
+  // Current location
+  Future<void> getCurrentLocationAndFill() async {
     try {
       // Ensure the location service is enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -134,115 +139,204 @@ class _CartScreenUserState extends State<CartScreenUser> {
     }
   }
 
-void showAddressSelectionSheet(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-    ),
-    builder: (BuildContext context) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Select Delivery Address',
+  void showAddressSelectionSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Select Delivery Address',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              Divider(),
+              ListTile(
+                leading: Icon(Icons.location_on),
+                title: Text('${userAddress?.name ?? ''}, ${userAddress?.stateCountry ?? ''}'),
+                subtitle: Text(
+                    '${userAddress?.flatHouseNumber ?? ''}, ${userAddress?.streetNumber ?? ''}, ${userAddress?.city ?? ''}'),
+                trailing: Radio(
+                  value: true,
+                  groupValue: true,
+                  onChanged: (value) {
+                    // When an address is selected, update the main screen's address and close the sheet
+                    Navigator.of(context).pop();
+                  },
+                ),
+                onTap: () {
+                  // When the user taps this address, update the cart screen with this address
+                  setState(() {
+                    userAddress = Address(
+                      flatHouseNumber: userAddress?.flatHouseNumber,
+                      streetNumber: userAddress?.streetNumber,
+                      city: userAddress?.city,
+                      stateCountry: userAddress?.stateCountry,
+                      name: userAddress?.name,
+                      phoneNumber: userAddress?.phoneNumber,
+                    );
+                  });
+                  Navigator.of(context).pop(); // Close the bottom sheet
+                },
+              ),
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'Use pincode to check delivery info',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(),
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Enter pincode',
+                  border: OutlineInputBorder(),
+                  suffixIcon: ElevatedButton(
+                    onPressed: () {
+                      // Handle submit pincode
+                    },
+                    child: Text('Submit'),
+                  ),
                 ),
-              ],
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.location_on),
-              title: Text('${userAddress?.name ?? ''}, ${userAddress?.stateCountry ?? ''}'),
-              subtitle: Text(
-                  '${userAddress?.flatHouseNumber ?? ''}, ${userAddress?.streetNumber ?? ''}, ${userAddress?.city ?? ''}'),
-              trailing: Radio(
-                value: true,
-                groupValue: true,
-                onChanged: (value) {
-                  // When an address is selected, update the main screen's address and close the sheet
-                  Navigator.of(context).pop();
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(height: 16),
+              GestureDetector(
+                onTap: () {
+                  getCurrentLocationAndFill();
+                  Navigator.of(context).pop(); // Close the bottom sheet after fetching location
                 },
-              ),
-              onTap: () {
-                // When the user taps this address, update the cart screen with this address
-                setState(() {
-                  userAddress = Address(
-                    flatHouseNumber: userAddress?.flatHouseNumber,
-                    streetNumber: userAddress?.streetNumber,
-                    city: userAddress?.city,
-                    stateCountry: userAddress?.stateCountry,
-                    name: userAddress?.name,
-                    phoneNumber: userAddress?.phoneNumber,
-                  );
-                });
-                Navigator.of(context).pop(); // Close the bottom sheet
-              },
-            ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                'Use pincode to check delivery info',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Enter pincode',
-                border: OutlineInputBorder(),
-                suffixIcon: ElevatedButton(
-                  onPressed: () {
-                    // Handle submit pincode
-                  },
-                  child: Text('Submit'),
-                ),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(height: 16),
-            GestureDetector(
-              onTap: () {
-                getCurrentLocationAndFill();
-                Navigator.of(context).pop(); // Close the bottom sheet after fetching location
-              },
-              child: Row(
-                children: [
-                  Icon(Icons.location_on, color: Colors.blue),
-                  SizedBox(width: 8),
-                  Text(
-                    'Use my current location',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 16,
+                child: Row(
+                  children: [
+                    Icon(Icons.location_on, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text(
+                      'Use my current location',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 16,
+                      ),
                     ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildAddressShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 20.0,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 4),
+                  Container(
+                    height: 20.0,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 4),
+                  Container(
+                    height: 20.0,
+                    width: 150.0,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 4),
+                  Container(
+                    height: 20.0,
+                    width: 100.0,
+                    color: Colors.grey,
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 16),
+            Container(
+              width: 50.0,
+              height: 20.0,
+              color: Colors.grey,
+            ),
           ],
         ),
-      );
-    },
-  );
-}
+      ),
+    );
+  }
+
+  Widget buildCartItemShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Container(
+              width: 80.0,
+              height: 80.0,
+              color: Colors.grey,
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 20.0,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 4),
+                  Container(
+                    height: 20.0,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 4),
+                  Container(
+                    height: 20.0,
+                    width: 50.0,
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -260,51 +354,53 @@ void showAddressSelectionSheet(BuildContext context) {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (userAddress != null) ...[
-                        Text(
-                          userAddress!.name ?? '',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  child: isLoadingAddress
+                      ? buildAddressShimmer() // Show shimmer effect while loading address
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (userAddress != null) ...[
+                              Text(
+                                userAddress!.name ?? '',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                '${userAddress!.flatHouseNumber ?? ''}, ${userAddress!.streetNumber ?? ''}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              Text(
+                                '${userAddress!.city ?? ''}, ${userAddress!.stateCountry ?? ''}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                userAddress!.phoneNumber ?? '',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ] else ...[
+                              Text(
+                                'Loading address...',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
-                        SizedBox(height: 4),
-                        Text(
-                          '${userAddress!.flatHouseNumber ?? ''}, ${userAddress!.streetNumber ?? ''}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                        Text(
-                          '${userAddress!.city ?? ''}, ${userAddress!.stateCountry ?? ''}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          userAddress!.phoneNumber ?? '',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ] else ...[
-                        Text(
-                          'Loading address...',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -329,9 +425,12 @@ void showAddressSelectionSheet(BuildContext context) {
               stream: fetchCartItems(),
               builder: (context, dataSnapshot) {
                 if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  ); // Show loading indicator
+                  return ListView.builder(
+                    itemCount: 5, // Show 5 shimmer placeholders while loading
+                    itemBuilder: (context, index) {
+                      return buildCartItemShimmer(); // Show shimmer effect for cart items
+                    },
+                  );
                 } else if (!dataSnapshot.hasData || dataSnapshot.data!.isEmpty) {
                   return Center(child: Text('No items exist in the cart'));
                 } else {

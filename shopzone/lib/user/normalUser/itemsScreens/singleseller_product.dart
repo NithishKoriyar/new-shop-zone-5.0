@@ -113,7 +113,7 @@ class _SellerItemsScreenState extends State<SellerItemsScreen> {
                                 maxLines: 1,
                               ),
                               Text(
-                                "₹ ${model.price.toString()}",
+                                "₹ ${model.sellingPrice.toString()}",
                                 style: TextStyle(
                                     fontSize: 15, color: Colors.green),
                                 overflow: TextOverflow.ellipsis,

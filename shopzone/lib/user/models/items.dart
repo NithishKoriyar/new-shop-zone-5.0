@@ -6,6 +6,7 @@ class Items {
   String? itemTitle;
   String? longDescription;
   String? price;
+  String? sellingPrice; // Added sellingPrice
   DateTime? publishedDate;
   String? sellerName;
   String? sellerUID;
@@ -18,8 +19,8 @@ class Items {
   String? fifthImageUrl;
   String? SizeId;
   String? ColourId;
-  List<String>? SizeName; // changed to list
-  List<String>? ColourName; // changed to list
+  List<String>? SizeName; // Changed to list
+  List<String>? ColourName; // Changed to list
 
   Items({
     this.brandID,
@@ -29,6 +30,7 @@ class Items {
     this.itemTitle,
     this.longDescription,
     this.price,
+    this.sellingPrice, // Added sellingPrice to constructor
     this.publishedDate,
     this.sellerName,
     this.sellerUID,
@@ -41,18 +43,19 @@ class Items {
     this.fifthImageUrl,
     this.SizeId,
     this.ColourId,
-    this.SizeName, // changed to list
-    this.ColourName, // changed to list
+    this.SizeName, // Changed to list
+    this.ColourName, // Changed to list
   });
 
   Items.fromJson(Map<String, dynamic> json)
       : brandID = json["brandID"],
         itemID = json["itemID"],
-        variantID=json["variantID"],
+        variantID = json["variantID"],
         itemInfo = json["itemInfo"],
         itemTitle = json["itemTitle"],
         longDescription = json["longDescription"],
         price = json["price"],
+        sellingPrice = json["sellingPrice"], // Parse sellingPrice from JSON
         publishedDate = json["publishedDate"] != null
             ? DateTime.parse(json["publishedDate"])
             : null,
@@ -60,7 +63,7 @@ class Items {
         sellerUID = json["sellerUID"],
         status = json["status"],
         thumbnailUrl = json["thumbnailUrl"],
-        isWishListed = json["isWishListed"], // ensure correct key case
+        isWishListed = json["isWishListed"], // Ensure correct key case
         secondImageUrl = json["secondImageUrl"],
         thirdImageUrl = json["thirdImageUrl"],
         fourthImageUrl = json["fourthImageUrl"],
@@ -70,11 +73,11 @@ class Items {
         SizeName = (json["SizeName"] as String?)
             ?.split(',')
             .map((e) => e.trim())
-            .toList(), // parse to list
+            .toList(), // Parse to list
         ColourName = (json["ColourName"] as String?)
             ?.split(',')
             .map((e) => e.trim())
-            .toList(); // parse to list
+            .toList(); // Parse to list
 
   Map<String, dynamic> toJson() {
     return {
@@ -85,6 +88,7 @@ class Items {
       "itemTitle": itemTitle,
       "longDescription": longDescription,
       "price": price,
+      "sellingPrice": sellingPrice, // Convert sellingPrice to JSON
       "publishedDate": publishedDate?.toIso8601String(),
       "sellerName": sellerName,
       "sellerUID": sellerUID,
@@ -94,12 +98,11 @@ class Items {
       "thirdImageUrl": thirdImageUrl,
       "fourthImageUrl": fourthImageUrl,
       "fifthImageUrl": fifthImageUrl,
-      "isWishListed": isWishListed, // ensure correct key case
+      "isWishListed": isWishListed, // Ensure correct key case
       "SizeId": SizeId,
       "ColourId": ColourId,
-      "SizeName": SizeName?.join(','), // convert list to comma-separated string
-      "ColourName":
-          ColourName?.join(','), // convert list to comma-separated string
+      "SizeName": SizeName?.join(','), // Convert list to comma-separated string
+      "ColourName": ColourName?.join(','), // Convert list to comma-separated string
     };
   }
 }
