@@ -576,6 +576,31 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                       Spacer(),
+                  IconButton(
+                    icon: Icon(
+                      widget.model!.isWishListed == "1"
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: widget.model!.isWishListed == "1"
+                          ? Color.fromARGB(255, 213, 9, 9)
+                          : Colors.grey,
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      toggleWishlist(widget.model!, userID);
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.share,
+                      color: Colors.blueGrey,
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      shareItem(widget.model!);
+                    },
+                  ),
                 ],
               ),
             ),

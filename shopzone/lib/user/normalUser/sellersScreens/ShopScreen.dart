@@ -40,6 +40,8 @@ class _ShopScreenState extends State<ShopScreen> {
   late String userID;
   bool dataLoaded = false;
 
+
+
   NotificationServices notificationServices = NotificationServices();
 
   @override
@@ -312,6 +314,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 return buildCategoryShimmer();
               } else if (dataSnapshot.hasData &&
                   dataSnapshot.data!.isNotEmpty) {
+                   
                 return SliverToBoxAdapter(
                   child: Container(
                     height: 150,
@@ -404,6 +407,7 @@ class _ShopScreenState extends State<ShopScreen> {
               )),
             ),
           ),
+        
           StreamBuilder<List<Sellers>>(
             stream: getSellersStream(),
             builder: (context, AsyncSnapshot<List<Sellers>> dataSnapshot) {
@@ -498,6 +502,7 @@ class _ShopScreenState extends State<ShopScreen> {
               }
             },
           ),
+
 
           // Top Brands Section
           const SliverPadding(
@@ -848,7 +853,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                         : Icons.favorite_border,
                                     color: model.isWishListed == "1"
                                         ? Colors.red
-                                        : Colors.red,
+                                        : Colors.grey,
                                     size: 28,
                                   ),
                                 ),
