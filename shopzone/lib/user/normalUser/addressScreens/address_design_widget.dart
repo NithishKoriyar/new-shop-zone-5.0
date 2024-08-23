@@ -122,7 +122,7 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                   children: [
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 205, 156, 152), // Red color for delete button
+                        backgroundColor: Color.fromARGB(255, 229, 122, 112), // Red color for delete button
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -141,7 +141,7 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                     ),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 165, 212, 167), // Green color for proceed button
+                        backgroundColor: Color.fromARGB(255, 82, 226, 87), // Green color for proceed button
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

@@ -79,7 +79,7 @@ class _CartScreenUserState extends State<CartScreenUser> {
       final List<dynamic> fetchedItems = json.decode(response.body);
       yield fetchedItems;
       print("fetchedItems");
-      print(fetchedItems);
+      print("cartdata ${fetchedItems}");
     } else {
       print("Error fetching cart items");
       yield [];

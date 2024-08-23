@@ -13,7 +13,7 @@ class Carts {
   String? thumbnailUrl;
   int? itemCounter;
   int? totalPrice;
-  
+  String? sellingPrice; // New property for selling price
 
   // New properties
   String? isWishListed;
@@ -23,8 +23,8 @@ class Carts {
   String? fifthImageUrl;
   String? sizeId;
   String? colourId;
-  List<String>? sizeName;
-  List<String>? colourName;
+  String? sizeName;
+  String? colourName;
 
   Carts({
     this.cartId,
@@ -41,6 +41,7 @@ class Carts {
     this.thumbnailUrl,
     this.itemCounter,
     this.totalPrice,
+    this.sellingPrice, // Added to constructor
     this.isWishListed,
     this.secondImageUrl,
     this.thirdImageUrl,
@@ -60,6 +61,7 @@ class Carts {
     itemTitle = json["itemTitle"];
     longDescription = json["longDescription"];
     price = json["price"];
+    sellingPrice = json["sellingPrice"]; // Added to fromJson method
 
     if (json["publishedDate"] is DateTime) {
       publishedDate = json["publishedDate"] as DateTime;
@@ -68,14 +70,14 @@ class Carts {
     sellerUID = json["sellerUID"];
     status = json["status"];
     thumbnailUrl = json["thumbnailUrl"];
-    
+
     if (json["itemCounter"] is int) {
       itemCounter = json["itemCounter"] as int?;
     } else if (json["itemCounter"] is String) {
       int? parsedCounter = int.tryParse(json["itemCounter"]);
       itemCounter = parsedCounter;
     }
-    
+
     if (json["totalPrice"] is int) {
       totalPrice = json["totalPrice"] as int?;
     } else if (json["totalPrice"] is String) {
@@ -92,12 +94,7 @@ class Carts {
     sizeId = json["sizeId"];
     colourId = json["colourId"];
 
-    // Parsing lists
-    if (json["sizeName"] is List) {
-      sizeName = List<String>.from(json["sizeName"]);
-    }
-    if (json["colourName"] is List) {
-      colourName = List<String>.from(json["colourName"]);
-    }
+    sizeName = json["SizeName"];
+    colourName = json["ColourName"];
   }
 }

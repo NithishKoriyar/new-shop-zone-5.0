@@ -973,6 +973,10 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                         widget.model!.itemID.toString(),
                         itemCounter,
                         userID,
+                      
+                       
+                 
+                     
                       );
                       setState(() {
                         isAddedToCart = true;
@@ -1009,6 +1013,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                       widget.model!.itemID.toString(),
                       itemCounter,
                       userID,
+                    
+                    
                     );
                     Navigator.push(context,
                         MaterialPageRoute(builder: (c) => CartScreenUser()));

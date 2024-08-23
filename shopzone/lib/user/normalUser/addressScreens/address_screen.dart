@@ -11,11 +11,22 @@ import 'package:http/http.dart' as http;
 import 'package:shopzone/user/models/cart.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
 
-// ignore: must_be_immutable
 class AddressScreen extends StatefulWidget {
   Carts? model;
+  int? quantity;
+  String? price;
+  String? sellingPrice;
+  String? totalPrice;
+  String? calculateDiscount;
 
-  AddressScreen({this.model});
+  AddressScreen({
+    this.model,
+    this.quantity,
+    this.price,
+    this.sellingPrice,
+    this.totalPrice,
+    this.calculateDiscount,
+  });
 
   @override
   State<AddressScreen> createState() => _AddressScreenState();
@@ -53,6 +64,7 @@ class _AddressScreenState extends State<AddressScreen> {
     print('user image: $userImg');
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -109,7 +121,24 @@ class _AddressScreenState extends State<AddressScreen> {
             }),
           ),
           Divider(thickness: 1, color: Colors.grey[300]),
-          // Display Buy Now Item
+          // Move the Add New Address Button above Price Details
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (c) => SaveNewAddressScreen()));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 215, 211, 206),
+                padding: EdgeInsets.symmetric(vertical: 12),
+              ),
+              child: Text(
+                "Add New Address",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
           if (widget.model != null)
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -139,6 +168,14 @@ class _AddressScreenState extends State<AddressScreen> {
                             ),
                             SizedBox(height: 8),
                             Text(
+                              'Color: ${widget.model!.colourName ?? ''}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
                               'Size: ${widget.model!.sizeName ?? ''}',
                               style: TextStyle(
                                 fontSize: 14,
@@ -147,7 +184,7 @@ class _AddressScreenState extends State<AddressScreen> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Qty: ${widget.model!.itemCounter}',
+                              'Qty: ${widget.quantity}',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.black54,
@@ -159,35 +196,135 @@ class _AddressScreenState extends State<AddressScreen> {
                     ],
                   ),
                   SizedBox(height: 16),
+                  // Price Display
+                  Row(
+                    children: [
+                      Text(
+                        "₹${widget.sellingPrice}", // Selling price in bold green
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                          color: Colors.green,
+                        ),
+                      ),
+                      SizedBox(width: 10), // Space between prices
+                      if (widget.price != null)
+                        Text(
+                          "₹${widget.price}", // Original price with strike-through
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.grey,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                      SizedBox(width: 10), // Space between prices and discount
+                      if (widget.price != null && widget.sellingPrice != null)
+                        Text(
+                          widget.calculateDiscount ?? '', // Discount percentage
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                    ],
+                  ),
+                  Divider(thickness: 1, color: Colors.grey[300]),
+                  SizedBox(height: 8),
                   Text(
-                    '₹${widget.model!.price}',
+                    'Price Details',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green,
+                      color: Colors.black,
                     ),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Price (${widget.quantity} item${widget.quantity! > 1 ? 's' : ''})',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      Text(
+                        '₹${widget.price}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Discount',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.green,
+                        ),
+                      ),
+                      Text(
+                        '-₹${(double.parse(widget.price!) - double.parse(widget.sellingPrice!)).toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Delivery Charges',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      Text(
+                        '₹40',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Divider(thickness: 1, color: Colors.grey[300]),
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total Amount',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        '₹${widget.totalPrice}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          // Add New Address Button
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (c) => SaveNewAddressScreen()));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange, // Button background color
-                padding: EdgeInsets.symmetric(vertical: 16), // Button height
-              ),
-              child: Text(
-                "Add New Address",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
         ],
       ),
     );
