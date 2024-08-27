@@ -312,6 +312,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                                 widget.model!.itemID.toString(),
                                 counterLimit,
                                 userID,
+                                selectedSize
                               );
                               Navigator.push(
                                 context,
@@ -973,6 +974,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                         widget.model!.itemID.toString(),
                         itemCounter,
                         userID,
+                        selectedSize,
                       
                        
                  
@@ -1013,6 +1015,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                       widget.model!.itemID.toString(),
                       itemCounter,
                       userID,
+                      selectedSize
                     
                     
                     );

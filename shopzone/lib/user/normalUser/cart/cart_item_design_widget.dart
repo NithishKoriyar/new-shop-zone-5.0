@@ -32,6 +32,8 @@ class _CartItemDesignWidgetState extends State<CartItemDesignWidget> {
   void initState() {
     super.initState();
     _quantity = widget.quantityNumber ?? 1;
+    selectedSize = widget.model?.sizeName; 
+      selectedColor = widget.model?.colourName;
 
     _updatePrice();
   }
@@ -191,23 +193,38 @@ class _CartItemDesignWidgetState extends State<CartItemDesignWidget> {
 
                             const SizedBox(height: 2),
 
-                            Text(
-                              widget.model!.colourName.toString(),
+                            // Text(
+                            //   widget.model!.colourName.toString(),
+                            //   style: const TextStyle(
+                            //     color: Colors.black,
+                            //     fontSize: 16,
+                              
+                            //   ),
+                            // ),
+                              Text(
+                              selectedColor ?? '',
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 16,
-                              
                               ),
                             ),
                             const SizedBox(height: 2),
-                            Text(
-                              widget.model!.sizeName.toString(),
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
+                            // Text(
+                            //   widget.model!.sizeName.toString(),
+                            //   style: const TextStyle(
+                            //     color: Colors.black,
+                            //     fontSize: 16,
                               
-                              ),
-                            ),
+                            //   ),
+                            // ),
+                            Text(
+  selectedSize ?? '',
+  style: const TextStyle(
+    color: Colors.black,
+    fontSize: 16,
+  ),
+),
+                              
 
                             // Size Selection
                             // Padding(

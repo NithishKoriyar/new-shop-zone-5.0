@@ -120,12 +120,14 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ElevatedButton.icon(
+                    ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 229, 122, 112), // Red color for delete button
+                        backgroundColor: Colors.red[400],
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(20),
                         ),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                       onPressed: () {
                         int? addressIdInt;
@@ -136,33 +138,47 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                           print("Error converting addressID to int: $e");
                         }
                       },
-                      icon: const Icon(Icons.delete),
-                      label: const Text("Delete"),
-                    ),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 82, 226, 87), // Green color for proceed button
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.delete_outline, size: 20),
+                          SizedBox(width: 8),
+                          Text("Delete", style: TextStyle(fontSize: 16)),
+                        ],
                       ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (c) => PlaceOrderScreen(
-                              sellerUID: widget.sellerUID,
-                              addressID: widget.addressID,
-                              totalAmount: widget.totalPrice,
-                              cartId: widget.cartId,
-                              model: widget.model,
-                            ),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.arrow_forward),
-                      label: const Text("Proceed"),
                     ),
+                    // ElevatedButton(
+                    //   style: ElevatedButton.styleFrom(
+                    //     backgroundColor: Colors.green[400],
+                    //     foregroundColor: Colors.white,
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(20),
+                    //     ),
+                    //     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    //   ),
+                    //   onPressed: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (c) => PlaceOrderScreen(
+                    //           sellerUID: widget.sellerUID,
+                    //           addressID: widget.addressID,
+                    //           totalAmount: widget.totalPrice,
+                    //           cartId: widget.cartId,
+                    //           model: widget.model,
+                    //         ),
+                    //       ),
+                    //     );
+                    //   },
+                    //   child: Row(
+                    //     mainAxisSize: MainAxisSize.min,
+                    //     children: [
+                    //       Text("Proceed", style: TextStyle(fontSize: 16)),
+                    //       SizedBox(width: 8),
+                    //       Icon(Icons.arrow_forward_ios, size: 20),
+                    //     ],
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

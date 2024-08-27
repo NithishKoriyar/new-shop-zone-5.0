@@ -5,7 +5,7 @@ import 'package:shopzone/api_key.dart';
 
 class CartMethods {
   Future<void> addItemToCart(
-      String itemId, int itemCounter, String userID,) async {
+      String itemId, int itemCounter, String userID, String? selectedSize,) async {
     const String apiUrl = API.addToCart;
 
     final response = await http.post(
@@ -17,6 +17,7 @@ class CartMethods {
         
 
         "itemCounter": itemCounter.toString(),
+        "selectedSize": selectedSize,
       },
     );
     // print(userID);
