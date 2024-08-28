@@ -19,7 +19,6 @@ import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart'
 import 'package:shopzone/user/normalUser/itemsScreens/items_screen.dart';
 import 'package:shopzone/user/normalUser/push_notifications/push_notifications_system.dart';
 import 'package:shopzone/user/normalUser/searchScreen/search_screen.dart';
-
 import 'package:shopzone/user/normalUser/subCetogoryScreens/SubcategoryScreen.dart';
 import 'package:shopzone/user/normalUser/subCetogoryScreens/categoryScreen.dart';
 import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
@@ -35,12 +34,15 @@ class ShopScreen extends StatefulWidget {
 }
 
 class _ShopScreenState extends State<ShopScreen> {
+  final ScrollController _scrollController = ScrollController();
+  List<Items> itemsList = [];
+  bool isLoadingMore = false;
+  int itemsLoaded = 6;
+
   List<dynamic> categories = [];
   final CurrentUser currentUserController = Get.put(CurrentUser());
   late String userID;
   bool dataLoaded = false;
-
-
 
   NotificationServices notificationServices = NotificationServices();
 
@@ -58,6 +60,15 @@ class _ShopScreenState extends State<ShopScreen> {
       setState(() {});
     });
     restrictBlockedUsersFromUsingUsersApp();
+
+    _scrollController.addListener(_onScroll);
+    fetchInitialItems(); // Initial fetch
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void setUserInfo() {
@@ -113,6 +124,67 @@ class _ShopScreenState extends State<ShopScreen> {
     }
   }
 
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent &&
+        !isLoadingMore) {
+      loadMoreItems(); // Fetch more items when scrolled to bottom
+    }
+  }
+
+  Future<void> fetchInitialItems() async {
+    try {
+      // Fetch the first 6 items
+      final response = await http.post(
+        Uri.parse(API.displayItems),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'user_id': userID, 'limit': itemsLoaded}),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          itemsList = data.map((itemData) => Items.fromJson(itemData)).toList();
+        });
+      }
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  Future<void> loadMoreItems() async {
+    setState(() {
+      isLoadingMore = true;
+    });
+
+    try {
+      // Load next set of items
+      final response = await http.post(
+        Uri.parse(API.displayItems),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'user_id': userID,
+          'limit': itemsLoaded,
+          'offset': itemsList.length
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          itemsList.addAll(
+              data.map((itemData) => Items.fromJson(itemData)).toList());
+          isLoadingMore = false;
+        });
+      }
+    } catch (e) {
+      // Handle error
+      setState(() {
+        isLoadingMore = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,8 +204,8 @@ class _ShopScreenState extends State<ShopScreen> {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (c) => SearchScreen())); 
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (c) => SearchScreen()));
             },
           ),
           IconButton(
@@ -150,13 +222,14 @@ class _ShopScreenState extends State<ShopScreen> {
             icon: Icon(Icons.shopping_cart),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (c) => CartScreenUser()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (c) => CartScreenUser()));
             },
           ),
         ],
       ),
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           // Search Box
           SliverToBoxAdapter(
@@ -314,7 +387,6 @@ class _ShopScreenState extends State<ShopScreen> {
                 return buildCategoryShimmer();
               } else if (dataSnapshot.hasData &&
                   dataSnapshot.data!.isNotEmpty) {
-                   
                 return SliverToBoxAdapter(
                   child: Container(
                     height: 150,
@@ -407,7 +479,6 @@ class _ShopScreenState extends State<ShopScreen> {
               )),
             ),
           ),
-        
           StreamBuilder<List<Sellers>>(
             stream: getSellersStream(),
             builder: (context, AsyncSnapshot<List<Sellers>> dataSnapshot) {
@@ -503,7 +574,6 @@ class _ShopScreenState extends State<ShopScreen> {
             },
           ),
 
-
           // Top Brands Section
           const SliverPadding(
             padding: EdgeInsets.all(1),
@@ -521,7 +591,8 @@ class _ShopScreenState extends State<ShopScreen> {
               } else if (dataSnapshot.hasData &&
                   dataSnapshot.data!.isNotEmpty) {
                 return SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 4,
                     childAspectRatio: 0.75,
                     crossAxisSpacing: 10,
@@ -717,7 +788,8 @@ class _ShopScreenState extends State<ShopScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (c) => ItemsDetailsScreen(model: item),
+                                builder: (c) =>
+                                    ItemsDetailsScreen(model: item),
                               ),
                             );
                           },
@@ -738,147 +810,136 @@ class _ShopScreenState extends State<ShopScreen> {
 
           // Items Section
           const SliverPadding(
-            padding: EdgeInsets.all(1),
+            padding: EdgeInsets.all(10),
             sliver: SliverToBoxAdapter(
               child: Center(
                   child: Text('ExploreItems',
                       style: TextStyle(color: Colors.grey))),
             ),
           ),
-          StreamBuilder<List<Items>>(
-            stream: getItemStream(userID),
-            builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
-              if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                return buildItemsShimmer();
-              } else if (dataSnapshot.hasData &&
-                  dataSnapshot.data!.isNotEmpty) {
-                return SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      Items model = dataSnapshot.data![index];
-                      String? thumbnailUrl = model.thumbnailUrl;
+        SliverGrid(
+  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 2, // 2 columns in the grid
+    childAspectRatio: 0.75, // Adjust this ratio based on your design
+    crossAxisSpacing: 5, // Space between columns
+    mainAxisSpacing: 5, // Space between rows
+  ),
+  delegate: SliverChildBuilderDelegate(
+    (context, index) {
+      if (index < itemsList.length) {
+        Items model = itemsList[index];
+        return buildItemCard(model); // Method to build your item widget
+      } else if (isLoadingMore) {
+        return Center(child: CircularProgressIndicator()); // Show loading indicator while loading more items
+      } else {
+        return Container(); // Return an empty container if no more items
+      }
+    },
+    childCount: itemsList.length + (isLoadingMore ? 1 : 0),
+  ),
+),
 
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (c) => ItemsDetailsScreen(model: model),
-                            ),
-                          );
-                        },
-                        child: Stack(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color.fromARGB(255, 233, 230, 230),
-                                    spreadRadius: 0.1,
-                                    blurRadius: 5,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 170,
-                                    height: 160,
-                                    padding: EdgeInsets.all(8),
-                                    child: thumbnailUrl != null
-                                        ? Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  API.getItemsImage +
-                                                      thumbnailUrl,
-                                                ),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          )
-                                        : Container(),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    model.itemTitle.toString(),
-                                    style: TextStyle(fontSize: 15),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    maxLines: 1,
-                                  ),
-                                  Text(
-                                    model.itemInfo.toString(),
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    maxLines: 1,
-                                  ),
-                                  Text(
-                                    "₹ ${model.price.toString()}",
-                                    style: TextStyle(
-                                        fontSize: 15, color: Colors.green),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Positioned(
-                              top: 0.7,
-                              right: 7,
-                              child: GestureDetector(
-                                onTap: () {
-                                  toggleWishlist(model, userID);
-                                },
-                                child: Container(
-                                  child: Icon(
-                                    model.isWishListed == "1"
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
-                                    color: model.isWishListed == "1"
-                                        ? Colors.red
-                                        : Colors.grey,
-                                    size: 28,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    childCount: dataSnapshot.data!.length,
-                  ),
-                );
-              } else {
-                return SliverToBoxAdapter(
-                  child: Center(
-                    child: Text("No Items Data exists."),
-                  ),
-                );
-              }
-            },
-          )
         ],
       ),
     );
   }
+
+ Widget buildItemCard(Items model) {
+  return InkWell(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (c) => ItemsDetailsScreen(model: model),
+        ),
+      );
+    },
+    child: Stack(
+      children: [
+        Container(
+          margin: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(255, 233, 230, 230),
+                spreadRadius: 0.1,
+                blurRadius: 5,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: double.infinity,
+                height: 160,
+                padding: EdgeInsets.all(8),
+                child: model.thumbnailUrl != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(5),
+                        child: Image.network(
+                          API.getItemsImage + model.thumbnailUrl!,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Container(),
+              ),
+              SizedBox(height: 5),
+              Text(
+                model.itemTitle.toString(),
+                style: TextStyle(fontSize: 15),
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                maxLines: 1,
+              ),
+              Text(
+                model.itemInfo.toString(),
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                maxLines: 1,
+              ),
+              Text(
+                "₹ ${model.price.toString()}",
+                style: TextStyle(fontSize: 15, color: Colors.green),
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                maxLines: 1,
+              ),
+            ],
+          ),
+        ),
+        Positioned(
+          top: 8,
+          right: 8, // Adjust these values to ensure the icon stays within the box
+          child: GestureDetector(
+            onTap: () {
+              toggleWishlist(model, userID);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white, // Optional: background color for better visibility
+              ),
+              padding: EdgeInsets.all(4), // Padding to increase the tap area
+              child: Icon(
+                model.isWishListed == "1"
+                    ? Icons.favorite
+                    : Icons.favorite_border,
+                color: model.isWishListed == "1" ? Colors.red : Colors.grey,
+                size: 24, // Adjust the size of the icon if needed
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 
   Widget buildCategoryShimmer() {
     return SliverToBoxAdapter(
@@ -1043,68 +1104,6 @@ class _ShopScreenState extends State<ShopScreen> {
     );
   }
 
-  Widget buildItemsShimmer() {
-    return SliverGrid(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.75,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              margin: const EdgeInsets.all(5),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 170,
-                    height: 160,
-                    color: Colors.white,
-                  ),
-                  SizedBox(height: 5),
-                  Container(
-                    height: 10,
-                    width: 100,
-                    color: Colors.white,
-                  ),
-                  SizedBox(height: 5),
-                  Container(
-                    height: 10,
-                    width: 80,
-                    color: Colors.white,
-                  ),
-                  SizedBox(height: 5),
-                  Container(
-                    height: 10,
-                    width: 60,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-        childCount: 6,
-      ),
-    );
-  }
-
-  Future<List<String>> fetchImages() async {
-    final response = await http.get(Uri.parse(API.imageSlider));
-
-    if (response.statusCode == 200) {
-      List<dynamic> imagesJson = jsonDecode(response.body);
-      return imagesJson.map((image) => image.toString()).toList();
-    } else {
-      throw Exception('Failed to load images');
-    }
-  }
-
   Stream<List<Sellers>> getSellersStream() async* {
     final response = await http.get(Uri.parse(API.sellerNameBrand));
     print(API.fetchCategories);
@@ -1116,25 +1115,6 @@ class _ShopScreenState extends State<ShopScreen> {
       yield sellersObjects;
     } else {
       throw Exception('Failed to load sellers');
-    }
-  }
-
-  Stream<List<Items>> getItemStream(String userId) async* {
-    final response = await http.post(
-      Uri.parse(API.displayItems),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'user_id': userId,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      yield data.map((itemData) => Items.fromJson(itemData)).toList();
-    } else {
-      throw Exception('Failed to load items');
     }
   }
 

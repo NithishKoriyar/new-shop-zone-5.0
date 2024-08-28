@@ -147,38 +147,38 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                         ],
                       ),
                     ),
-                    // ElevatedButton(
-                    //   style: ElevatedButton.styleFrom(
-                    //     backgroundColor: Colors.green[400],
-                    //     foregroundColor: Colors.white,
-                    //     shape: RoundedRectangleBorder(
-                    //       borderRadius: BorderRadius.circular(20),
-                    //     ),
-                    //     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    //   ),
-                    //   onPressed: () {
-                    //     Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //         builder: (c) => PlaceOrderScreen(
-                    //           sellerUID: widget.sellerUID,
-                    //           addressID: widget.addressID,
-                    //           totalAmount: widget.totalPrice,
-                    //           cartId: widget.cartId,
-                    //           model: widget.model,
-                    //         ),
-                    //       ),
-                    //     );
-                    //   },
-                    //   child: Row(
-                    //     mainAxisSize: MainAxisSize.min,
-                    //     children: [
-                    //       Text("Proceed", style: TextStyle(fontSize: 16)),
-                    //       SizedBox(width: 8),
-                    //       Icon(Icons.arrow_forward_ios, size: 20),
-                    //     ],
-                    //   ),
-                    // ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[400],
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (c) => PlaceOrderScreen(
+                              sellerUID: widget.sellerUID,
+                              addressID: widget.addressID,
+                              totalAmount: widget.totalPrice,
+                              cartId: widget.cartId,
+                              model: widget.model,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("Proceed", style: TextStyle(fontSize: 16)),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward_ios, size: 20),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
