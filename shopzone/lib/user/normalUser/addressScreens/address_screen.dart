@@ -43,6 +43,9 @@ class _AddressScreenState extends State<AddressScreen> {
   late String userID;
   late String userImg;
 
+  int? selectedAddressIndex;
+  String? selectedAddressID;
+
   @override
   void initState() {
     super.initState();
@@ -68,13 +71,35 @@ class _AddressScreenState extends State<AddressScreen> {
   }
 
   void _scrollToPriceDetails() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (_priceDetailsKey.currentContext != null) {
       Scrollable.ensureVisible(
         _priceDetailsKey.currentContext!,
         duration: Duration(seconds: 1),
         curve: Curves.easeInOut,
       );
-    });
+    } else {
+      print("Price Details section not found.");
+    }
+  }
+
+  void _navigateToPlaceOrderScreen() {
+    if (selectedAddressID != null && widget.model != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (c) => PlaceOrderScreen(
+            sellerUID: widget.model?.sellerUID,
+            addressID: selectedAddressID,
+            totalAmount: widget.model?.totalPrice,
+            cartId: widget.model?.cartId,
+            model: widget.model,
+          ),
+        ),
+      );
+    } else {
+      // Handle the case when no address is selected or model is null
+      print("No address selected or cart model is null");
+    }
   }
 
   @override
@@ -109,16 +134,22 @@ class _AddressScreenState extends State<AddressScreen> {
                       if (snapshot.connectionState == ConnectionState.active) {
                         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                           return Column(
-                            children: snapshot.data!.map((item) {
+                            children: snapshot.data!.map((index) {
                               return AddressDesignWidget(
-                                addressModel: Address.fromJson(item),
+                                addressModel: Address.fromJson(index),
                                 index: address.count,
-                                value: snapshot.data!.indexOf(item),
-                                addressID: item['id'],
+                                value: snapshot.data!.indexOf(index),
+                                addressID: index['id'],
                                 sellerUID: widget.model?.sellerUID,
                                 totalPrice: widget.model?.totalPrice,
                                 cartId: widget.model?.cartId,
                                 model: widget.model,
+                                onSelected: (selectedID) {
+                                  setState(() {
+                                    selectedAddressIndex = snapshot.data!.indexOf(index);
+                                    selectedAddressID = selectedID;
+                                  });
+                                },
                               );
                             }).toList(),
                           );
@@ -138,6 +169,7 @@ class _AddressScreenState extends State<AddressScreen> {
                   );
                 }),
                 Divider(thickness: 1, color: Colors.grey[300]),
+
                 // Add New Address Button
                 Container(
                   width: double.infinity,
@@ -157,217 +189,59 @@ class _AddressScreenState extends State<AddressScreen> {
                     ),
                   ),
                 ),
+
+                // Item Display Section
                 if (widget.model != null)
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Image.network(
-                              API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
-                              height: 100,
-                              width: 100,
-                              fit: BoxFit.cover,
-                            ),
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.model!.itemTitle ?? '',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Color: ${widget.model!.colourName ?? ''}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Size: ${widget.model!.sizeName ?? ''}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Qty: ${widget.quantity}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        // Item Image
+                        Image.network(
+                          API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
                         ),
-                        SizedBox(height: 16),
-                        // Price Display
-                        Row(
-                          children: [
-                            Text(
-                              "₹${widget.sellingPrice}", // Selling price in bold green
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25,
-                                color: Colors.green,
-                              ),
-                            ),
-                            SizedBox(width: 10), // Space between prices
-                            if (widget.price != null)
-                              Text(
-                                "₹${widget.price}", // Original price with strike-through
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.grey,
-                                  decoration: TextDecoration.lineThrough,
-                                ),
-                              ),
-                            SizedBox(width: 10), // Space between prices and discount
-                            if (widget.price != null && widget.sellingPrice != null)
-                              Text(
-                                widget.calculateDiscount ?? '', // Discount percentage
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                          ],
-                        ),
-                        Divider(thickness: 10, color: Colors.grey[300]),
-                        SizedBox(height: 8),
-                        // Price Details Section
-                        Container(
-                          key: _priceDetailsKey,
-                          padding: const EdgeInsets.all(8.0),
+                        SizedBox(width: 16),
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Item Title
                               Text(
-                                'Price Details',
+                                widget.model!.itemTitle ?? '',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
                               ),
                               SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Price (${widget.quantity} item${widget.quantity! > 1 ? 's' : ''})',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                  Text(
-                                    '₹${widget.price}',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Discount',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                  Text(
-                                    '-₹${(double.parse(widget.price!) - double.parse(widget.sellingPrice!)).toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Delivery Charges',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        '₹40',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey,
-                                          decoration: TextDecoration.lineThrough,
-                                        ),
-                                      ),
-                                      Text(
-                                        ' FREE Delivery',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.green,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Divider(thickness: 1, color: Colors.grey[300]),
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Total Amount',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  Text(
-                                    '₹${widget.totalPrice}',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                             Divider(thickness: 1, color: Colors.grey[300]),
-                              SizedBox(height: 8),
-                              // You will save section
+                              // Item Color
                               Text(
-                                'You will save ₹${(double.parse(widget.price!) - double.parse(widget.sellingPrice!)).toStringAsFixed(2)} on this order',
+                                'Color: ${widget.model!.colourName ?? ''}',
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              // Item Size
+                              Text(
+                                'Size: ${widget.model!.sizeName ?? ''}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              // Item Quantity
+                              Text(
+                                'Qty: ${widget.quantity}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black54,
                                 ),
                               ),
                             ],
@@ -376,9 +250,171 @@ class _AddressScreenState extends State<AddressScreen> {
                       ],
                     ),
                   ),
+
+                // Price Display
+                Row(
+                  children: [
+                    Text(
+                      "₹${widget.sellingPrice}", // Selling price in bold green
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: Colors.green,
+                      ),
+                    ),
+                    SizedBox(width: 10), // Space between prices
+                    if (widget.price != null)
+                      Text(
+                        "₹${widget.price}", // Original price with strike-through
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.grey,
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    SizedBox(width: 10), // Space between prices and discount
+                    if (widget.price != null && widget.sellingPrice != null)
+                      Text(
+                        widget.calculateDiscount ?? '', // Discount percentage
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                  ],
+                ),
+                Divider(thickness: 10, color: Colors.grey[300]),
+                SizedBox(height: 8),
+
+                // Price Details Section
+                if (widget.model != null)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    key: _priceDetailsKey, // Assign the key here
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Price Details',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Price (${widget.quantity} item${widget.quantity! > 1 ? 's' : ''})',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            Text(
+                              '₹${widget.price}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Discount',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.green,
+                              ),
+                            ),
+                            Text(
+                              '-₹${(double.parse(widget.price!) - double.parse(widget.sellingPrice!)).toStringAsFixed(2)}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Delivery Charges',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  '₹40',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                    decoration: TextDecoration.lineThrough,
+                                  ),
+                                ),
+                                Text(
+                                  ' FREE Delivery',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Divider(thickness: 1, color: Colors.grey[300]),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total Amount',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              '₹${widget.totalPrice}',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Divider(thickness: 1, color: Colors.grey[300]),
+                        SizedBox(height: 8),
+                        Text(
+                          'You will save ₹${(double.parse(widget.price!) - double.parse(widget.sellingPrice!)).toStringAsFixed(2)} on this order',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
+
           // Fixed Bottom Bar with View Price Details and Continue Button
           Positioned(
             left: 0,
@@ -393,9 +429,9 @@ class _AddressScreenState extends State<AddressScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (widget.price != null)
+                      if (widget.sellingPrice != null)
                         Text(
-                          "${widget.sellingPrice}",
+                          "₹${widget.sellingPrice}",
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -405,11 +441,10 @@ class _AddressScreenState extends State<AddressScreen> {
                       TextButton(
                         onPressed: _scrollToPriceDetails,
                         child: Text(
-                          "View price ",
+                          "View price details",
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.blue,
-                            // decoration: TextDecoration.underline,
                           ),
                         ),
                       ),
@@ -423,20 +458,7 @@ class _AddressScreenState extends State<AddressScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (c) => PlaceOrderScreen(
-                            sellerUID: widget.model?.sellerUID,
-                            addressID: widget.model?.cartId,
-                            totalAmount: widget.model?.totalPrice,
-                            cartId: widget.model?.cartId,
-                            model: widget.model,
-                          ),
-                        ),
-                      );
-                    },
+                    onPressed: _navigateToPlaceOrderScreen,
                     child: Text(
                       "Continue",
                       style: TextStyle(

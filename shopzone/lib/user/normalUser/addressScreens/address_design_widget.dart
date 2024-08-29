@@ -8,7 +8,6 @@ import 'package:shopzone/user/models/address.dart';
 import 'package:shopzone/user/models/cart.dart';
 import 'package:shopzone/user/normalUser/placeOrderScreen/place_order_screen.dart';
 import 'package:http/http.dart' as http;
-
 class AddressDesignWidget extends StatefulWidget {
   final Address? addressModel;
   final Carts? model;
@@ -18,6 +17,7 @@ class AddressDesignWidget extends StatefulWidget {
   final String? sellerUID;
   final String? cartId;
   final int? totalPrice;
+  final Function(String?)? onSelected;
 
   AddressDesignWidget({
     this.addressModel,
@@ -28,6 +28,7 @@ class AddressDesignWidget extends StatefulWidget {
     this.sellerUID,
     this.totalPrice,
     this.cartId,
+    this.onSelected,
   });
 
   @override
@@ -77,6 +78,9 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                   onChanged: (val) {
                     Provider.of<NormalUserAddressChanger>(context, listen: false)
                         .showSelectedAddress(val);
+                    if (widget.onSelected != null) {
+                      widget.onSelected!(widget.addressID);
+                    }
                   },
                 ),
                 Expanded(
@@ -157,6 +161,7 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                       onPressed: () {
+                        widget.onSelected!(widget.addressID);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
