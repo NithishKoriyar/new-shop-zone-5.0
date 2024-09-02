@@ -10,7 +10,6 @@ import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart'
 import 'package:shopzone/user/normalUser/sellersScreens/ShopScreen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-
 class WishListScreen extends StatefulWidget {
   final String userID;
   WishListScreen({required this.userID});
@@ -27,7 +26,7 @@ class _WishListScreenState extends State<WishListScreen> {
   @override
   void initState() {
     super.initState();
-    fetchWishListItems(widget.userID); // Use widget.userID to access the userID property
+    fetchWishListItems(widget.userID);
   }
 
   Future<void> fetchWishListItems(String userID) async {
@@ -41,7 +40,6 @@ class _WishListScreenState extends State<WishListScreen> {
         setState(() {
           wishListItems = data.map((item) => Items.fromJson(item)).toList();
         });
-        // Emit a new event to the stream
         _wishlistStreamController.add(wishListItems);
       } else {
         throw Exception('Failed to load wishListItems');
@@ -53,9 +51,12 @@ class _WishListScreenState extends State<WishListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Wish List Items"),
+        title: Text("Wish List Items", style: TextStyle(fontSize: screenWidth * 0.05)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -70,52 +71,52 @@ class _WishListScreenState extends State<WishListScreen> {
         stream: _wishlistStreamController.stream,
         builder: (context, snapshot) {
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return buildEmptyWishlist();
+            return buildEmptyWishlist(screenWidth, screenHeight);
           }
-          return buildWishlist(snapshot);
+          return buildWishlist(snapshot, screenWidth, screenHeight);
         },
       ),
     );
   }
 
-  Widget buildEmptyWishlist() {
+  Widget buildEmptyWishlist(double screenWidth, double screenHeight) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(screenWidth * 0.04),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
               'images/empty_wishlist.png', // Your image asset path
-              height: 150.0,
-              width: 150.0,
+              height: screenHeight * 0.2,
+              width: screenWidth * 0.3,
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: screenHeight * 0.02),
             Text(
               "You haven't added any products yet",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18.0, color: Colors.grey),
+              style: TextStyle(fontSize: screenWidth * 0.045, color: Colors.grey),
             ),
-            SizedBox(height: 8.0),
+            SizedBox(height: screenHeight * 0.01),
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
                 children: [
                   TextSpan(
                     text: 'Click ',
-                    style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                    style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
                   ),
                   WidgetSpan(
-                    child: Icon(Icons.favorite, color: Colors.red, size: 16.0),
+                    child: Icon(Icons.favorite, color: Colors.red, size: screenWidth * 0.04),
                   ),
                   TextSpan(
                     text: ' to save products',
-                    style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                    style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: screenHeight * 0.02),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -123,7 +124,7 @@ class _WishListScreenState extends State<WishListScreen> {
                   MaterialPageRoute(builder: (context) => ShopScreen()),
                 );
               },
-              child: Text("Find items to save"),
+              child: Text("Find items to save", style: TextStyle(fontSize: screenWidth * 0.04)),
             ),
           ],
         ),
@@ -131,10 +132,10 @@ class _WishListScreenState extends State<WishListScreen> {
     );
   }
 
-  Widget buildWishlist(AsyncSnapshot<List<Items>> snapshot) {
+  Widget buildWishlist(AsyncSnapshot<List<Items>> snapshot, double screenWidth, double screenHeight) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: EdgeInsets.all(screenWidth * 0.025),
         child: Column(
           children: <Widget>[
             ListView.builder(
@@ -143,7 +144,7 @@ class _WishListScreenState extends State<WishListScreen> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final item = snapshot.data![index];
-                return buildWishlistItem(item);
+                return buildWishlistItem(item, screenWidth, screenHeight);
               },
             ),
           ],
@@ -152,105 +153,137 @@ class _WishListScreenState extends State<WishListScreen> {
     );
   }
 
-  Widget buildWishlistItem(Items item) {
+Widget buildWishlistItem(Items item, double screenWidth, double screenHeight) {
     return InkWell(
-      onTap: () {
-        // Navigate to the Item Details screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ItemsDetailsScreen(model: item),
-          ),
-        );
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+        onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ItemsDetailsScreen(model: item),
+                ),
+            );
+        },
+        child: Card(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(screenWidth * 0.02),
+            ),
+            elevation: 4.0,
+            child: Padding(
+                padding: EdgeInsets.all(screenWidth * 0.02),
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                        ClipRRect(
+                            borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                            child: Image.network(
+                                API.getItemsImage + (item.thumbnailUrl ?? ''),
+                                width: screenWidth * 0.3,
+                                height: screenHeight * 0.25,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(Icons.error),
+                            ),
+                        ),
+                        SizedBox(width: screenWidth * 0.03),
+                        Expanded(
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                    Text(
+                                        item.itemTitle ?? 'Unnamed Item',
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.045,
+                                            fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    if (item.sellingPrice != null)
+                                        Row(
+                                            children: [
+                                                Text(
+                                                    "₹${item.sellingPrice}",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: screenWidth * 0.035,
+                                                        color: Colors.green,
+                                                    ),
+                                                ),
+                                                SizedBox(width: screenWidth * 0.01),
+                                                if (item.price != null)
+                                                    Text(
+                                                        "₹${item.price}",
+                                                        style: TextStyle(
+                                                            fontSize: screenWidth * 0.045,
+                                                            color: Colors.grey,
+                                                            decoration: TextDecoration.lineThrough,
+                                                        ),
+                                                        overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                SizedBox(width: screenWidth * 0.01),
+                                                if (item.price != null && item.sellingPrice != null)
+                                                    Text(
+                                                        _calculateDiscount(item.price!, item.sellingPrice!),
+                                                        style: TextStyle(
+                                                            fontSize: screenWidth * 0.045,
+                                                            color: Colors.red,
+                                                            fontWeight: FontWeight.bold,
+                                                        ),
+                                                    ),
+                                            ],
+                                        ),
+                                    SizedBox(height: screenHeight * 0.02),
+                                    Text(
+                                        "${item.itemInfo ?? 'Brand'}",
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.04,
+                                            color: Colors.grey,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: screenHeight * 0.04),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                            _showSelectSizeDialog(item, screenWidth, screenHeight);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: Colors.yellow[700],
+                                            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: screenHeight * 0.02),
+                                        ),
+                                        child: Text('Add to Cart', style: TextStyle(fontSize: screenWidth * 0.04)),
+                                    ),
+                                ],
+                            ),
+                        ),
+                        SizedBox(width: screenWidth * 0.02),
+                        IconButton(
+                            icon: Icon(
+                                Icons.more_vert,
+                                color: Colors.grey,
+                            ),
+                            onPressed: () {
+                                showRemoveConfirmationDialog(context, item);
+                            },
+                        ),
+                    ],
+                ),
+            ),
         ),
-        elevation: 4.0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  API.getItemsImage + (item.thumbnailUrl ?? ''),
-                  width: 130,
-                  height: 200,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.error),
-                ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.itemTitle ?? 'Unnamed Item',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      "₹ ${item.price}",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      " ${item.itemInfo ?? 'Brand'}",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        _showSelectSizeDialog(item);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: Colors.yellow[700],
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      ),
-                      child: Text('Add to Cart'),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 8),
-              IconButton(
-                icon: Icon(
-                  Icons.more_vert,
-                  color: Colors.grey,
-                ),
-                onPressed: () {
-                  showRemoveConfirmationDialog(context, item);
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
     );
-  }
+}
 
- void _showSelectSizeDialog(Items item) {
+
+String _calculateDiscount(String originalPrice, String sellingPrice) {
+  double original = double.parse(originalPrice);
+  double selling = double.parse(sellingPrice);
+  double discount = ((original - selling) / original) * 100;
+  return "-${discount.toStringAsFixed(0)}%";
+}
+
+ void _showSelectSizeDialog(Items item, double screenWidth, double screenHeight) {
   showDialog(
     context: context,
     builder: (context) {
@@ -300,7 +333,7 @@ class _WishListScreenState extends State<WishListScreen> {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        "₹ ${item.price}",
+                        "₹ ${item.sellingPrice}",
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.green,

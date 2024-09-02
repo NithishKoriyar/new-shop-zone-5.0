@@ -191,6 +191,11 @@ static const fetchSizes =
       "$hostConnectSeller/upload_similar_product.php";
        static const fetchSimilarProducts =
       "$hostConnectSeller/fetch_similar_products.php";
+      
+        static const fetchRamOptions =
+      "$hostConnectSeller/fetch_similar_products2.php";
+       static const  fetchStorageOptions =
+      "$hostConnectSeller/fetch_similar_products3.php";
 
 
   //!------------------------------ FOOD SELLERS API CONNECTIONS --------------------------------

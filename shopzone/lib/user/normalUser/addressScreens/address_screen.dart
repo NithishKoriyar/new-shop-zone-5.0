@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:shopzone/user/models/cart.dart';
 import 'package:shopzone/user/normalUser/placeOrderScreen/place_order_screen.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
+import 'dart:convert';
 
 class AddressScreen extends StatefulWidget {
   Carts? model;
@@ -43,15 +43,26 @@ class _AddressScreenState extends State<AddressScreen> {
   late String userID;
   late String userImg;
 
-  int? selectedAddressIndex;
   String? selectedAddressID;
 
   @override
   void initState() {
     super.initState();
+
+    // Fetch user information and initialize selectedAddressID
     currentUserController.getUserInfo().then((_) {
       setUserInfo();
       printUserInfo();
+
+      // Fetch address list and set initial selected address
+      fetchAddressStream().first.then((addresses) {
+        if (addresses.isNotEmpty) {
+          setState(() {
+            selectedAddressID = addresses[0]['id'];
+          });
+        }
+      });
+
       setState(() {});
     });
   }
@@ -97,8 +108,13 @@ class _AddressScreenState extends State<AddressScreen> {
         ),
       );
     } else {
-      // Handle the case when no address is selected or model is null
-      print("No address selected or cart model is null");
+      // Show a Snackbar or AlertDialog if no address is selected
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please select an address before continuing.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -127,57 +143,62 @@ class _AddressScreenState extends State<AddressScreen> {
             child: Column(
               children: [
                 // Address List
-                Consumer<NormalUserAddressChanger>(builder: (context, address, c) {
-                  return StreamBuilder<List<dynamic>>(
-                    stream: fetchAddressStream(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.active) {
-                        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                          return Column(
-                            children: snapshot.data!.map((index) {
-                              return AddressDesignWidget(
-                                addressModel: Address.fromJson(index),
-                                index: address.count,
-                                value: snapshot.data!.indexOf(index),
-                                addressID: index['id'],
-                                sellerUID: widget.model?.sellerUID,
-                                totalPrice: widget.model?.totalPrice,
-                                cartId: widget.model?.cartId,
-                                model: widget.model,
-                                onSelected: (selectedID) {
-                                  setState(() {
-                                    selectedAddressIndex = snapshot.data!.indexOf(index);
-                                    selectedAddressID = selectedID;
-                                  });
-                                },
-                              );
-                            }).toList(),
-                          );
-                        } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                          return const Center(
-                            child: Text("No address found."),
-                          );
+                Consumer<NormalUserAddressChanger>(
+                  builder: (context, address, c) {
+                    return StreamBuilder<List<dynamic>>(
+                      stream: fetchAddressStream(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.active) {
+                          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                            return Column(
+                              children: snapshot.data!.map((index) {
+                                return AddressDesignWidget(
+                                  addressModel: Address.fromJson(index),
+                                  index: address.count,
+                                  value: snapshot.data!.indexOf(index),
+                                  addressID: index['id'],
+                                  sellerUID: widget.model?.sellerUID,
+                                  totalPrice: widget.model?.totalPrice,
+                                  cartId: widget.model?.cartId,
+                                  model: widget.model,
+                                  onSelected: (selectedID) {
+                                    setState(() {
+                                      selectedAddressID = selectedID;
+                                    });
+                                  },
+                                );
+                              }).toList(),
+                            );
+                          } else if (snapshot.hasData &&
+                              snapshot.data!.isEmpty) {
+                            return const Center(
+                              child: Text("No address found."),
+                            );
+                          } else {
+                            return Container();
+                          }
                         } else {
-                          return Container();
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
-                      } else {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                    },
-                  );
-                }),
+                      },
+                    );
+                  },
+                ),
                 Divider(thickness: 1, color: Colors.grey[300]),
 
                 // Add New Address Button
                 Container(
                   width: double.infinity,
-                  margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (c) => SaveNewAddressScreen()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (c) => SaveNewAddressScreen()));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 155, 198, 13),
@@ -185,7 +206,8 @@ class _AddressScreenState extends State<AddressScreen> {
                     ),
                     child: Text(
                       "Add New Address",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -198,7 +220,8 @@ class _AddressScreenState extends State<AddressScreen> {
                       children: [
                         // Item Image
                         Image.network(
-                          API.getItemsImage + (widget.model!.thumbnailUrl ?? ''),
+                          API.getItemsImage +
+                              (widget.model!.thumbnailUrl ?? ''),
                           height: 100,
                           width: 100,
                           fit: BoxFit.cover,
@@ -345,7 +368,6 @@ class _AddressScreenState extends State<AddressScreen> {
                         ),
                         SizedBox(height: 8),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               'Delivery Charges',
@@ -453,7 +475,8 @@ class _AddressScreenState extends State<AddressScreen> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 49, 61, 8),
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -484,7 +507,7 @@ class _AddressScreenState extends State<AddressScreen> {
       final response = await http.get(requestUri);
 
       if (response.statusCode == 200) {
-        print("Data received: ${response.body}");
+        print("Data received adid: ${response.body}");
 
         var decodedData = json.decode(response.body);
         if (decodedData is List) {

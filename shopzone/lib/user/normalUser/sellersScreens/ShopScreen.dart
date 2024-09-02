@@ -188,7 +188,7 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white10,
+      backgroundColor: Colors.white,
       drawer: MyDrawer(),
       appBar: AppBar(
         elevation: 20,

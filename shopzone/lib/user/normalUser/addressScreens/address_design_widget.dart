@@ -8,6 +8,7 @@ import 'package:shopzone/user/models/address.dart';
 import 'package:shopzone/user/models/cart.dart';
 import 'package:shopzone/user/normalUser/placeOrderScreen/place_order_screen.dart';
 import 'package:http/http.dart' as http;
+
 class AddressDesignWidget extends StatefulWidget {
   final Address? addressModel;
   final Carts? model;
@@ -76,7 +77,8 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                   value: widget.value!,
                   activeColor: Colors.pink,
                   onChanged: (val) {
-                    Provider.of<NormalUserAddressChanger>(context, listen: false)
+                    Provider.of<NormalUserAddressChanger>(context,
+                            listen: false)
                         .showSelectedAddress(val);
                     if (widget.onSelected != null) {
                       widget.onSelected!(widget.addressID);
@@ -118,7 +120,8 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
             ),
 
             // Buttons
-            if (widget.value == Provider.of<NormalUserAddressChanger>(context).count)
+            if (widget.value ==
+                Provider.of<NormalUserAddressChanger>(context).count)
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Row(
@@ -131,7 +134,8 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                       onPressed: () {
                         int? addressIdInt;
@@ -158,7 +162,8 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                       onPressed: () {
                         widget.onSelected!(widget.addressID);

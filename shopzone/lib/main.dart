@@ -4,7 +4,7 @@ import 'package:shopzone/user/foodUser/foodUserAssistantMethods/address_changer.
 import 'package:shopzone/user/normalUser/assistantMethods/address_changer.dart';
 import 'package:shopzone/user/splashScreen/my_splash_screen.dart';
 
- void main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
