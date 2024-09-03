@@ -83,6 +83,8 @@ static const wishListRemoveAll = "$hostConnectUser/wishListRemoveAll.php";
   static const fetchSellerInfo = "$hostConnectUser/fetchSellerInfoitem.php";
     // static const fetchSellerProducts = "$hostConnectUser/fetchSellerProducts.php";
     static const displayItemss = "$hostConnectUser/displayItemss.php";
+    static const FetchReviews = "$hostConnectUser/Fetch Reviews.php";
+    static const AddReview = "$hostConnectUser/AddReview.php";
   
 
 
@@ -141,6 +143,7 @@ static const wishListRemoveAll = "$hostConnectUser/wishListRemoveAll.php";
   // save Fcm Token User
   static const displayAllBrands = "$hostConnectFoodUser/displayAllBrands.php";
   static const displayfoodItems = "$hostConnectFoodUser/displayItems.php";
+
 
   //!------------------------------SELLERS API CONNECTIONS --------------------------------
 
