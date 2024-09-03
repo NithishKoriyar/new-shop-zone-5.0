@@ -15,8 +15,7 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
-
-    //!seller information--------------------------------------
+  //!seller information--------------------------------------
   final CurrentSeller currentSellerController = Get.put(CurrentSeller());
 
   late String sellerName;
@@ -41,19 +40,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
     sellerImg = currentSellerController.seller.seller_profile;
   }
 
-
   List<dynamic> items = [];
   bool isLoading = true;
 
   Stream<List<dynamic>> fetchOrders() async* {
-    // Assuming your API endpoint is something like this
     const String apiUrl = API.sellerOrdersView;
 
     try {
+      print("Seller ID: $sellerID");
       final response =
-          await http.post(Uri.parse(apiUrl),body: {'sellerID': sellerID});
-          print(API.sellerOrdersView);
+          await http.post(Uri.parse(apiUrl), body: {'sellerID': sellerID});
 
+      print(API.sellerOrdersView);
       print("Response Status Code: ${response.statusCode}");
       print("Response Body: ${response.body}");
 
@@ -61,18 +59,19 @@ class _OrdersScreenState extends State<OrdersScreen> {
         final responseData = json.decode(response.body);
 
         if (responseData.containsKey('error')) {
-          // If there's an error message in the response
           print("Server Error: ${responseData['error']}");
-          yield []; // yield an empty list or handle error differently
-        } else {
-          final List<dynamic> fetchedItems = responseData['orders'] ?? [];
-          // Assuming the fetched items are under the 'orders' key. Use a null check just in case.
+          yield [];
+        } else if (responseData.containsKey('orders')) {
+          final List<dynamic> fetchedItems = responseData['orders'];
           yield fetchedItems;
           print(fetchedItems);
+        } else {
+          print("No orders found in the response.");
+          yield [];
         }
       } else {
         print("Error fetching cart items");
-        yield []; // yield an empty list or handle error differently
+        yield [];
       }
     } catch (e) {
       print("Exception while fetching orders: $e");
@@ -84,7 +83,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Orders"), elevation: 20,
+        title: const Text("Orders"),
+        elevation: 20,
         centerTitle: true,
       ),
       body: StreamBuilder<List<dynamic>>(
@@ -94,8 +94,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
             return const Center(
                 child: CircularProgressIndicator()); // Show loading indicator
           } else if (!dataSnapshot.hasData || dataSnapshot.data!.isEmpty) {
-            return const Center(
-                child: Text('No Orders')); // Show loading indicator
+            return const Center(child: Text('No Orders'));
           } else {
             List<dynamic> orderItems = dataSnapshot.data!;
             return ListView.builder(

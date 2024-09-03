@@ -3,6 +3,7 @@ import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/normalUser/cart/cart_screen.dart';
 import 'package:shopzone/user/normalUser/global/global.dart';
@@ -44,6 +45,8 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
   String sellerProfile = '';
   double sellerRating = 0.0;
 
+  bool isLoading = true; // To manage loading state
+
   @override
   void initState() {
     super.initState();
@@ -53,7 +56,9 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
       fetchSimilarProducts(widget.model!.variantID.toString());
       fetchSellerInfo(widget.model!.sellerUID.toString());
       fetchSellerProducts(); // Fetch seller's other products
-      setState(() {});
+      setState(() {
+        isLoading = false; // Stop loading after fetching data
+      });
     });
     selectedSize = widget.model!.SizeName?.first;
     initialSelectedSize = selectedSize;
@@ -252,7 +257,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                         SizedBox(height: 10),
                         // Product Price
                         Text(
-                          "₹ ${widget.model?.price}",
+                          "₹ ${widget.model?.sellingPrice}",
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.green,
@@ -307,6 +312,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                                 widget.model!.itemID.toString(),
                                 counterLimit,
                                 userID,
+                                selectedSize
                               );
                               Navigator.push(
                                 context,
@@ -325,6 +331,13 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
         );
       },
     );
+  }
+
+  String _calculateDiscount(String originalPrice, String sellingPrice) {
+    double original = double.parse(originalPrice);
+    double selling = double.parse(sellingPrice);
+    double discount = ((original - selling) / original) * 100;
+    return "-${discount.toStringAsFixed(0)}%";
   }
 
   @override
@@ -386,30 +399,32 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                     height: 480,
                     child: Stack(
                       children: [
-                        PageView.builder(
-                          controller: pageController,
-                          itemCount: imageUrls.length,
-                          itemBuilder: (context, index) {
-                            if (imageUrls[index] != null) {
-                              return Hero(
-                                tag: 'hero-${widget.model!.itemID}-$index',
-                                child: Stack(
-                                  children: [
-                                    Image.network(
-                                      API.getItemsImage +
-                                          (imageUrls[index] ?? ''),
-                                      fit: BoxFit.contain,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            } else {
-                              return Container();
-                            }
-                          },
-                        ),
+                        isLoading
+                            ? _buildShimmerEffect() // Display shimmer while loading
+                            : PageView.builder(
+                                controller: pageController,
+                                itemCount: imageUrls.length,
+                                itemBuilder: (context, index) {
+                                  if (imageUrls[index] != null) {
+                                    return Hero(
+                                      tag: 'hero-${widget.model!.itemID}-$index',
+                                      child: Stack(
+                                        children: [
+                                          Image.network(
+                                            API.getItemsImage +
+                                                (imageUrls[index] ?? ''),
+                                            fit: BoxFit.contain,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                },
+                              ),
                         Positioned(
                           bottom: 8,
                           left: 0,
@@ -562,23 +577,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                children: [
-                  Text(
-                    "₹ ${widget.model!.price}",
-                    textAlign: TextAlign.justify,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                      color: Colors.green,
-                    ),
-                  ),
-                  Spacer(),
+                       Spacer(),
                   IconButton(
                     icon: Icon(
                       widget.model!.isWishListed == "1"
@@ -603,6 +602,42 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                       shareItem(widget.model!);
                     },
                   ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                children: [
+                  if (widget.model!.sellingPrice != null)
+                    Text(
+                      "₹${widget.model!.sellingPrice}", // Selling price in bold green
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: Colors.green,
+                      ),
+                    ),
+                  SizedBox(width: 10), // Space between prices
+                  if (widget.model!.price != null)
+                    Text(
+                      "₹${widget.model!.price}", // Original price with strike-through
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                  SizedBox(width: 10), // Space between prices and discount
+                  if (widget.model!.price != null && widget.model!.sellingPrice != null)
+                    Text(
+                      _calculateDiscount(widget.model!.price!, widget.model!.sellingPrice!), // Discount percentage
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -845,79 +880,79 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
 
             // Display up to 6 seller's random items
            Padding(
-  padding: const EdgeInsets.all(8.0),
-  child: SizedBox(
-    height: 220, // Adjust the height according to your design
-    child: sellerProducts.isNotEmpty
-        ? ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: sellerProducts.length,
-            itemBuilder: (context, index) {
-              final item = sellerProducts[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ItemsDetailsScreen(model: item),
-                    ),
-                  );
-                },
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.zero, // Sharp edges
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.network(
-                        API.getItemsImage + item.thumbnailUrl.toString(),
-                        height: 120, // Adjust according to your design
-                        width: 120, // Adjust according to your design
-                        fit: BoxFit.cover,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10.0,
-                          vertical: 5.0,
-                        ),
-                        child: Container(
-                          width: 100, // Constrain the width of the title
-                          child: Text(
-                            item.itemTitle.toString(),
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                height: 220, // Adjust the height according to your design
+                child: sellerProducts.isNotEmpty
+                    ? ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: sellerProducts.length,
+                        itemBuilder: (context, index) {
+                          final item = sellerProducts[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ItemsDetailsScreen(model: item),
+                                ),
+                              );
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.zero, // Sharp edges
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.network(
+                                    API.getItemsImage + item.thumbnailUrl.toString(),
+                                    height: 120, // Adjust according to your design
+                                    width: 120, // Adjust according to your design
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                      vertical: 5.0,
+                                    ),
+                                    child: Container(
+                                      width: 100, // Constrain the width of the title
+                                      child: Text(
+                                        item.itemTitle.toString(),
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(horizontal: 10.0),
+                                    child: Text(
+                                      "₹${item.sellingPrice}",
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text("No items found from this seller."),
                       ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          "₹${item.price}",
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          )
-        : Center(
-            child: Text("No items found from this seller."),
-          ),
-  ),
-)
+              ),
+            )
 
           ],
         ),
@@ -939,6 +974,11 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                         widget.model!.itemID.toString(),
                         itemCounter,
                         userID,
+                        selectedSize,
+                      
+                       
+                 
+                     
                       );
                       setState(() {
                         isAddedToCart = true;
@@ -975,6 +1015,9 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                       widget.model!.itemID.toString(),
                       itemCounter,
                       userID,
+                      selectedSize
+                    
+                    
                     );
                     Navigator.push(context,
                         MaterialPageRoute(builder: (c) => CartScreenUser()));
@@ -997,6 +1040,17 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerEffect() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        height: 480,
+        color: Colors.white,
       ),
     );
   }
@@ -1032,7 +1086,7 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Text(
-              "₹ ${item.price}",
+              "₹ ${item.sellingPrice}",
               style: TextStyle(fontSize: 14, color: Colors.green),
               textAlign: TextAlign.center,
             ),

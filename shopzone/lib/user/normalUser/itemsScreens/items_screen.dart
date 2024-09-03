@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/models/brands.dart';
 import 'package:shopzone/user/normalUser/itemsScreens/items_ui_design_widget.dart';
@@ -8,30 +9,23 @@ import 'package:shopzone/user/models/items.dart';
 import '../widgets/text_delegate_header_widget.dart';
 import 'package:http/http.dart' as http;
 
-
 // ignore: must_be_immutable
-class ItemsScreen extends StatefulWidget
-{
+class ItemsScreen extends StatefulWidget {
   Brands? model;
 
-  ItemsScreen({this.model,});
+  ItemsScreen({this.model});
 
   @override
   State<ItemsScreen> createState() => _ItemsScreenState();
 }
 
-
-
-class _ItemsScreenState extends State<ItemsScreen>
-{
-  
+class _ItemsScreenState extends State<ItemsScreen> {
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-         elevation: 20,
+        elevation: 20,
         title: const Text(
           "Shop Zone",
           style: TextStyle(
@@ -44,21 +38,22 @@ class _ItemsScreenState extends State<ItemsScreen>
       ),
       body: CustomScrollView(
         slivers: [
-
           SliverPersistentHeader(
             pinned: true,
-            delegate: TextDelegateHeaderWidget(title: widget.model!.brandTitle.toString() + "'s Items"),
+            delegate: TextDelegateHeaderWidget(
+              title: widget.model!.brandTitle.toString() + "'s Items",
+            ),
           ),
 
-          //1. query
-          //2. model
-          //3. ui design widget
-
           StreamBuilder(
-            // We're emulating the stream using a FutureBuilder and StreamController
             stream: _fetchItems(),
-            builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> dataSnapshot) {
-              if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
+            builder:
+                (context, AsyncSnapshot<List<Map<String, dynamic>>> dataSnapshot) {
+              if (dataSnapshot.connectionState == ConnectionState.waiting) {
+                return SliverToBoxAdapter(
+                  child: _buildShimmerEffect(),
+                );
+              } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
                 return SliverStaggeredGrid.countBuilder(
                   crossAxisCount: 1,
                   staggeredTileBuilder: (c) => const StaggeredTile.fit(1),
@@ -74,18 +69,18 @@ class _ItemsScreenState extends State<ItemsScreen>
                 return const SliverToBoxAdapter(
                   child: Center(
                     child: Text(
-                      "No items exists",
+                      "No items exist",
                     ),
                   ),
                 );
               }
             },
-          )
-
+          ),
         ],
       ),
     );
   }
+
   Stream<List<Map<String, dynamic>>> _fetchItems() async* {
     final response = await http.get(Uri.parse(
         '${API.userSellerBrandItemView}?sellerUID=${widget.model!.sellerUID}&brandID=${widget.model!.brandID}'));
@@ -99,4 +94,25 @@ class _ItemsScreenState extends State<ItemsScreen>
     }
   }
 
+  Widget _buildShimmerEffect() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          children: List.generate(
+            6,
+            (index) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Container(
+                height: 100,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

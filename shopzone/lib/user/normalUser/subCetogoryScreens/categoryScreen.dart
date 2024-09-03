@@ -1,10 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/models/shopcetogery.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopzone/user/normalUser/subCetogoryScreens/SubcategoryScreen.dart';
+import 'package:shimmer/shimmer.dart';  // Import the shimmer package
 
 class CategoryScreen extends StatelessWidget {
   const CategoryScreen({Key? key}) : super(key: key);
@@ -34,9 +34,7 @@ class CategoryScreen extends StatelessWidget {
         stream: getCategoryStream(),
         builder: (context, AsyncSnapshot<List<ShopCategory>> dataSnapshot) {
           if (dataSnapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+            return buildCategoryShimmer(); // Show shimmer effect while loading
           } else if (dataSnapshot.hasData && dataSnapshot.data!.isNotEmpty) {
             return ListView.builder(
               padding: const EdgeInsets.all(8.0),
@@ -74,7 +72,8 @@ class CategoryScreen extends StatelessWidget {
                               height: 50,
                               width: 50,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Image.asset(
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.asset(
                                 'assets/images/placeholder.png', // Placeholder image
                                 height: 50,
                                 width: 50,
@@ -92,7 +91,8 @@ class CategoryScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                          Icon(Icons.arrow_forward_ios,
+                              size: 16, color: Colors.grey),
                         ],
                       ),
                     ),
@@ -107,6 +107,51 @@ class CategoryScreen extends StatelessWidget {
           }
         },
       ),
+    );
+  }
+
+  Widget buildCategoryShimmer() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(8.0),
+      itemCount: 6, // Number of shimmer items to display
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Card(
+            margin: const EdgeInsets.symmetric(vertical: 8.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 3,
+            shadowColor: Colors.black.withOpacity(0.1),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Container(
+                      height: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_ios,
+                      size: 16, color: Colors.grey),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

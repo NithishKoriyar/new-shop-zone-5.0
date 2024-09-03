@@ -1,7 +1,3 @@
-
-
-
-
 class Orders {
   String? brandID;
   String? itemID;
@@ -23,6 +19,7 @@ class Orders {
   String? completeAddress;
   double? lat;
   double? lng;
+  String? userID; // Added user ID
 
   Orders({
     this.brandID,
@@ -45,6 +42,7 @@ class Orders {
     this.completeAddress,
     this.lat,
     this.lng,
+    this.userID, // Initialize user ID
   });
 
   Orders.fromJson(Map<String, dynamic> json) {
@@ -53,37 +51,21 @@ class Orders {
     itemInfo = json["itemInfo"];
     itemTitle = json["itemTitle"];
     longDescription = json["longDescription"];
-    if (json["price"] is int) {
-      price = json["price"].toString();
-    } else {
-      price = json["price"];
-    }
-    if (json["totalAmount"] is int) {
-      totalAmount = json["totalAmount"].toString();
-    } else {
-      totalAmount = json["totalAmount"];
-    }
-    if (json["publishedDate"] is DateTime) {
-      publishedDate = json["publishedDate"] as DateTime;
-    }
+    price = json["price"] is int ? json["price"].toString() : json["price"];
+    totalAmount = json["totalAmount"] is int ? json["totalAmount"].toString() : json["totalAmount"];
+    publishedDate = json["publishedDate"] is DateTime ? json["publishedDate"] as DateTime : null;
     sellerName = json["sellerName"];
     sellerUID = json["sellerUID"];
     orderStatus = json["orderStatus"];
     thumbnailUrl = json["thumbnailUrl"];
     orderId = json["orderId"];
-
     orderTime = json["orderTime"];
-
-    if (json["itemQuantity"] is int) {
-      itemQuantity = json["itemQuantity"] as int?;
-    } else if (json["itemQuantity"] is String) {
-      int? parsedCounter = int.tryParse(json["itemQuantity"]);
-      itemQuantity = parsedCounter;
-    }
+    itemQuantity = json["itemQuantity"] is String ? int.tryParse(json["itemQuantity"]) : json["itemQuantity"];
     name = json["name"];
     phoneNumber = json["phoneNumber"];
     completeAddress = json["completeAddress"];
     lat = json["lat"] != null ? double.tryParse(json["lat"]) : null;
     lng = json["lng"] != null ? double.tryParse(json["lng"]) : null;
+    userID = json["userID"]; // Parse user ID from JSON if available
   }
 }

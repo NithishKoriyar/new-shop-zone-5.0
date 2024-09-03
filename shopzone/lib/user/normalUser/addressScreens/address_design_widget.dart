@@ -18,6 +18,7 @@ class AddressDesignWidget extends StatefulWidget {
   final String? sellerUID;
   final String? cartId;
   final int? totalPrice;
+  final Function(String?)? onSelected;
 
   AddressDesignWidget({
     this.addressModel,
@@ -28,6 +29,7 @@ class AddressDesignWidget extends StatefulWidget {
     this.sellerUID,
     this.totalPrice,
     this.cartId,
+    this.onSelected,
   });
 
   @override
@@ -75,8 +77,12 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                   value: widget.value!,
                   activeColor: Colors.pink,
                   onChanged: (val) {
-                    Provider.of<NormalUserAddressChanger>(context, listen: false)
+                    Provider.of<NormalUserAddressChanger>(context,
+                            listen: false)
                         .showSelectedAddress(val);
+                    if (widget.onSelected != null) {
+                      widget.onSelected!(widget.addressID);
+                    }
                   },
                 ),
                 Expanded(
@@ -114,18 +120,22 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
             ),
 
             // Buttons
-            if (widget.value == Provider.of<NormalUserAddressChanger>(context).count)
+            if (widget.value ==
+                Provider.of<NormalUserAddressChanger>(context).count)
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ElevatedButton.icon(
+                    ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 205, 156, 152), // Red color for delete button
+                        backgroundColor: Colors.red[400],
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(20),
                         ),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                       onPressed: () {
                         int? addressIdInt;
@@ -136,17 +146,27 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                           print("Error converting addressID to int: $e");
                         }
                       },
-                      icon: const Icon(Icons.delete),
-                      label: const Text("Delete"),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.delete_outline, size: 20),
+                          SizedBox(width: 8),
+                          Text("Delete", style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
                     ),
-                    ElevatedButton.icon(
+                    ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 165, 212, 167), // Green color for proceed button
+                        backgroundColor: Colors.green[400],
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(20),
                         ),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                       onPressed: () {
+                        widget.onSelected!(widget.addressID);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -160,8 +180,14 @@ class _AddressDesignWidgetState extends State<AddressDesignWidget> {
                           ),
                         );
                       },
-                      icon: const Icon(Icons.arrow_forward),
-                      label: const Text("Proceed"),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("Proceed", style: TextStyle(fontSize: 16)),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward_ios, size: 20),
+                        ],
+                      ),
                     ),
                   ],
                 ),

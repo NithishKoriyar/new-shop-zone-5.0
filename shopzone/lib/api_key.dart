@@ -83,6 +83,8 @@ static const wishListRemoveAll = "$hostConnectUser/wishListRemoveAll.php";
   static const fetchSellerInfo = "$hostConnectUser/fetchSellerInfoitem.php";
     // static const fetchSellerProducts = "$hostConnectUser/fetchSellerProducts.php";
     static const displayItemss = "$hostConnectUser/displayItemss.php";
+    static const FetchReviews = "$hostConnectUser/Fetch Reviews.php";
+    static const AddReview = "$hostConnectUser/AddReview.php";
   
 
 
@@ -142,6 +144,7 @@ static const wishListRemoveAll = "$hostConnectUser/wishListRemoveAll.php";
   static const displayAllBrands = "$hostConnectFoodUser/displayAllBrands.php";
   static const displayfoodItems = "$hostConnectFoodUser/displayItems.php";
 
+
   //!------------------------------SELLERS API CONNECTIONS --------------------------------
 
   static const hostConnectSeller = "$hostConnect/seller";
@@ -191,6 +194,11 @@ static const fetchSizes =
       "$hostConnectSeller/upload_similar_product.php";
        static const fetchSimilarProducts =
       "$hostConnectSeller/fetch_similar_products.php";
+      
+        static const fetchRamOptions =
+      "$hostConnectSeller/fetch_similar_products2.php";
+       static const  fetchStorageOptions =
+      "$hostConnectSeller/fetch_similar_products3.php";
 
 
   //!------------------------------ FOOD SELLERS API CONNECTIONS --------------------------------

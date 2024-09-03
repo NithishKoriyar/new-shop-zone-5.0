@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shimmer/shimmer.dart'; // Import the shimmer package
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/user/models/items.dart';
 import 'package:shopzone/user/models/subcettogry.dart';
@@ -121,14 +122,16 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                   children: <Widget>[
                     Text(
                       "Subcategories",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     isLoadingSubcategories
-                        ? Center(child: CircularProgressIndicator())
+                        ? buildSubcategoryShimmer() // Show shimmer while loading subcategories
                         : GridView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
                               childAspectRatio: 0.75,
                               crossAxisSpacing: 10,
@@ -142,29 +145,37 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => SubcategoryItemsScreen(
-                                          subcategoryId: subcategory.subcategory_id.toString()),
+                                      builder: (context) =>
+                                          SubcategoryItemsScreen(
+                                              subcategoryId: subcategory
+                                                  .subcategory_id
+                                                  .toString()),
                                     ),
                                   );
                                 },
                                 child: Column(
                                   children: <Widget>[
                                     ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius:
+                                          BorderRadius.circular(8.0),
                                       child: Image.network(
-                                        API.normalImage + subcategory.img_path.toString(),
+                                        API.normalImage +
+                                            subcategory.img_path.toString(),
                                         width: double.infinity,
                                         height: 100,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) =>
+                                        errorBuilder: (context, error,
+                                                stackTrace) =>
                                             const Icon(Icons.error),
                                       ),
                                     ),
                                     SizedBox(height: 5),
                                     Text(
-                                      subcategory.name ?? 'Unnamed Subcategory',
+                                      subcategory.name ??
+                                          'Unnamed Subcategory',
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
@@ -176,10 +187,11 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                     ),
                     Text(
                       "Items",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     isLoadingItems
-                        ? Center(child: CircularProgressIndicator())
+                        ? buildItemsShimmer() // Show shimmer while loading items
                         : GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
@@ -200,45 +212,56 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => ItemsDetailsScreen(model: item),
+                                        builder: (context) =>
+                                            ItemsDetailsScreen(
+                                                model: item),
                                       ),
                                     );
                                   },
                                   child: Card(
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius:
+                                          BorderRadius.circular(8.0),
                                     ),
                                     elevation: 4.0,
                                     child: Column(
                                       children: <Widget>[
                                         Expanded(
                                           child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(8.0),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
                                             child: Image.network(
-                                              API.getItemsImage + (item.thumbnailUrl ?? ''),
+                                              API.getItemsImage +
+                                                  (item.thumbnailUrl ?? ''),
                                               width: double.infinity,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) =>
+                                              errorBuilder: (context, error,
+                                                      stackTrace) =>
                                                   const Icon(Icons.error),
                                             ),
                                           ),
                                         ),
                                         SizedBox(height: 8),
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                          padding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 8.0),
                                           child: Text(
-                                            item.itemTitle ?? 'Unnamed Item',
+                                            item.itemTitle ??
+                                                'Unnamed Item',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                overflow: TextOverflow.ellipsis),
+                                                overflow:
+                                                    TextOverflow.ellipsis),
                                             maxLines: 1,
                                           ),
                                         ),
                                         Text(
                                           "₹ ${item.price}",
                                           textAlign: TextAlign.center,
-                                          style: const TextStyle(color: Colors.blueAccent),
+                                          style: const TextStyle(
+                                              color: Colors.blueAccent),
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.all(5.0),
@@ -266,6 +289,89 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget buildSubcategoryShimmer() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: 6, // Number of shimmer items to display
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Container(
+                  width: double.infinity,
+                  height: 100,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 5),
+              Container(
+                width: double.infinity,
+                height: 16,
+                color: Colors.white,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildItemsShimmer() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: 6, // Number of shimmer items to display
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Column(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Container(
+                    width: double.infinity,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                height: 16,
+                color: Colors.white,
+              ),
+              SizedBox(height: 5),
+              Container(
+                width: double.infinity,
+                height: 16,
+                color: Colors.white,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

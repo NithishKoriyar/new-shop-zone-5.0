@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:shopzone/user/normalUser/searchScreen/searchitem_ui_design_widget.dart';
+import 'package:shimmer/shimmer.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -26,6 +27,7 @@ class _SearchScreenState extends State<SearchScreen> {
   List<String> searchHistory = [];
   List<Items> searchItems = [];
   List<Brands> searchBrands = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -47,6 +49,10 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<Map<String, dynamic>> initializeSearching(String searchTerm) async {
+    setState(() {
+      _isLoading = true;
+    });
+    
     final response =
         await http.get(Uri.parse("${API.searchStores}?searchTerm=$searchTerm"));
 
@@ -59,6 +65,7 @@ class _SearchScreenState extends State<SearchScreen> {
         searchBrands = (data['brands'] as List)
             .map((brand) => Brands.fromJson(brand))
             .toList();
+        _isLoading = false;
       });
       return data;
     } else {
@@ -67,6 +74,10 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<Map<String, dynamic>> searchByImage(XFile image) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     var request = http.MultipartRequest('POST',
         Uri.parse(API.searchStores)); // Ensure you have an endpoint for this
     request.files.add(await http.MultipartFile.fromPath('image', image.path));
@@ -83,6 +94,7 @@ class _SearchScreenState extends State<SearchScreen> {
         searchBrands = (data['brands'] as List)
             .map((brand) => Brands.fromJson(brand))
             .toList();
+        _isLoading = false;
       });
       return data;
     } else {
@@ -201,8 +213,8 @@ class _SearchScreenState extends State<SearchScreen> {
       body: FutureBuilder(
         future: searchResults,
         builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+          if (snapshot.connectionState == ConnectionState.waiting || _isLoading) {
+            return _buildShimmerLoading();
           } else if (snapshot.hasError) {
             return Center(child: NoConnectionPage());
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -210,11 +222,11 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                   Image.asset(
-                      'images/no_results.png', // Your image asset path
-                      height: 150.0,
-                      width: 150.0,
-                    ), // Ensure you have this image in your assets
+                  Image.asset(
+                    'images/no_results.png', // Your image asset path
+                    height: 150.0,
+                    width: 150.0,
+                  ), // Ensure you have this image in your assets
                   SizedBox(height: 20),
                   Text(
                     "Sorry, no results found!",
@@ -331,6 +343,71 @@ class _SearchScreenState extends State<SearchScreen> {
             );
           }
         },
+      ),
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Column(
+                children: [
+                  Container(
+                    height: 150,
+                    color: Colors.white,
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    height: 150,
+                    color: Colors.white,
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    height: 150,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              "Loading Items...",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3, // 3 columns
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+              childAspectRatio: 0.75, // Adjust the aspect ratio as needed
+            ),
+            itemCount: 6, // Show 6 shimmer items as placeholders
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  color: Colors.white,
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

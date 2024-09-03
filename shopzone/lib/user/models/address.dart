@@ -1,5 +1,4 @@
-class Address
-{
+class Address {
   String? uid;
   String? name;
   String? phoneNumber;
@@ -8,7 +7,7 @@ class Address
   String? city;
   String? stateCountry;
   String? completeAddress;
-
+ 
 
   Address({
     this.uid,
@@ -19,10 +18,10 @@ class Address
     this.city,
     this.stateCountry,
     this.completeAddress,
+
   });
 
-  Address.fromJson(Map<String, dynamic> json)
-  {
+  Address.fromJson(Map<String, dynamic> json) {
     uid = json["uid"];
     name = json['name'];
     phoneNumber = json['phoneNumber'];
@@ -31,5 +30,6 @@ class Address
     city = json['city'];
     stateCountry = json['stateCountry'];
     completeAddress = json['completeAddress'];
+   
   }
 }

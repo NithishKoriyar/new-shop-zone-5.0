@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'package:shopzone/api_key.dart';
 import 'package:shopzone/notification_service.dart';
@@ -19,7 +19,6 @@ import 'package:shopzone/user/normalUser/itemsScreens/items_details_screen.dart'
 import 'package:shopzone/user/normalUser/itemsScreens/items_screen.dart';
 import 'package:shopzone/user/normalUser/push_notifications/push_notifications_system.dart';
 import 'package:shopzone/user/normalUser/searchScreen/search_screen.dart';
-
 import 'package:shopzone/user/normalUser/subCetogoryScreens/SubcategoryScreen.dart';
 import 'package:shopzone/user/normalUser/subCetogoryScreens/categoryScreen.dart';
 import 'package:shopzone/user/normalUser/wishlist/wishlist_screen.dart';
@@ -27,7 +26,6 @@ import 'package:shopzone/user/normalUser/widgets/my_drawer.dart';
 import 'package:shopzone/user/splashScreen/blocked_screen.dart';
 import 'package:shopzone/user/splashScreen/my_splash_screen.dart';
 import 'package:shopzone/user/userPreferences/current_user.dart';
-import 'package:shopzone/user/userPreferences/user_preferences.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 class ShopScreen extends StatefulWidget {
@@ -36,6 +34,11 @@ class ShopScreen extends StatefulWidget {
 }
 
 class _ShopScreenState extends State<ShopScreen> {
+  final ScrollController _scrollController = ScrollController();
+  List<Items> itemsList = [];
+  bool isLoadingMore = false;
+  int itemsLoaded = 6;
+
   List<dynamic> categories = [];
   final CurrentUser currentUserController = Get.put(CurrentUser());
   late String userID;
@@ -54,12 +57,18 @@ class _ShopScreenState extends State<ShopScreen> {
     currentUserController.getUserInfo().then((_) {
       setUserInfo();
       printUserInfo();
-      // Once the seller info is set, call setState to trigger a rebuild.
       setState(() {});
     });
     restrictBlockedUsersFromUsingUsersApp();
-    getSellersStream();
-    getCategoryStream();
+
+    _scrollController.addListener(_onScroll);
+    fetchInitialItems(); // Initial fetch
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void setUserInfo() {
@@ -89,7 +98,6 @@ class _ShopScreenState extends State<ShopScreen> {
           if (resBody['success'] == true) {
             if (resBody['status'] == 'approved') {
               // User is approved
-              // Add your logic here if needed
             } else {
               // User is blocked
               print("blocked user-------------------");
@@ -116,12 +124,71 @@ class _ShopScreenState extends State<ShopScreen> {
     }
   }
 
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent &&
+        !isLoadingMore) {
+      loadMoreItems(); // Fetch more items when scrolled to bottom
+    }
+  }
+
+  Future<void> fetchInitialItems() async {
+    try {
+      // Fetch the first 6 items
+      final response = await http.post(
+        Uri.parse(API.displayItems),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'user_id': userID, 'limit': itemsLoaded}),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          itemsList = data.map((itemData) => Items.fromJson(itemData)).toList();
+        });
+      }
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  Future<void> loadMoreItems() async {
+    setState(() {
+      isLoadingMore = true;
+    });
+
+    try {
+      // Load next set of items
+      final response = await http.post(
+        Uri.parse(API.displayItems),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'user_id': userID,
+          'limit': itemsLoaded,
+          'offset': itemsList.length
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          itemsList.addAll(
+              data.map((itemData) => Items.fromJson(itemData)).toList());
+          isLoadingMore = false;
+        });
+      }
+    } catch (e) {
+      // Handle error
+      setState(() {
+        isLoadingMore = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Set the user information
-
     return Scaffold(
-      backgroundColor: Colors.white10,
+      backgroundColor: Colors.white,
       drawer: MyDrawer(),
       appBar: AppBar(
         elevation: 20,
@@ -137,8 +204,8 @@ class _ShopScreenState extends State<ShopScreen> {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (c) => SearchScreen()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (c) => SearchScreen()));
             },
           ),
           IconButton(
@@ -155,16 +222,16 @@ class _ShopScreenState extends State<ShopScreen> {
             icon: Icon(Icons.shopping_cart),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (c) => CartScreenUser()));
-              // Handle cart action
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (c) => CartScreenUser()));
             },
           ),
         ],
       ),
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
-          //...........
+          // Search Box
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -187,23 +254,15 @@ class _ShopScreenState extends State<ShopScreen> {
                       filled: true,
                       fillColor: Colors.blue[50],
                       contentPadding: EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 20), // Adjust the padding here
+                          vertical: 10, horizontal: 20),
                     ),
-                    onSubmitted: (String query) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SearchScreen()),
-                      );
-                    },
                   ),
                 ),
               ),
             ),
           ),
 
-          //..........................
-          //image slider
+          // Image Slider
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -289,6 +348,7 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
           ),
 
+          // Category Section
           SliverPadding(
             padding: EdgeInsets.all(1),
             sliver: SliverToBoxAdapter(
@@ -303,7 +363,6 @@ class _ShopScreenState extends State<ShopScreen> {
                     ),
                     InkWell(
                       onTap: () {
-                        //Navigate to the screen that shows all categories
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -321,21 +380,16 @@ class _ShopScreenState extends State<ShopScreen> {
               ),
             ),
           ),
-          //displyaing categories section
           StreamBuilder<List<ShopCategory>>(
             stream: getCategoryStream(),
             builder: (context, AsyncSnapshot<List<ShopCategory>> dataSnapshot) {
               if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                return SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
+                return buildCategoryShimmer();
               } else if (dataSnapshot.hasData &&
                   dataSnapshot.data!.isNotEmpty) {
                 return SliverToBoxAdapter(
                   child: Container(
-                    height: 150, // Set the height of the container
+                    height: 150,
                     padding: EdgeInsets.all(5),
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
@@ -357,17 +411,16 @@ class _ShopScreenState extends State<ShopScreen> {
                           },
                           child: Container(
                             margin: EdgeInsets.symmetric(horizontal: 15),
-                            width: 80, // Set the width for each seller's widget
+                            width: 80,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Container(
-                                  width: 100, // Diameter of the circle
-                                  height: 100, // Diameter of the circle
+                                  width: 100,
+                                  height: 100,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors
-                                        .white, // Background color of the circle
+                                    color: Colors.white,
                                     boxShadow: [
                                       BoxShadow(
                                         color: Color.fromARGB(255, 69, 69, 69)
@@ -378,8 +431,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                       ),
                                     ],
                                   ),
-                                  padding: EdgeInsets.all(
-                                      5), // Padding for the circle
+                                  padding: EdgeInsets.all(5),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
@@ -416,7 +468,7 @@ class _ShopScreenState extends State<ShopScreen> {
             },
           ),
 
-//................................
+          // Top Sellers Section
           SliverPadding(
             padding: EdgeInsets.all(1),
             sliver: SliverToBoxAdapter(
@@ -427,22 +479,16 @@ class _ShopScreenState extends State<ShopScreen> {
               )),
             ),
           ),
-
-          ///...............circes in shop name
           StreamBuilder<List<Sellers>>(
             stream: getSellersStream(),
             builder: (context, AsyncSnapshot<List<Sellers>> dataSnapshot) {
               if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                return SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
+                return buildSellersShimmer();
               } else if (dataSnapshot.hasData &&
                   dataSnapshot.data!.isNotEmpty) {
                 return SliverToBoxAdapter(
                   child: Container(
-                    height: 150, // Set the height of the container
+                    height: 150,
                     padding: EdgeInsets.all(5),
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
@@ -451,7 +497,6 @@ class _ShopScreenState extends State<ShopScreen> {
                         Sellers model = dataSnapshot.data![index];
                         return InkWell(
                           onTap: () {
-                            // Perform your action on tap!
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -460,21 +505,19 @@ class _ShopScreenState extends State<ShopScreen> {
                                 ),
                               ),
                             );
-                            // You can navigate to a new page or display a dialog, etc.
                           },
                           child: Container(
                             margin: EdgeInsets.symmetric(horizontal: 15),
-                            width: 80, // Set the width for each seller's widget
+                            width: 80,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Container(
-                                  width: 100, // Diameter of the circle
-                                  height: 100, // Diameter of the circle
+                                  width: 100,
+                                  height: 100,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors
-                                        .white, // Background color of the circle
+                                    color: Colors.white,
                                     boxShadow: [
                                       BoxShadow(
                                         color: Color.fromARGB(255, 69, 69, 69)
@@ -485,8 +528,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                       ),
                                     ],
                                   ),
-                                  padding: EdgeInsets.all(
-                                      5), // Padding for the circle
+                                  padding: EdgeInsets.all(5),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
@@ -506,7 +548,6 @@ class _ShopScreenState extends State<ShopScreen> {
                                   maxLines: 1,
                                 ),
                                 SmoothStarRating(
-                                  // ignore: unnecessary_null_comparison
                                   rating: model.rating == null
                                       ? 0.0
                                       : double.parse(model.rating.toString()),
@@ -533,6 +574,7 @@ class _ShopScreenState extends State<ShopScreen> {
             },
           ),
 
+          // Top Brands Section
           const SliverPadding(
             padding: EdgeInsets.all(1),
             sliver: SliverToBoxAdapter(
@@ -541,27 +583,20 @@ class _ShopScreenState extends State<ShopScreen> {
                       Text('Top Brands', style: TextStyle(color: Colors.grey))),
             ),
           ),
-
-          ///...............displying 16 brand products
-
           StreamBuilder<List<Brands>>(
             stream: getBrandStream(),
             builder: (context, AsyncSnapshot<List<Brands>> dataSnapshot) {
               if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                return const SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
+                return buildBrandsShimmer();
               } else if (dataSnapshot.hasData &&
                   dataSnapshot.data!.isNotEmpty) {
                 return SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4, // Number of columns
-                    childAspectRatio:
-                        0.75, // Ratio of the width to the height of each cell
-                    crossAxisSpacing: 10, // Horizontal space between cells
-                    mainAxisSpacing: 10, // Vertical space between cells
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    childAspectRatio: 0.75,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -581,12 +616,9 @@ class _ShopScreenState extends State<ShopScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                width:
-                                    70, // You might need to adjust this based on your padding
-                                height:
-                                    70, // Same as above, adjust if necessary
-                                padding: EdgeInsets.all(
-                                    5), // Adjust the padding value as needed
+                                width: 70,
+                                height: 70,
+                                padding: EdgeInsets.all(5),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                   color: Colors.white,
@@ -612,9 +644,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
-                                  height:
-                                      5), // Space between the image and the text
+                              SizedBox(height: 5),
                               Text(
                                 model.brandTitle.toString(),
                                 style: TextStyle(fontSize: 12),
@@ -640,22 +670,20 @@ class _ShopScreenState extends State<ShopScreen> {
             },
           ),
 
-// Wishlist Section
+          // Wishlist Section
           SliverPadding(
-            padding:
-                EdgeInsets.all(8.0), // Increased padding for overall spacing
+            padding: EdgeInsets.all(8.0),
             sliver: SliverToBoxAdapter(
               child: Center(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min, // Use min size to fit content
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(
                       'Recently Shortlisted by You',
                       style: TextStyle(
-                        fontSize: 20.0, // Larger font size for the header
-                        fontWeight: FontWeight.bold, // Bold font weight
-                        color: Color(
-                            0xFF757575), // Dark grey, equivalent to grey[600]
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF757575),
                       ),
                     ),
                     Row(
@@ -664,14 +692,11 @@ class _ShopScreenState extends State<ShopScreen> {
                         Text(
                           'Picked from your Wishlist',
                           style: TextStyle(
-                            fontSize: 16.0, // Slightly smaller font size
-                            color: Color(
-                                0xFF9E9E9E), // Light grey, equivalent to grey[500]
+                            fontSize: 16.0,
+                            color: Color(0xFF9E9E9E),
                           ),
                         ),
-                        SizedBox(
-                            width:
-                                8.0), // Add some spacing between text and icon
+                        SizedBox(width: 8.0),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -688,7 +713,7 @@ class _ShopScreenState extends State<ShopScreen> {
                             child: Icon(
                               Icons.arrow_forward,
                               color: Colors.white,
-                              size: 16.0, // Adjust icon size as needed
+                              size: 16.0,
                             ),
                           ),
                         ),
@@ -699,16 +724,11 @@ class _ShopScreenState extends State<ShopScreen> {
               ),
             ),
           ),
-
           StreamBuilder<List<Items>>(
             stream: getWishListItemsStream(userID),
             builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
               if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                return const SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
+                return buildWishlistShimmer();
               } else if (dataSnapshot.hasData &&
                   dataSnapshot.data!.isNotEmpty) {
                 // Pick 3 random items from the wishlist
@@ -718,17 +738,15 @@ class _ShopScreenState extends State<ShopScreen> {
                 return SliverToBoxAdapter(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(
-                          255, 228, 244, 252), // Ash grey background color
+                      color: Color.fromARGB(255, 228, 244, 252),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black26, // Shadow color
-                          blurRadius: 10.0, // Shadow blur radius
-                          offset: Offset(0, 4), // Shadow offset
+                          color: Colors.black26,
+                          blurRadius: 10.0,
+                          offset: Offset(0, 4),
                         ),
                       ],
-                      borderRadius: BorderRadius.circular(
-                          8.0), // Optional: Rounded corners
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
                     padding: EdgeInsets.all(5),
                     child: Column(
@@ -752,8 +770,8 @@ class _ShopScreenState extends State<ShopScreen> {
                             children: [
                               Text(
                                 item.itemInfo ?? '',
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                               ),
@@ -770,7 +788,8 @@ class _ShopScreenState extends State<ShopScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (c) => ItemsDetailsScreen(model: item),
+                                builder: (c) =>
+                                    ItemsDetailsScreen(model: item),
                               ),
                             );
                           },
@@ -790,167 +809,299 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
 
           // Items Section
-          ///items---------------------------------------------------------------
           const SliverPadding(
-            padding: EdgeInsets.all(1),
+            padding: EdgeInsets.all(10),
             sliver: SliverToBoxAdapter(
               child: Center(
                   child: Text('ExploreItems',
                       style: TextStyle(color: Colors.grey))),
             ),
           ),
+        SliverGrid(
+  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 2, // 2 columns in the grid
+    childAspectRatio: 0.75, // Adjust this ratio based on your design
+    crossAxisSpacing: 5, // Space between columns
+    mainAxisSpacing: 5, // Space between rows
+  ),
+  delegate: SliverChildBuilderDelegate(
+    (context, index) {
+      if (index < itemsList.length) {
+        Items model = itemsList[index];
+        return buildItemCard(model); // Method to build your item widget
+      } else if (isLoadingMore) {
+        return Center(child: CircularProgressIndicator()); // Show loading indicator while loading more items
+      } else {
+        return Container(); // Return an empty container if no more items
+      }
+    },
+    childCount: itemsList.length + (isLoadingMore ? 1 : 0),
+  ),
+),
 
-          StreamBuilder<List<Items>>(
-            stream: getItemStream(userID),
-            builder: (context, AsyncSnapshot<List<Items>> dataSnapshot) {
-              if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                return SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              } else if (dataSnapshot.hasData &&
-                  dataSnapshot.data!.isNotEmpty) {
-                return SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      Items model = dataSnapshot.data![index];
-                      String? thumbnailUrl = model.thumbnailUrl;
-
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (c) => ItemsDetailsScreen(model: model),
-                            ),
-                          );
-                        },
-                        child: Stack(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color.fromARGB(255, 233, 230, 230),
-                                    spreadRadius: 0.1,
-                                    blurRadius: 5,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 170,
-                                    height: 160,
-                                    padding: EdgeInsets.all(8),
-                                    child: thumbnailUrl != null
-                                        ? Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  API.getItemsImage +
-                                                      thumbnailUrl,
-                                                ),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          )
-                                        : Container(),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    model.itemTitle.toString(),
-                                    style: TextStyle(fontSize: 15),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    maxLines: 1,
-                                  ),
-                                  Text(
-                                    model.itemInfo.toString(),
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    maxLines: 1,
-                                  ),
-                                  Text(
-                                    "₹ ${model.price.toString()}",
-                                    style: TextStyle(
-                                        fontSize: 15, color: Colors.green),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Heart-shaped wishlist icon
-                            Positioned(
-                              top: 0.7,
-                              right: 7,
-                              child: GestureDetector(
-                                onTap: () {
-                                  // Toggle the wishlist state
-                                  print(model.isWishListed);
-                                  toggleWishlist(model, userID);
-                                },
-                                child: Container(
-                                  child: Icon(
-                                    model.isWishListed == "1"
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
-                                    color: model.isWishListed == "1"
-                                        ? Colors.red
-                                        : Colors.red,
-                                    size: 28,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    childCount: dataSnapshot.data!.length,
-                  ),
-                );
-              } else {
-                return SliverToBoxAdapter(
-                  child: Center(
-                    child: Text("No Items Data exists."),
-                  ),
-                );
-              }
-            },
-          )
         ],
       ),
     );
   }
 
-  Future<List<String>> fetchImages() async {
-    final response = await http.get(Uri.parse(API.imageSlider));
+ Widget buildItemCard(Items model) {
+  return InkWell(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (c) => ItemsDetailsScreen(model: model),
+        ),
+      );
+    },
+    child: Stack(
+      children: [
+        Container(
+          margin: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(255, 233, 230, 230),
+                spreadRadius: 0.1,
+                blurRadius: 5,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: double.infinity,
+                height: 160,
+                padding: EdgeInsets.all(8),
+                child: model.thumbnailUrl != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(5),
+                        child: Image.network(
+                          API.getItemsImage + model.thumbnailUrl!,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Container(),
+              ),
+              SizedBox(height: 5),
+              Text(
+                model.itemTitle.toString(),
+                style: TextStyle(fontSize: 15),
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                maxLines: 1,
+              ),
+              Text(
+                model.itemInfo.toString(),
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                maxLines: 1,
+              ),
+              Text(
+                "₹ ${model.price.toString()}",
+                style: TextStyle(fontSize: 15, color: Colors.green),
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                maxLines: 1,
+              ),
+            ],
+          ),
+        ),
+        Positioned(
+          top: 8,
+          right: 8, // Adjust these values to ensure the icon stays within the box
+          child: GestureDetector(
+            onTap: () {
+              toggleWishlist(model, userID);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white, // Optional: background color for better visibility
+              ),
+              padding: EdgeInsets.all(4), // Padding to increase the tap area
+              child: Icon(
+                model.isWishListed == "1"
+                    ? Icons.favorite
+                    : Icons.favorite_border,
+                color: model.isWishListed == "1" ? Colors.red : Colors.grey,
+                size: 24, // Adjust the size of the icon if needed
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
-    if (response.statusCode == 200) {
-      List<dynamic> imagesJson = jsonDecode(response.body);
-      return imagesJson.map((image) => image.toString()).toList();
-    } else {
-      throw Exception('Failed to load images');
-    }
+
+  Widget buildCategoryShimmer() {
+    return SliverToBoxAdapter(
+      child: Container(
+        height: 150,
+        padding: EdgeInsets.all(5),
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: 6,
+          itemBuilder: (context, index) {
+            return Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 15),
+                width: 80,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      height: 10,
+                      width: 60,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget buildSellersShimmer() {
+    return SliverToBoxAdapter(
+      child: Container(
+        height: 150,
+        padding: EdgeInsets.all(5),
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: 6,
+          itemBuilder: (context, index) {
+            return Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 15),
+                width: 80,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      height: 10,
+                      width: 60,
+                      color: Colors.white,
+                    ),
+                    SizedBox(height: 5),
+                    Container(
+                      height: 10,
+                      width: 40,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget buildBrandsShimmer() {
+    return SliverGrid(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          return Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              margin: const EdgeInsets.all(5),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Container(
+                    height: 10,
+                    width: 60,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        childCount: 8,
+      ),
+    );
+  }
+
+  Widget buildWishlistShimmer() {
+    return SliverToBoxAdapter(
+      child: Container(
+        padding: EdgeInsets.all(5),
+        child: Column(
+          children: List.generate(3, (index) {
+            return Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: ListTile(
+                leading: Container(
+                  width: 50,
+                  height: 50,
+                  color: Colors.white,
+                ),
+                title: Container(
+                  height: 10,
+                  color: Colors.white,
+                ),
+                subtitle: Container(
+                  height: 10,
+                  color: Colors.white,
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
   }
 
   Stream<List<Sellers>> getSellersStream() async* {
@@ -967,26 +1118,6 @@ class _ShopScreenState extends State<ShopScreen> {
     }
   }
 
-  Stream<List<Items>> getItemStream(String userId) async* {
-    final response = await http.post(
-      Uri.parse(API.displayItems),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'user_id': userId,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      yield data.map((itemData) => Items.fromJson(itemData)).toList();
-    } else {
-      throw Exception('Failed to load items');
-    }
-  }
-
-// Fetch wishlist items
   Stream<List<Items>> getWishListItemsStream(String userId) async* {
     final response =
         await http.get(Uri.parse('${API.fetchWishListItems}?userID=$userId'));
@@ -999,7 +1130,6 @@ class _ShopScreenState extends State<ShopScreen> {
     }
   }
 
-  // Displaying 16 brands
   Stream<List<Brands>> getBrandStream() async* {
     final response = await http.get(Uri.parse(API.display16Brands));
     if (response.statusCode == 200) {
@@ -1028,8 +1158,6 @@ class _ShopScreenState extends State<ShopScreen> {
     setState(() {
       model.isWishListed = (model.isWishListed == "1" ? "0" : "1").toString();
     });
-    // Emit a new event to the stream
-    // _wishlistStreamController.add(wishListItems);
 
     updateWishlistInBackend(model, userId);
   }

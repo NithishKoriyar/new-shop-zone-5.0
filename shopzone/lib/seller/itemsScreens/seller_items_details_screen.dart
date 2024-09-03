@@ -198,6 +198,20 @@ class _ItemsDetailsScreenState extends State<ItemsDetailsScreen> {
                 ),
               ),
             ),
+             Center(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                "Selling Price: ₹ " + (widget.model!.sellingPrice ?? ''), // Display sellingPrice
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                  color: Colors.green,
+                ),
+              ),
+            ),
+          ),
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(10.0),

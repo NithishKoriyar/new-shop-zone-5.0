@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shopzone/user/models/orders.dart';
 import 'package:shopzone/user/normalUser/ordersScreens/address_design_widget.dart';
 
+import 'package:shopzone/user/normalUser/reviewscreen/reviews_screen.dart'; // Ensure you have the correct import path
+
 // ignore: must_be_immutable
 class OrderDetailsScreen extends StatefulWidget {
   Orders? model;
@@ -75,11 +77,20 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     thickness: 1,
                     color: Colors.pinkAccent,
                   ),
-                 AddressDesign(
-                  model: widget.model,
-                 )
-
-
+                  AddressDesign(
+                    model: widget.model,
+                  ),
+                  if (widget.model!.orderStatus == "ended") // Conditionally display this part
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: OutlinedButton(
+                        onPressed: () => navigateToReviews(context),
+                        child: Text("Do you want to rate this product?"),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.pinkAccent),
+                        ),
+                      ),
+                    ),
                 ],
               )
             : const Center(
@@ -90,4 +101,23 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
       ),
     );
   }
+
+void navigateToReviews(BuildContext context) {
+  if (widget.model != null && widget.model!.sellerUID != null && widget.model!.userID != null) {
+    // Since sellerUID and userID are checked for null, they can be safely cast to non-nullable.
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => ReviewsScreen(sellerUID: widget.model!.sellerUID.toString(), userID: widget.model!.userID.toString())
+    //   )
+    // );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Invalid or missing seller or user ID')),
+    );
+  }
+}
+
+
+
 }
